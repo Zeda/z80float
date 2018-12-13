@@ -1,0 +1,158 @@
+    ld (ptr_r),de
+    ld (ptr_s),hl
+    ld bc,var_e
+    ld a,(de) \ sub (hl) \ ld (bc),a \ inc hl \ inc de \ inc bc     ;\
+    ld a,(de) \ sbc a,(hl) \ ld (bc),a \ inc hl \ inc de \ inc bc   ; |e=s-r
+    ld a,(de) \ sbc a,(hl) \ ld (bc),a \ inc hl \ inc de \ inc bc   ; |
+    ld a,(de) \ sbc a,(hl) \ ld (bc),a                              ;/
+    call c,neg_e
+    ld a,1
+    jp p,loop0
+    push af
+    ld hl,(ptr_s)   ;\
+    inc hl \ inc hl ; |s=s/2
+    inc hl          ; |
+    xor a \  rr (hl); |
+    dec hl \ rr (hl); |
+    dec hl \ rr (hl); |
+    dec hl \ rr (hl);/
+    call sub_e
+    push af
+    ld hl,(ptr_r)   ;\
+    sla (hl) \ inc hl;|r=2r
+    rl (hl) \ inc hl; |
+    rl (hl) \ inc hl; |
+    rl (hl)         ;/
+    pop af
+    add a,a
+    call c,neg_e
+    pop af
+loop0:
+    ld hl,var_e     ;\
+    sla (hl) \ inc hl;|e=2e
+    rl (hl) \ inc hl; |
+    rl (hl) \ inc hl; |
+    rl (hl)         ;/
+    call m,geomean_sub
+    inc a
+    cp 16
+    jr nz,loop0
+    ld hl,(ptr_s)
+    ld bc,(ptr_r)
+    ld de,var_e
+    ld a,(bc) \ add a,(hl) \ ld (de),a \ inc hl \ inc de \ inc bc
+    ld a,(bc) \ add a,(hl) \ ld (de),a \ inc hl \ inc de \ inc bc
+    ld a,(bc) \ add a,(hl) \ ld (de),a \ inc hl \ inc de \ inc bc
+    ld a,(bc) \ add a,(hl) \ ld (de),a \ ex de,hl
+    ex de,hl \ rr (hl)  ;
+    dec hl \ rr (hl)    ;
+    dec hl \ rr (hl)    ;
+    dec hl \ rr (hl)    ;
+    ret
+neg_e:
+    xor a
+    ld hl,var_e
+    ld c,a \ sbc a,(hl) \ ld (hl),a \ inc hl
+    ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+    ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+    ld a,c \ sbc a,(hl) \ ld (hl),a
+    ld hl,(ptr_s)   ;\
+    ld bc,(ptr_r)   ; |ex(r,s)
+    ld (ptr_r),hl   ; |
+    ld (ptr_s),bc   ;/
+    ret
+sub_e:
+;;e=e-s-r
+    ld de,var_e
+    ld hl,(ptr_s)
+    xor a
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ sbc a,a \ ld b,a
+    ld de,var_e
+    ld hl,(ptr_r)
+    xor a
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld c,a \ ld a,(de) \ sbc a,(hl) \ ld (de),a \ ld a,b \ sbc a,c
+    ret
+add:
+;;Adds temp to (hl)
+    push af
+    push hl
+    ld de,var_temp
+    ld a,(de) \ add a,(hl) \ ld (hl),a \ inc hl \ inc de
+    ld a,(de) \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
+    ld a,(de) \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
+    ld a,(de) \ adc a,(hl) \ ld (hl),a
+    pop hl
+    pop af
+    ret
+sub:
+    push af
+    push hl
+    ld de,var_temp
+    ex de,hl
+    ld a,(de) \ sub (hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a    
+    pop hl
+    pop af
+    ret
+geomean_sub:
+    push af
+    ld hl,(ptr_s)
+    call rshift
+    call sub      ;s-=temp
+;subtract result from s
+    add a,a
+    cp 32
+    jr nc,$+13
+    call rshift
+    call add      ;s+=temp
+    add a,a
+    cp 32
+    jr c,$-9
+    call sub_e
+    pop hl
+    ld a,h
+    push af
+    ld hl,(ptr_r)
+    call rshift
+    call add
+    ld d,a
+    pop af
+    call c,neg_e
+    ld a,d
+    ret
+rshift:
+    push hl
+    push af
+    ld de,var_temp
+    ld bc,0508h
+    dec b \ sub c \ inc hl \ jr nc,$-3 \ add a,c \ ld c,a
+;c is the number of shifts
+;b is number of bytes to shift
+    jr z,pad
+    ld a,b
+    push hl
+    or a
+    dec hl
+    rr (hl)
+    djnz $-3
+    ld b,a
+    dec c
+    pop hl
+    jr nz,$-10
+pad:
+    ld a,4
+    sub b
+    ld b,a
+    jr z,$+6
+    ld (hl),c \ inc hl \ djnz,$-2
+    pop hl
+    pop af
+    ret

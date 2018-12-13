@@ -1,0 +1,79 @@
+xadd:
+;Input:
+;  HL points to one number
+;  DE points to another
+
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop hl
+  push de
+  ex de,hl
+  ld hl,var_z+8
+  call mov8
+  ex de,hl
+  pop de
+  ld (hl),e
+  inc hl
+  ld (hl),d
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+;copy the inputs to fpOP2 and fpOP3, leaving fpOP1 open for shifting
+  push de
+  ld de,fpOP2
+  call mov10
+  pop hl
+  call mov10
+	ld hl,(fpOP2+8)
+	ld de,(fpOP3+8)
+  ld a,h
+  xor d
+  ld b,a
+  ld a,h
+  or l
+  jr z,caseadd
+  ld a,d
+  or e
+  jr z,caseadd1
+; Now make sure fpOP3 has the bigger exponent
+  res 7,h
+  res 7,d
+  sbc hl,de
+  jr nc,+_
+  xor a
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
+  ld h,a
+  push hl
+  call swapfpOP2fpOP3   ;need to swap fpOP2 and fpOP3
+  pop hl
+_:
+  ld a,h
+  or a
+  ret nz
+  ld a,l
+  cp 66
+  ret nc
+
+
+
+caseadd:
+;zero+x => x for all x
+;NaN +x => NaN for all x
+;inf-inf=> NaN
+;inf +x => inf, x != inf
+  ret
+caseadd1:
+;x+zero => x
+;x+inf  => inf
+;x+NaN  => NaN
+  ret

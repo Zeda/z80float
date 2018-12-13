@@ -1,0 +1,44 @@
+start_const:
+const_pi:     .db $DB,$0F,$49,$81
+const_e:      .db $54,$f8,$2d,$81
+const_pi_div_ln2:   .db $18,$09,$11,$82
+const_lg_e:   .db $3b,$AA,$38,$80
+const_ln_2:   .db $18,$72,$31,$7f
+const_log2:   .db $9b,$20,$1a,$7e
+const_lg10:   .db $78,$9a,$54,$81
+const_0:      .db $00,$00,$00,$00
+const_1:      .db $00,$00,$00,$80
+const_inf:    .db $00,$00,$40,$00
+const_NegInf: .db $00,$00,$C0,$00
+const_NAN:    .db $00,$00,$20,$00
+const_10:     .db $00,$00,$20,$83
+const_10_inv: .db $CD,$CC,$4C,$7C    ;roughly 0.1
+const_pi_inv: .db $83,$F9,$22,$7E
+const_e_inv:  .db $B2,$5A,$3C,$7E
+;    .db $,$,$,$
+end_const:
+iconstSingle:
+    ex (sp),hl
+    ld a,(hl)
+    inc hl
+    ex (sp),hl
+constSingle:
+;A is the constant ID#
+;returns nc if failed, c otherwise
+;HL points to the constant
+    cp (end_const-start_const)>>2
+    ret nc
+    ld hl,start_const
+    add a,a
+    add a,a
+    add a,l
+    ld l,a
+#if ((end_const-4)>>8)!=(start_const>>8)
+    ccf
+    ret c
+    inc h
+#endif
+    scf
+    ret
+
+

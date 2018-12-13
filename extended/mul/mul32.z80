@@ -1,0 +1,112 @@
+
+mul32:
+;max: 724cc  + 3*mul16
+;min: 676cc  + 3*mul16
+;avg: 694.25cc+3*mul16
+;2389.652cc
+;DEHL * BCIX
+  push de
+  push bc
+  push hl
+  push ix
+  call mul16  ;DEHL
+  ld (z2_32),hl
+  ld (z2_32+2),de
+  
+  pop de
+  pop bc
+  push bc
+  push de
+  call mul16  ;DEHL
+  ld (z0_32),hl
+  ld (z0_32+2),de
+  
+  pop de    ;low word
+  pop bc    ;low word
+  pop hl
+  xor a
+  sbc hl,de
+  jr nc,+_
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
+  ld h,a
+  xor a
+  inc a
+_:
+  ex de,hl
+  pop hl
+  sbc hl,bc
+  jr nc,+_
+  ld b,a
+  xor a
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
+  ld h,a
+  ld a,b
+  inc a
+_:
+  ld b,h
+  ld c,l
+  push af
+  call mul16
+  pop af    ;holds the sign in the low bit
+  rra
+  jr c,mul32_add
+;need to perform z0+z2-result
+  push de
+  push hl
+  xor a
+  ld hl,(z0_32)
+  ld bc,(z2_32)
+  add hl,bc
+  ex de,hl
+  ld hl,(z0_32+2)
+  ld bc,(z2_32+2)
+  adc hl,bc
+  rla
+;now need to subtract
+  ex de,hl
+  pop bc
+  sbc hl,bc
+  ex de,hl
+  pop bc
+  sbc hl,bc
+  sbc a,0
+;A:HL:DE is the result, need to add to z0_32+2
+mul32_final:
+  ld bc,(z0_32+2)
+  ex de,hl
+  add hl,bc
+  ld (z0_32+2),hl
+  ld hl,(z2_32)
+  adc hl,de
+  ld (z2_32),hl
+  ld hl,z2_32+2
+  adc a,(hl)
+  ld (hl),a
+  ret nc
+  inc hl
+  inc (hl)
+  ret
+mul32_add:
+;add to the current result
+  xor a
+  ld bc,(z0_32)
+  add hl,bc
+  ex de,hl
+  ld bc,(z0_32+2)
+  adc hl,bc
+  rla
+  ex de,hl
+  ld bc,(z2_32)
+  add hl,bc
+  ex de,hl
+  ld bc,(z2_32+2)
+  adc hl,bc
+  adc a,0
+  jp mul32_final
+.echo "  mul32: +",$-mul32

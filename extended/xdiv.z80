@@ -1,0 +1,126 @@
+#define var_q fpOP1
+#define var_x fpOP2
+#define var_n fpOP3
+xdiv:
+;avg: 11107.37035cc+29
+  push hl
+  push de
+  push bc
+  push af
+  push ix
+  push bc
+  call +_
+  ex (sp),hl
+  ex de,hl
+  ld hl,var_q
+  call mov8
+  ex de,hl
+  pop de
+  ld (hl),e
+  inc hl
+  ld (hl),d
+  pop ix
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  push hl
+  ex de,hl
+  ld de,fpOP2
+  call mov10
+  pop hl
+  call mov10
+	ld hl,(fpOP3+8)
+	ld de,(fpOP2+8)
+	ld a,h
+	xor d
+  ld b,a
+	res 7,d
+	res 7,h
+	ld a,h \ or l \ jp z,casediv
+	ld a,d \ or e \ jp z,casediv2
+  ld a,b
+  ld bc,$3FFF
+  add hl,bc
+  sbc hl,de
+  jp z,div_zero
+  jp c,div_zero
+  jp m,div_inf
+  add a,a
+  jr nc,+_
+  set 7,h
+_:
+  ;HL is the new exponent
+  push hl
+;Need to verify that mantissa var_n<var_x
+  ld de,var_n+7
+  ld hl,var_x+7
+  call cmp64
+  jr c,+_
+  pop hl
+  inc l
+  jr nz,$+5
+  inc h
+  jr z,div_zero
+  push hl
+  ld hl,var_n+7
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+_:
+  call div64
+  pop hl
+  ret
+div_zero:
+  xor a
+  ld (fpOP1+7),a
+  ld h,a
+  ld l,a
+  ret
+div_inf:
+  xor a
+  ld h,a
+  ld l,a
+  dec a
+  ld (fpOP1+7),a
+  ret
+casediv:
+;0/x
+;inf/x
+;NaN/x
+  ld hl,(fpOP2+8)
+  ld a,h
+  or l
+  jr z,+_
+  ld hl,fpOP3
+  ld de,fpOP1
+  call mov8
+  ld hl,0
+  ret
+_:
+
+  ret
+casediv2:
+;x/0   -> NaN
+;x/inf -> 0
+;x/NaN -> NaN
+  ld a,(fpOP2+7)
+  rla
+  jr c,div_inf
+  rla
+  jr nc,div_zero
+div_NaN:
+  ld hl,0
+  ld a,$40
+  ld (fpOP1+7),a
+  ret
+.echo "xdiv: ",$-xdiv
+#include "div/div64.z80"
+#include "div/div32.z80"

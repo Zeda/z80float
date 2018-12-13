@@ -1,0 +1,9 @@
+ti2single:
+;;converts a TI-float to a single precision float.
+;;HL points to the input float.
+;;BC points to the output.
+
+;;
+;;
+    ret
+.echo "ti2single:",$-ti2single

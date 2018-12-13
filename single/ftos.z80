@@ -1,0 +1,196 @@
+#define fpOP1 scrap+9
+#define fpOP2 scrap+13
+#define exp   scrap+17
+ftos:
+.echo "ftos does not take care of special cases!"
+  push hl
+  push de
+  push bc
+  push af
+  call +_
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  call tofpOP2
+  sub 128
+  push af   ;carry means we need to multiply by 10^x, nc means divide
+  jr nc,$+4
+  neg       ;CPL would cause possible values smaller than .1, requiring an additional check.
+  ld l,a
+  ld h,0
+  ld c,l
+  ld b,h
+  add hl,hl
+  add hl,hl
+  add hl,hl
+  add hl,bc
+  add hl,hl
+  add hl,bc
+  add hl,hl
+  add hl,hl
+  add hl,bc
+  ld a,h
+  ld (fpOP2+4),a ;this is the exponent
+#ifdef fast
+;10 bytes, 47cc
+  ld h,b
+  ld l,b
+  ld (fpOP1),hl
+  ld h,80h
+  ld (fpOP1+2),hl
+#else
+;6 bytes, 111cc
+  ld hl,const_1
+  call tofpOP1
+#endif
+  ld de,fpOP1
+  ld b,d
+  ld c,e
+  rra \ ld hl,pow10LUT \ call mulSingle
+  rra \ ld hl,pow10LUT+4 \ call mulSingle
+  rra \ ld hl,pow10LUT+8 \ call mulSingle
+  rra \ ld hl,pow10LUT+12 \ call mulSingle
+  rra \ ld hl,pow10LUT+16 \ call mulSingle
+  rra \ ld hl,pow10LUT+20 \ call mulSingle
+  pop af
+  ld hl,fpOP2
+  ld b,h
+  ld c,l
+  call nc,divSingle
+  call c,mulSingle
+  ld a,(fpOP2+2)
+  sub 80h
+  ld bc,scrap+4
+  jr c,+_
+  ld (fpOP2+2),a
+  ld a,'-'
+  ld (bc),a
+  inc bc
+_:
+  ld hl,fpOP2
+  call fpfix8_24
+  ld hl,exp
+  ld a,(scrap+3)
+  or a
+  jr nz,$+5
+  dec (hl)
+  jr +_
+  cp 10
+  jr c,+_
+  ld de,$0AFF   ;could do 0A2F, but need to add 30h anyways for other routine that is piggybacking
+  inc (hl)
+  inc e \ sub d \ jr nc,$-2
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld a,e
+_:
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld a,'.'
+  ld (bc),a
+  inc bc
+_:
+  call mul10_sub
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld hl,scrap
+  ld a,(hl)
+  inc hl
+  or (hl)
+  inc hl
+  or (hl)
+  inc hl
+  or (hl)
+  jr nz,-_
+  ld (bc),a
+  ret
+mul10_sub:
+;(scrap) is treated as an 8.24 fixed-point number
+;This multiplies the fractional part by 10.0, storing the result back in (scrap)
+;Returns a copy of the integer part in A
+  push bc
+  ld hl,(scrap)
+  ld b,h
+  ld c,l
+  ld de,(scrap+2)
+  xor a
+  add hl,hl
+  rl e
+  rla
+  add hl,hl
+  rl e
+  rla
+  ld d,a
+  add hl,bc
+  ld bc,(scrap+2)
+  ex de,hl
+  adc hl,bc
+  ex de,hl
+  add hl,hl
+  ld (scrap),hl
+  ex de,hl
+  adc hl,hl
+  ld (scrap+2),hl
+  ld a,h
+  pop bc
+  ret
+fpfix8_24:
+;convert the absolute value of the number at HL to 8.24 fixed point at scrap
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld a,(hl)
+  or 80h
+  inc hl
+  ld h,(hl)
+  ld l,a
+  ld a,h
+  sub 80h
+  ld h,a
+  jr c,+_
+_:
+;if we get here, it means we need to shift left a times
+  ex de,hl
+  inc d
+  xor a
+  add hl,hl \ rl e \ rla \ dec d \ jr nz,$-5
+  ld d,a
+  ld (scrap),hl \ ld (scrap+2),de
+  ret
+_:
+  inc h
+  jr z,+_
+  ld a,e
+  ld e,h
+  srl h \ rr l \ rr d \ rra \ inc e \ jr nz,$-8
+  ld e,a
+  jr nc,+_
+  inc e \ jr nz,+_
+  inc d \ jr nz,+_ \ inc hl
+_:
+  ld (scrap),de \ ld (scrap+2),hl
+  ret
+tofpOP1:
+  ld de,fpOP1
+  ldi
+  ldi
+  ldi
+  ldi
+  ret
+#undefine exp
+#undefine fpOP1
+#undefine fpOP2
+pow10LUT:
+.db $00,$00,$20,$83 ;10
+.db $00,$00,$48,$86 ;100
+.db $00,$40,$1c,$8d ;10000
+.db $20,$bc,$3e,$9a ;10^8
+.db $ca,$1b,$0e,$b5 ;10^16
+.db $ae,$c5,$1d,$ea ;10^32

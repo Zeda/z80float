@@ -1,0 +1,7 @@
+div32_16 is now 222cc faster
+sqrt32 is now 231.5cc faster on average
+div32 is now 513cc faster
+sqrt64 is now 869.384cc faster - 12.25-24.5
+xsqrt is now 869.384cc faster
+
+div32_16 is now 12.25cc slower

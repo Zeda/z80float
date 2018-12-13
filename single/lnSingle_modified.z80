@@ -1,0 +1,136 @@
+#define var_x       scrap+6 ;5 bytes
+#define var_xtmp    scrap+11;4 bytes
+#define var_c       scrap+15;5 bytes
+#define lnLUTptr    scrap+20;2 bytes
+lnSingle:
+    push hl
+    push de
+    push bc
+    push af
+    call +_
+    pop af
+    pop bc
+    pop de
+    pop hl
+    ret
+_:
+;;First we need to isolate 1-.5mantissa, which will be used as a 0.32 fixed point number called 'X'. Math ops will be much faster.
+    xor a
+    ld e,a \ sub (hl) \ ld d,a \ inc hl
+    ld a,e \ sbc a,(hl) \ ld c,(hl) \  inc hl
+    ld a,(hl) \ rla \ jp c,lncmplx
+    scf
+    rra
+    ld b,a
+    ld a,e \ sbc a,b \ ld b,a \ inc hl
+    
+    ld (var_x),de
+    ld (var_x+2),bc
+;;We need to get the exponent of the input, convert it to a signed int, and multiply this by ln(2) to get the starting value for 'C'.
+;;This will be an extra precision float (32-bit mantissa instead of 24).
+    ld a,(hl)
+    or a
+    jp z,lnSpecial  ;special cases for ln
+    sub 7Fh
+    push af
+    jr nc,$+4
+    neg
+    ld de,45426
+    ld bc,6136
+    call DEBC_Times_A
+    ld b,a
+    jr z,+_
+    ld b,88h
+    dec b \ add ix,ix \ adc hl,hl \ rla \ jr nc,$-6
+_:
+    ld c,a
+    pop af
+    ld a,ixh
+    rr c \ rr h \ rr l \ rra
+    ld (var_c),a
+    ld (var_c+1),hl
+    ld (var_c+3),bc
+;;Now we actually do the fancy loop
+    ld bc,0C01h
+    ld hl,lnLUT1pluspow2
+_lnFOR:
+    ld (lnLUTptr),hl
+    ld hl,var_x
+    sla (hl) \ inc hl \ rl (hl) \ inc hl \ rl (hl) \ inc hl \ rl (hl) \ jp nc,lnendfor
+_:
+    push bc
+    call lnadd_to_c
+    call shiftx
+    ld hl,var_xtmp
+    ld de,var_x
+    ld a,(de) \ add a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+    ld a,(de) \ res 7,a \ adc a,(hl) \ ld (de),a
+    jr c,-_
+    pop bc
+lnendfor:
+    ld hl,(lnLUTptr)
+    ld bc,5
+    add hl,bc
+    inc c
+    djnz _lnFOR
+;now do c-=x>>12
+    ld hl,(var_x)
+    ld de,(var_x+2)
+    ld b,80h-11
+    ld a,d
+    or a
+    jp m,$+18
+    ld a,h \ or l \ or d \ or e \ jr z,+_
+    dec b \ add hl,hl \ rl e \ rl d \ jp p,$-6
+    ld (var_x),hl
+    ld (var_x+2),de
+    ld a,b
+    ld (var_x+4),a
+    ld hl,var_c
+    ld de,var_x
+    ld b,h
+    ld c,l
+    call subSingle
+_:
+    pop af
+    ld hl,var_c+1
+    ret nc
+    ld b,h
+    ld c,l
+    jp invSingle
+
+
+shiftx:
+lnadd_to_c:
+;C-=LUT[k]
+    ret
+.echo "shiftx and lnadd_to_c are not finished."
+lnSpecial:
+    ld a,c
+    add a,a
+    add a,a
+    jr c,lnINF
+    jr z,lnNEGINF
+lncmplx:
+;NEED TO VERIFY that this is not -NAN, if we are allowing complex outputs.
+lnNAN: ld hl,const_NAN \ ret
+lnINF: ld hl,const_INF \ ret
+lnNEGINF: ld hl,const_NegInf \ ret
+DEBC_Times_A:
+;result is in A:HL:IX
+    ld hl,0
+    ld ix,0
+    or a
+    ret z
+    rla \ jr nc,$+12 \ ld ixh,b \ ld ixl,c \ ld h,d \ ld l,e
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ jr nc,$+8 \ add ix,bc \ adc hl,de \ adc a,0
+    add ix,ix \ adc hl,hl \ rla \ ret nc \ add ix,bc \ adc hl,de \ adc a,0
+    ret
+

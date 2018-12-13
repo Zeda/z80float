@@ -1,0 +1,82 @@
+#define var_c fpOP1   ;input
+#define var_y var_c+4 ;  used for sqrt32
+#define var_x fpOP2   ;output
+#define var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
+#define var_a fpOP2   ;   2 bytes
+#define var_z0 fpOP2+8;used in sqr32
+
+xsqrt:
+;HL points to x
+;BC points to the output
+;computes x^.5, if x>=0
+;avg: 9183.44329412cc
+  push hl
+  push de
+  push bc
+  push af
+  push ix
+  push bc
+  call +_
+  ld hl,var_x
+  pop de
+  call mov8
+  pop ix
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  ld de,fpOP1
+  call mov10
+  ex de,hl
+  dec hl
+  ld a,(hl)
+  or a
+  jp m,sqrtNAN
+  ld d,a
+  dec hl
+  ld e,(hl)
+  or e
+  jp z,sqrt_special
+  ex de,hl
+  ld bc,-16383
+  add hl,bc
+  sra h
+  rr l
+  ex de,hl
+  call c,shiftright_mantissa_sqrt
+  ld hl,16383
+  add hl,de
+  ld (fpOP1+8),hl
+#include "sqrt/sqrt64.z80"
+sqrt_special:
+;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
+  ld de,fpOP1
+  ld hl,var_x
+  jp mov10
+sqrtNAN:
+  ld hl,const_NaN
+  ld de,fpOP1
+  jp mov10
+shiftright_mantissa_sqrt:
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  ret
+.echo "xsqrt: ",$-xsqrt
+#include "sqrt/sqrt32.z80"
+.echo "  sqrt32: +",$-sqrt32
+#include "sqrt/sqrt16.z80"
+.echo "  sqrt16: +",$-sqrtHL
+
+#undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
+#undefine var_a fpOP2   ;   2 bytes
+#undefine var_c fpOP2+8 ;input
+#undefine var_y var_c+4 ;  used for sqrt32
+#undefine var_z0 fpOP2+16

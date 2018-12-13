@@ -1,0 +1,310 @@
+;requires       by
+;   lgSingle    powSingle
+;   mulSingle   powSingle,expSingle
+;   invSingle   powSingle,expSingle,exp2Single
+
+#define var_x   scrap     ;4 bytes
+#define var_c   scrap+4   ;4 bytes
+#define out_exp scrap+8   ;1 byte
+#define lutptr  scrap+9   ;2 bytes
+
+;           HL  DE  BC      desc
+;powSingle  y   x   out     compute y^x
+;expSingle  x   --  out     compute e^x
+;exp2Single x   --  out     compute 2^x
+
+powSingle:
+;;Computes y^x
+;;HL points to y
+;;DE points to x
+;;BC points to output
+    push hl
+    push de
+    push bc
+    push af
+    push bc
+    ld bc,var_c
+    call lgSingle
+    ld h,b
+    ld l,c
+    ex de,hl
+    jp pow_inject
+.echo "powSingle:",$-powSingle
+exp10Single:
+    push hl
+    push de
+    push bc
+    push af
+    ld de,const_lg10
+    push bc
+    jp pow_inject
+expSingle:
+;;Computes e^x
+;;HL points to x
+;;BC points to the output
+    push hl
+    push de
+    push bc
+    push af
+    ld de,const_lg_e
+    push bc
+pow_inject:
+;;DE points to lg(y), HL points to x, BC points to output
+    ld bc,var_x
+    call mulSingle
+    ld h,b
+    ld l,c
+    jp exp_inject
+.echo "expSingle:",$-expSingle
+exp2Single:
+;;Computes 2^x
+    push hl
+    push de
+    push bc
+    push af
+    push bc
+exp_inject:
+;;int(x) -> out_exp
+;;e^(fPart(x)*ln(2)) -> out_mant
+;;If x_sign is negative, remember to inverse at the end
+;;If x==0    -> out==1
+;;if x==inf  -> out==inf
+;;if x==-inf -> out==0
+;;if x==NAN  -> out==NAN
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    inc hl
+    ld a,(hl)   ;\
+    add a,a     ; |
+    push af     ; |Save sign for later,
+    scf         ; |make the implicit bit explicit
+    rra         ; |
+    ld c,a      ;/
+    inc hl      ;\
+    ld a,(hl)   ; |Check special case numbers
+    or a        ; |
+    jp z,exp_spec;/
+    sub a,7Fh
+    jr c,denorm ;int(x)=0 so reshape it to a fixed point 0.32 number
+    inc a
+    cp 8        ;
+    jp nc,exp_overflow
+    ld b,a
+    xor a
+    ex de,hl
+    dec b
+    jr z,comp_exp
+    add hl,hl \ rl c \ rla \ djnz $-4
+    jp comp_exp
+denorm:
+;CDE >> -A
+    cpl
+    jr z,comp_exp
+    cp 32
+    jp nc,exp_zero
+    ld b,a
+    xor a
+    srl c \ rr d \ rr e \ rra \ djnz $-7
+    ld b,a
+    ex de,hl
+    xor a
+comp_exp:
+    add a,80h
+    push af
+
+    ld de,(lnLUT+1)
+    ld a,(lnLUT+3)
+    ld b,a
+;
+    call mul24
+    ld (var_x),bc
+    ld (var_x+2),hl
+    pop af
+    ld (out_exp),a
+;    ld a,c
+;    ld (var_x+3),a
+;    ld (var_x+1),hl
+;    ld a,b
+;    ld (var_x),a
+
+    call exp_sub
+    ld hl,(var_c+2)
+    ld a,(var_c+1)
+    srl h
+    rr l
+    rra
+    ld (var_c+1),a
+    ld (var_c+2),hl
+    pop af
+    pop de
+    jr c,exp_inv
+    ex de,hl
+    ld (hl),a \ inc hl
+    ld (hl),e \ inc hl
+    ld (hl),d \ inc hl
+    ld a,(out_exp)
+    ld (hl),a
+    pop af
+    pop bc
+    pop de
+    pop hl
+    ret
+exp_inv:
+    ld b,d
+    ld c,e
+    ld hl,var_c+1
+    call invSingle
+    pop af
+    pop bc
+    pop de
+    pop hl
+    ret
+exp_sub:
+;;Input: HL points to the 0.32 int
+;;'x' is a fixed-point 0.32 number, on [0,ln(2))
+;;'c' is a fixed point 1.32 number. But c is extra special
+;;because the integer part is always 1. Because of that, we
+;;don't technically need to store it anywhere. Instead, we
+;;only keep the fractional part while the integer part is implicit.
+    ld hl,lnLUT+5
+    ld (lutptr),hl
+    ld hl,var_c
+    xor a
+    ld (hl),a
+    inc hl
+    ld (hl),a
+    inc hl
+    ld (hl),a
+    inc hl
+    ld (hl),a
+    inc a
+forloop:
+    ld hl,var_x ;\
+    sla (hl)    ; |
+    inc hl      ; |
+    rl (hl)     ; |
+    inc hl      ; |
+    rl (hl)     ; |
+    inc hl      ; |
+    rl (hl)     ;/
+    jr nc,endfor
+innerloop:
+    push af
+    ld hl,(var_c)
+    ld de,(var_c+2)
+    ld b,a
+    ld a,d
+    scf
+shiftloop:
+    rra
+    rr e
+    rr h
+    rr l
+    or a
+    djnz shiftloop
+    ld d,a
+    ld bc,(var_c) \ add hl,bc \ ld (var_c),hl
+    ld hl,(var_c+2) \ adc hl,de \ ld (var_c+2),hl
+    
+    ld de,var_x
+    ld hl,(lutptr)
+    ld a,(de) \ sub (hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc hl \ inc de
+    ld a,(de) \ sbc a,(hl) \ ld (de),a
+    pop hl
+	ld a,h
+    jr nc,innerloop
+endfor:
+    ld hl,(lutptr)  ;\
+    ld bc,5         ; |Get a pointer to the next item in the LUT.
+    add hl,bc       ; |
+    ld (lutptr),hl  ;/
+    inc a
+    cp 32
+    jp nz,forloop
+    ret
+exp_spec:
+;bit 6 means INF
+;bit 5 means NAN
+;no bits means zero
+;NAN -> NAN
+;+inf -> +inf
+;-inf -> +0  because lim approaches 0 from the right
+    ld a,c
+    add a,a
+    jr z,exp_zero
+    jp m,exp_inf
+;exp_NAN
+    pop af
+    ld de,0040h
+exp_return_spec:
+    pop hl
+    ld b,h
+    ld c,l
+    ld (hl),0 \ inc hl
+    ld (hl),0 \ inc hl
+    rr e
+    ld (hl),e \ inc hl
+    ld (hl),d
+    pop de
+    pop hl
+    pop af
+    ret
+
+exp_overflow:
+exp_inf:
+;+inf -> +inf
+;-inf -> +0  because lim approaches 0 from the right
+    pop af
+    ld de,0000h
+    rr e
+    jr exp_return_spec
+exp_zero:
+    pop af
+    or a
+    ld de,8000h
+    jr exp_return_spec
+lnLUT:
+;;Extended precision for -ln(1+2^-k) from k=0 to k=32
+;;Precision is an extra 8 bits of mantissa
+;;Mantissa can be used as 0.32 fixed point for 2^k*ln(1+2^-k)
+.db $F8,$17,$72,$B1,$7F
+.db $65,$1F,$99,$CF,$7E
+.db $3C,$BE,$7F,$E4,$7D
+.db $71,$3B,$38,$F1,$7C
+.db $00,$86,$51,$F8,$7B
+.db $73,$D8,$14,$FC,$7A
+.db $87,$45,$05,$FE,$79
+.db $58,$53,$01,$FF,$78
+.db $15,$55,$80,$FF,$77
+.db $4D,$15,$C0,$FF,$76
+.db $54,$05,$E0,$FF,$75
+.db $55,$01,$F0,$FF,$74
+.db $55,$00,$F8,$FF,$73
+.db $15,$00,$FC,$FF,$72
+.db $05,$00,$FE,$FF,$71
+.db $01,$00,$FF,$FF,$70
+.db $00,$80,$FF,$FF,$6F
+.db $00,$C0,$FF,$FF,$6E
+.db $00,$E0,$FF,$FF,$6D
+.db $00,$F0,$FF,$FF,$6C
+.db $00,$F8,$FF,$FF,$6B
+.db $00,$FC,$FF,$FF,$6A
+.db $00,$FE,$FF,$FF,$69
+.db $00,$FF,$FF,$FF,$68
+.db $80,$FF,$FF,$FF,$67
+.db $C0,$FF,$FF,$FF,$66
+.db $E0,$FF,$FF,$FF,$65
+.db $F0,$FF,$FF,$FF,$64
+.db $F8,$FF,$FF,$FF,$63
+.db $FC,$FF,$FF,$FF,$62
+.db $FE,$FF,$FF,$FF,$61
+.db $FF,$FF,$FF,$FF,$60
+.echo "exp2Single:",$-exp2Single
+#undefine var_x
+#undefine var_c
+#undefine out_exp
+#undefine lutptr
+

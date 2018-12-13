@@ -1,0 +1,144 @@
+#define var_z fpOP3+16
+
+xmul:
+;Input:
+;  HL points to one number
+;  DE points to another
+;Timing, excluding special cases (which take ~ 800cc):
+;max: 1036+max(mul64)+29
+;min: 882+min(mul64)+29
+;avg: 959+avg(mul64)+29
+;    ~9925.527+29
+
+  push hl
+  push de
+  push bc
+  push af
+  push ix
+  push bc
+  call +_
+  pop hl
+  push de
+  ex de,hl
+  ld hl,var_z+8
+  call mov8
+  ex de,hl
+  pop de
+  ld (hl),e
+  inc hl
+  ld (hl),d
+  pop ix
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  push de
+  ld de,fpOP1
+  call mov10
+  pop hl
+  call mov10
+	ld hl,(fpOP1+8)
+	ld de,(fpOP2+8)
+	ld a,h
+	xor d
+  ld b,a
+	res 7,d
+	res 7,h
+	ld a,h \ or l \ jp z,casemul
+	ld a,d \ or e \ jp z,casemul2
+  add hl,de
+  ld de,$3FFF
+  sbc hl,de
+  jp c,mul_zero
+  jp m,mul_inf
+  sla b
+  jr nc,+_
+  set 7,h
+_:
+  push hl
+	call mul64
+  ld a,(var_z+15)
+  add a,a
+  ld hl,var_z+7
+  pop de
+  jr c,+_
+  sla (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl)
+  ret
+_:
+  inc de
+  ret
+
+casemul:
+;fpOP1 is inf/nan/0
+  ld hl,fpOP2+9
+  ld a,(hl)
+  dec hl
+  or (hl)
+  dec hl
+  ld a,(hl)
+  ld hl,fpOP2
+  jr nz,casemul2_copy
+  ;now we have two special cases to multipy together
+;inf*inf-> inf
+;0*0    -> 0
+;
+;nan*nan-> NaN
+;inf*nan-> NaN
+;inf*0  -> NaN
+;nan*inf-> NaN
+;nan*0  -> NaN
+;0*inf  -> NaN
+;0*nan  -> NaN
+
+  sla b
+  ld de,0
+  rr d
+  and $C0
+  ld c,a
+  ld a,(fpOP1+7)
+  and $C0
+  cp c
+  jr z,+_
+  ld a,$40
+_:  
+  ld (var_z+15),a
+  ret
+casemul2:
+;finite times inf/nan/0, so fpOP1 -> out
+  ld hl,fpOP1
+casemul2_copy:
+  ld de,var_z+8
+  call mov8
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  ret
+mul_zero:
+  xor a
+  ld (var_z+15),a
+  ld d,a
+  ld e,a
+  ret
+mul_inf:
+  xor a
+  ld d,a
+  ld e,a
+  dec a
+  ld (var_z+15),a
+  ret
+.echo "xmul: ",$-xmul
+#include "mul/mul64.z80"
+#include "mul/mul32.z80"
+#include "mul/mul16.z80"
+.echo "  mul16: +",$-mul16
+.echo "  Total: ",$-xmul
+

@@ -1,0 +1,99 @@
+#define subsqrt32
+
+
+
+sqrt64:
+;avg: 7544.059294cc
+  call sqrt32
+  ld (var_x+6),hl
+  ld (var_x+4),de
+  call sqr32
+  ld hl,var_z0
+  ld de,var_c
+  call rsub40
+  ld a,(var_z0+4)
+  ld de,(var_z0)
+  ld hl,(var_z0+2)
+  rra
+  rr h
+  rr l
+  rr d
+  rr e
+  rla
+  push af
+  jr nc,+_
+  xor a
+  ld b,a \ sbc a,e \ ld e,a
+  ld a,b \ sbc a,d \ ld d,a
+  ld a,b \ sbc a,l \ ld l,a
+  ld a,b \ sbc a,h \ ld h,a
+_:
+;  sbc a,a
+;  push af
+;  ;if carry flag is set, then remainder is negative
+;  
+;  ld (var_x+6),hl
+;  ld (var_x+4),de
+;;need to square var_b, a 16-bit number
+;  ld hl,(var_b+2)
+;  ld a,l \ cpl \ ld e,a
+;  ld a,h \ cpl \ ld d,a
+;  ld b,d
+;  ld c,e
+;  call mul16    ;result in DEHL
+;  pop af
+;  push de
+;  ld b,h
+;  ld c,l
+;need to shift in the low bit of var_c+2 to A
+;  ld hl,(var_a)
+;  ld d,a
+;  ld a,(var_c+2)
+;  rra
+;  adc hl,hl
+;  ld a,d
+;  rla
+;subtract from var_a
+;  ex de,hl
+;  ld hl,(var_c)
+;  ;ADEHL - xxBC
+;  sbc hl,bc
+;  ex de,hl
+;  pop bc
+;  sbc hl,bc
+;  ld b,0
+;  sbc a,b
+;now AHLDE is our new remainder, 'A'
+;  push af
+;  jp p,+_
+;  ld c,a
+;  xor a \ sub e \ ld e,a
+;  ld a,b \ sbc a,d \ ld d,a
+;  ld a,b \ sbc a,l \ ld l,a
+;  ld a,b \ sbc a,h \ ld h,a
+;  ld a,b \ sbc a,c
+;_:
+;divide by 2
+;  rra
+;  rr h
+;  rr l
+;  rr d
+;  rr e
+;divide by var_x (32-bit by 32-bit)
+  call div32_32
+  ;620D81B8/E2DFC48E ==> .6EA40469
+  ;append to var_x
+  pop af
+  ret nc
+  ld hl,var_x
+  xor a
+  ld b,a \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,b \ sbc a,(hl) \ ld (hl),a
+  ret nc
+  inc hl \ dec (hl) \ ret nz
+  inc hl \ dec (hl) \ ret nz
+  inc hl \ dec (hl) \ ret nz
+  inc hl \ dec (hl)
+  ret

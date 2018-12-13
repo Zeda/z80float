@@ -1,0 +1,235 @@
+;;Need to check special cases inf,zero,NAN
+var48 = scrap+4
+mul10Single:
+;;Multiplies a single precision float by 10
+    push af
+    push hl
+    push de
+    push bc
+    ld c,(hl) \ inc hl
+    ld b,(hl) \ inc hl
+    ld e,(hl) \ inc hl
+    ld a,(hl)
+    push de
+    or 80h
+    rra \ rr e \ rr b \ rr c
+    srl a \ rr e \ rr b \ rr c
+    dec hl \ dec hl \ dec hl
+    ld d,a
+    ld a,(hl) \ adc a,c \ ld c,a \ inc hl
+    ld a,(hl) \ adc a,b \ ld c,a \ inc hl
+    ld a,(hl) \ adc a,e \ ld c,a \ inc hl
+    ld a,(hl) \ set 7,a \ adc a,d \ inc hl
+    jr nc,$+10
+    rra \ rr e \ rr b \ rr c \ scf
+    add a,a
+    ld d,a
+    ld a,(hl) \ adc a,3 \ jr c,mul10_overflow
+    ld (hl),a
+    ld l,a
+    pop af
+    add a,a
+    rr d
+    ld a,l
+    pop hl
+    push hl
+    ld (hl),c \ inc hl
+    ld (hl),b \ inc hl
+    ld (hl),e \ inc hl
+    ld (hl),d \ inc hl
+    ld (hl),a
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+mul10_overflow:
+    xor a
+    pop de
+    pop hl
+    ld b,h
+    ld c,l
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    rl d
+    or 80h
+    rra
+    ld (hl),a \ inc hl
+    ld(hl),-1
+    pop de
+    pop hl
+    pop af
+    ret
+mulSingle:
+;;Inputs: HL points to float1, DE points to float2, BC points to where the result is copied
+;;Outputs: float1*float2 is stored to (BC)
+    push af
+    push hl
+    push de
+    push bc
+    
+    call +_   ;CHLB
+    ld a,c
+    ex de,hl
+    pop hl
+    push hl
+    ld (hl),b \ inc hl
+    ld (hl),e \ inc hl
+    ld (hl),d \ inc hl
+    ld (hl),a
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+
+
+_:
+;;return float in CHLB
+    push de
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    inc hl
+    ld c,(hl)
+    inc hl
+    ld a,(hl)
+    ex de,hl
+    ex (sp),hl
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    inc hl
+    ld b,(hl)
+    inc hl
+    
+
+    add a,(hl)      ;\
+    pop hl          ; |
+    rra             ; |Lots of help from Runer112 and
+    adc a,a         ; |calc84maniac for optimizing
+    jp po,bad       ; |this exponent check.
+    xor 80h         ; |
+    jr z,underflow  ;/
+    push af         ;exponent
+    ld a,b
+    xor c
+    push af         ;sign
+    set 7,b
+    set 7,c
+    call mul24      ;BDE*CHL->HLBCDE, returns sign info
+    pop de
+    ld a,e
+    pop de
+    jp m,fixed
+    rl c
+    rl b
+    adc hl,hl
+    dec d
+fixed:
+    inc d
+    jr z,overflow
+    rl c
+    ld c,d
+    ld de,0
+    push af
+    ld a,b
+    adc a,e
+    ld b,a
+    adc hl,de
+    jr nc,$+11
+    inc c \ jr z,overflow
+    rr h
+    rr l
+    rr b
+    pop af
+    cpl
+    and $80
+    xor h
+    ld h,a
+    ret
+bad:
+    jr c,overflow
+underflow:
+    ld hl,0
+    rl b
+    rr h
+    ld c,l
+    ld b,l
+    ret
+overflow:
+    ld hl,$8000
+    jr underflow+3
+.echo "mulSingle:",$-mulSingle
+mul24:
+;;BDE*CHL -> HLBCDE
+;;155 bytes
+;;403cc+3mul
+;;fastest:1201cc
+;;slowest:1753cc
+;;avg    :1464.9033203125cc (1464+925/1024)
+    push bc
+    ld c,l
+    push hl
+    call C_Times_BDE
+    ld (var48),hl
+    ld l,a
+    ld h,c
+    ld (var48+2),hl
+    
+    pop hl
+    ld c,h
+    call C_Times_BDE
+    push bc
+    ld bc,(var48+1)
+    add hl,bc
+    ld (var48+1),hl
+    pop bc
+    ld b,c
+    ld c,a
+    ld hl,(var48+3)
+    ld h,0
+    adc hl,bc
+    ld (var48+3),hl
+    
+    pop bc
+    call C_Times_BDE
+    ld de,(var48+2)
+    add hl,de
+    ld (var48+2),hl
+    ld d,c
+    ld e,a
+    ld b,h
+    ld c,l
+    ld hl,(var48+4)
+    ld h,0
+    adc hl,de
+    ld de,(var48)
+    ret
+.echo "mul24:",$-mul24
+    
+
+C_times_BDE:
+;;C*BDE => CAHL
+;;266cc ~ 452cc or 27cc if C=0
+;;266+22b-b&c+8d*e
+;;avg=266+22*4-7*.5*.5+8*.25
+;;   =355.25
+;;b is 0 to 8 depending on bits of C
+;;c is dependent on overflow of result      ;never 1 for the 7th bit of C
+;;d is bit 0 of C
+;;e is 0 or 1 depending on overflow
+;;88 bytes
+    xor a
+    ld h,a
+    ld l,a
+    rlc c \ ret z \ jr nc,$+8 \ ld a,b \ ld h,d \ ld l,e \ dec c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+    add hl,hl \ rla \ rl c \ ret nc \ add hl,de \ adc a,b \ ret nc \ inc c \ ret
+
+

@@ -1,0 +1,102 @@
+subroutine_start:
+
+PushFPOP2:
+	ld hl,fpOP2
+	jr PushFP
+PushFPOP1:
+	ld hl,fpOP1
+PushFP:
+	ld de,(floatStackPtr)
+	call Copy10
+	ld (floatStackPtr),de
+	ret
+PopFPOP3:
+	ld de,fpOP3+9
+	jr PopFP
+PopFPOP2:
+	ld de,fpOP2+9
+	jr PopFP
+PopFPOP1:
+	ld de,fpOP1+9
+PopFP:
+	ld hl,(floatStackPtr)
+	dec hl
+	ldd \ ldd
+	ldd \ ldd
+	ldd \ ldd
+	ldd \ ldd
+	ldd \ ldd
+	inc hl
+	ld (floatStackPtr),hl
+	ret
+sub_64b:
+;(de)-(hl), little endian 64-bit.
+	ld a,(de) \ sub (hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+	ld a,(de) \ sbc a,(hl) \ ld (de),a \ ret
+cp_64b:
+;compares (de) to (hl), big endian 64-bit ints
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret nz \ dec de \ dec hl
+	ld a,(de) \ cp (hl) \ ret
+
+fpOP1_to:
+	ld hl,fpOP1
+	jp CopyOPR
+fpOP2_to_fpOP1:
+	ld hl,fpOP2
+	ld de,fpOP1
+CopyOPR:
+	ldi
+	ldi
+	ldi
+	ldi
+	jp Copy10
+LoadFPOP1:
+	ld de,fpOP1
+	jp LoadFPOP
+LoadFPOP2:
+	ld de,fpOP2
+	jp LoadFPOP
+fpOP1_to_Ans:
+	ld de,fpAns
+from_fpOP1:
+	ld hl,fpOP1+4
+	jp Copy10
+LoadFPOPs:
+;HL points to the first
+;DE points to the second
+	push de
+	ld de,fpOP1
+	call LoadFPOP
+	pop hl
+LoadFPOP:
+	xor a
+	ld (de),a \ inc de
+	ld (de),a \ inc de
+	ld (de),a \ inc de
+	ld (de),a \ inc de
+Copy10:
+	ldi
+	ldi
+Copy8:
+	ldi
+	ldi
+	ldi
+	ldi
+	ldi
+	ldi
+	ldi
+	ldi
+	ret
+.echo "Subroutines  :",$-subroutine_start

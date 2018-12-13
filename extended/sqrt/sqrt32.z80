@@ -1,0 +1,129 @@
+#define var_c fpOP1   ;input
+#define var_y var_c+4 ;  used for sqrt32
+#define var_x fpOP2   ;output
+#define var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
+#define var_a fpOP2   ;   2 bytes
+#define var_z0 fpOP2+8;used in sqr32
+;NOTE!
+;This expects the top two bits to be non-zero
+sqrt32:
+;returns 0.HLDE as the square root
+;as subsqrt32:
+;  min: 2017cc
+;  max: 2538cc
+;  avg: 2271.5cc
+
+;Step one is to generate 8 accurate bits
+  ld hl,(var_y+2)
+  call sqrtHL   ;HL is remainder, DE is value
+  ld a,e
+  ld (var_x+5),a
+
+;Now we need to create b0
+  srl h
+  rr l
+  ld h,l
+  ld a,(var_y+1)
+  rra
+  ld l,a
+;now perform HL/E
+;This is a NOT a general purpose division
+;It assumes E>H
+;A is remainder, L is result
+
+  ld a,h
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+
+;shift in low bit of (var_y+1) to the remainder
+;store L to (var_x+4)
+  ld e,a
+  ld a,(var_y+1)
+  rra
+  rl e
+  ld d,0
+  rl d
+
+  ld a,l
+  ld (var_x+4),a
+
+;no we need to compute l*l
+  ld b,d
+  ld c,l
+  ld l,d
+  add a,a
+  ld h,a
+  jr nc,$+3 \ ld l,c
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+;leaves c flag reset
+
+  ex de,hl
+;now need to perform HL*256+(var_y)-DE
+  ld c,h
+  ld h,l
+  ld a,(var_y)
+  ld l,a
+  ld a,c
+  sbc hl,de
+  sbc a,b
+;AHL is the new remainder
+;Need to divide by 2, then divide by the 16-bit (var_x+4)
+
+  push af
+  jr nc,+_
+  xor a
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
+  ld h,a
+  xor a
+_:
+  rra
+  rr h
+  rr l
+#ifdef subsqrt32
+  ld de,(var_c+2)
+  rr d
+  rr e
+  push de
+  pop ix
+#endif
+  
+  ld bc,(var_x+4)
+#ifdef subsqrt32
+  call div32_16   ;returns DE = result
+  ld (var_a),hl
+  ld (var_b+2),de
+#else
+  call divide
+#endif
+  ld hl,(var_x+4)
+  pop af
+  ret nc
+_:
+  xor a
+  sub e
+  ld e,a
+  sbc a,a
+  sub d
+  ld d,a
+  dec hl
+  ret
+#undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
+#undefine var_a fpOP2   ;   2 bytes
+#undefine var_c fpOP2+8 ;input
+#undefine var_y var_c+4 ;  used for sqrt32
+#undefine var_z0 fpOP2+16

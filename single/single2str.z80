@@ -1,0 +1,419 @@
+
+single2ti:
+;;Turns a single precision float into a TI-float
+;;HL points to the input float.
+;;BC points to the output.
+    push af
+    push hl
+    push de
+    push bc
+    ld bc,scrap
+    call single2str
+    pop hl
+    push hl
+    ld a,(bc)
+    sub $1A
+    sub 1
+    ld a,0
+    rra
+    ld (hl),a
+    inc hl
+    push hl     ;HL is where exponent will get written to
+;
+    ld de,017Fh
+    call toti_sub2
+    call toti_sub2
+    call toti_sub2
+    call toti_sub2
+    xor a
+    inc hl \ ld (hl),a
+    inc hl \ ld (hl),a
+    inc hl \ ld (hl),a
+    ld a,(bc)
+    or a
+    jr z,write_ti_exp
+    inc bc
+    ld a,(bc)
+    cp $1A
+    push af     ;sign
+    jr nz,$+4
+    inc bc \ ld a,(bc)
+    sub 30h
+    ld h,a
+    inc bc
+    ld a,(bc)
+    or a
+    jr z,sign_exp
+    ld l,a
+    add a,a
+    add a,a
+    add a,h
+    add a,a
+    add a,l
+    ld h,a
+sign_exp:
+    pop af
+    ld a,h
+    jr nz,$+4
+    neg
+    add a,e
+    ld e,a
+write_ti_exp:
+    pop hl
+    ld (hl),e
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+toti_sub2:
+    inc hl
+    call toti_sub
+toti_sub:
+    ld a,(bc)
+    or a
+    jr z,toti_sub_end
+    sub $1B
+    jr z,toti_sub_end
+    cp '.'-$1B
+    jr nz,$+4
+    inc bc
+    dec d
+    ld a,d
+    add a,e
+    ld e,a
+    ld a,(bc)
+    inc bc
+toti_sub_end:
+    rld
+    ret
+.echo "single2ti:",$-single2ti
+single2str:
+    push af
+    push hl
+    push de
+    push bc
+    call toBase10
+    pop bc
+    ld d,b
+    ld e,c
+    ld a,(hl) \ ld (de),a \ inc hl \ inc de \ or a \ jr nz,$-5
+    pop de
+    pop hl
+    pop af
+    ret
+base10temp=scrap+25
+scrapstr=scrap+4
+toBase10:
+;;In: Convert the float pointed to by HL to a string
+;;Out: HL points to the result string
+    ld de,base10temp
+    ldi         ;\
+    ldi         ; |Copy the float so we can modify it
+    ld a,(hl)   ; |without directly modifying the source.
+    add a,a     ; |\
+    push af     ; | |Get sign and perform abs(x)
+    rrca        ; |/
+    ld (de),a   ; |
+    inc hl      ; |
+    inc de      ; |
+    ld a,(hl)   ; |
+    or a        ; |
+    jp z,base10_spec    ;Special cases, 0, INF, NAN
+    ld (de),a   ;/
+    ld bc,scrap     ;\
+    ld hl,base10temp; |get ipart(log10(x))
+    call log10Single; |
+    ld h,b \ ld l,c ; |
+    call single2char; |
+    ld e,a          ;/
+    ld b,87h
+    rlca
+    push af
+    rrca
+    jr nc,$+4
+    dec e
+    cpl
+;    or a \ jr nz,$+5 \ ld b,a \ jr $+7
+    inc a \ jr nz,$+6 \ ld b,-1 \ jr $+7
+    add a,a \ jr c,$+4 \ djnz $-3
+    ld c,a
+    pop af
+    ccf
+    rr c
+    ld hl,0
+    ld (scrap),hl
+    ld (scrap+2),bc
+    ld bc,scrap
+    ld h,b
+    ld l,c
+    call exp10Single
+    ld a,(scrap+2)
+    or 80h
+    ld (scrap+2),a
+    pop af
+    ld a,e
+    ld de,base10temp
+    call mulSingle
+    ld hl,scrap+4
+    ld d,$1A
+    jr c,$+4
+    ld d,'+'
+    ld (hl),d \ inc hl
+    ld (hl),'0' \ inc hl
+    ld b,6
+    inc a
+    bit 7,a
+    jp nz,base10neg_exp
+    cp 7
+    jp nc,engineering
+    ld c,a \ inc c
+    dec c \ jr nz,$+5 \ ld (hl),'.' \ inc hl
+    call mul10_sub \ add a,30h
+    ld (hl),a \ inc hl
+    djnz $-13
+    ld (hl),b
+format:
+    ld hl,(scrap)
+    add hl,hl
+    ld hl,(scrap+2)
+    rl l
+    ld a,h
+    adc a,80h
+    jr nc,roundstr_done
+    ld hl,scrapstr+8
+    ld bc,$3A30
+roundstr_loop:
+    ld a,(hl) \ cp '.' \ jr nz,$+4 \ dec hl \ ld a,(hl)
+    inc a \ ld (hl),a
+    cp b \ jr nz,roundstr_done
+    ld (hl),c \ dec hl
+    jr roundstr_loop
+roundstr_done:
+
+;now reformat
+;;if engineering format, make sure if first digit (padding) is not zero,
+;;shift up the decimal and increment the exponent
+    ld hl,scrapstr+9
+    ld a,(hl)
+    or a
+    jr z,eng_round_fixed
+    ld hl,scrapstr+1
+    ld a,(hl)
+    cp '0'
+    jr z,eng_round_fixed
+    inc hl
+    ld a,(hl)
+    ld (hl),'.'
+    inc hl
+    ld (hl),a
+    ld hl,scrapstr+10
+    ld a,(hl)
+    cp '+'
+    jr z,inc_eng_exp
+;dec_eng_exp
+    inc hl
+    inc hl
+    ld a,(hl)
+    or a
+    jr nz,$+3
+    dec hl \ ld a,(hl)
+    dec a
+    ld (hl),a
+    cp '0'-1
+    jr nz,eng_round_fixed
+    ld (hl),'9'
+    dec hl
+    dec (hl)
+    jr eng_round_fixed
+inc_eng_exp:
+    inc hl
+    inc hl
+    ld a,(hl)
+    or a
+    jr nz,$+3
+    dec hl \ ld a,(hl)
+    inc a
+    ld (hl),a
+    cp '9'+1
+    jr nz,eng_round_fixed
+    ld (hl),'0'
+    dec hl
+    inc (hl)
+eng_round_fixed:
+;;cannot have a '.' as the last digit
+;;no leading or trailing zeroes
+;;no leading '+'
+    ld de,scrap
+    ld hl,scrapstr
+    ld a,(hl)
+    cp '+' \ jr nz,$+6 \ inc hl \ ld a,(hl) \ jr $+5 \ ldi \ ld a,(hl)
+    cp '0' \ jr nz,$+3 \ inc hl
+    ldi
+    ld a,(hl) \ cp $1B \ jr z,$+5
+    or a \ jr nz,$-8
+striptrailloop:
+    dec de
+    ld a,(de)
+    cp '.'
+    jr z,striptrailloop
+    cp '0'
+    jr z,striptrailloop
+    
+    inc de
+    ld a,(hl)
+    ldi
+    or a
+    jr z,strfrmt_done
+    ld a,(hl)
+    cp '+'
+    jr nz,$+4
+    inc hl
+    ld a,(hl)
+    ldi
+    ld a,(hl)
+    ldi
+    or a
+    jr z,strfrmt_done
+    xor a
+    ld (de),a
+strfrmt_done:
+    ld hl,scrap
+    ret
+engineering:
+    push af
+    call mul10_sub \ add a,30h
+    ld (hl),a \ inc hl
+    ld (hl),'.' \ inc hl
+    dec b
+    call getnumstr
+;;Add engineering formatting
+    ld (hl),$1B
+    inc hl
+    pop af
+    cp 80h
+    ld d,'+'
+    jr c,$+7 \ ld d,$1A \ cpl \ add a,2
+    ld (hl),d \ inc hl
+    ld d,0
+    inc d \ sub 10 \ jr nc,$-3
+    dec d
+    jr z,$+9
+    ld e,a \ ld a,d \ add a,'0'
+    ld (hl),a \ inc hl \ ld a,e
+    add a,$3A
+    ld (hl),a
+    inc hl
+    ld (hl),0
+    jp format
+base10neg_exp:
+    neg
+    cp 3
+    jr c,$+6 \ neg \ jr engineering
+    ld (hl),'.'
+    ld c,b
+    ld b,a \ inc b \ ld a,'0'
+    dec c \ inc hl \ ld (hl),a \ djnz $-3
+    ld b,c \ inc b
+    call getnumstr
+    jp format
+getnumstr:
+    call mul10_sub \ add a,30h
+    ld (hl),a \ inc hl
+    djnz $-7
+    ld (hl),b
+    ret
+
+
+base10_spec:
+    pop bc
+    dec hl
+    ld a,(hl)
+    add a,a
+    jr z,base10_zero
+    jp m,base10_inf
+    ld hl,str_NAN
+    ret
+base10_zero:
+    ld hl,str_zero
+    ret nc
+    ld hl,str_negzero
+    ret
+base10_inf:
+    ld hl,str_inf
+    ret nc
+    ld hl,str_neginf
+    ret
+
+mul10_sub:
+;;multiply (scrap) by 10, leaving the integer part in A, decimal part in (scrap)
+    push bc
+    push hl
+    ld hl,(scrap)
+    ld bc,(scrap+2)
+    ld a,b
+    inc a
+    jr z,mul10_sub_done
+    ld d,h
+    ld e,l
+    ld a,c
+    ld b,0
+    or a
+    rra \ rr h \ rr l \ rr b
+    rra \ rr h \ rr l \ rr b
+    add hl,de \ adc a,c
+    jr nc,$+10
+    rra \ rr h \ rr l \ rr b \ scf
+    ld c,a
+;CHLB
+    ld a,(scrap+3)
+    adc a,3
+;A is the exponent
+    cp 80h
+    jr c,int_part_is_zero_str
+    ld d,b
+    sub 7Fh
+    ld b,a
+    xor a
+;CHLD
+    sla d \ adc hl,hl \ rl c \ rla \ djnz $-7
+    ld b,7Fh
+    ld e,a
+    ld a,c
+    or a \ jp m,$+18
+    or h
+    or l
+    or d
+    jr z,str_is_zeroed
+    ld a,c
+    dec b
+    sla d \ adc hl,hl \ adc a,a
+    jp p,$-6
+    ld c,a
+    ld a,e
+    ld (scrap),hl
+    ld (scrap+2),bc
+mul10_sub_done:
+    pop hl
+    pop bc
+    ret
+int_part_is_zero_str:
+    ld b,a
+    ld (scrap),hl
+    ld (scrap+2),bc
+    xor a
+    pop hl
+    pop bc
+    ret
+str_is_zeroed:
+    dec d
+    ld (scrap+2),de
+    pop hl
+    pop bc
+    ret
+str_negzero:.db $1A
+str_zero:   .db "0",0
+str_NAN:    .db "NAN",0
+str_neginf  .db $1A
+str_inf     .db "INF",0
+.echo "single2str:",$-single2str

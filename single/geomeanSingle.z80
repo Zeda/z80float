@@ -1,0 +1,8 @@
+geomeanSingle:
+    push hl
+    call mulSingle
+    ld h,b
+    ld l,c
+    call sqrtSingle
+    pop hl
+    ret

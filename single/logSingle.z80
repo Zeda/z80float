@@ -1,0 +1,186 @@
+lgvar_x = scrap+11  ;4 bytes
+lgvar_c = scrap+15  ;4 bytes
+lglutptr= scrap+19  ;2 bytes
+lgtemp1 = scrap+21  ;4 bytes
+lgBase  = scrap+25  ;4 bytes
+lnSingle:
+    push hl
+    push de
+    push bc
+    ld bc,const_lg_e
+    jp log_inject
+log10Single:
+    push hl
+    push de
+    push bc
+    ld bc,const_lg10
+    jp log_inject
+logSingle:
+    push hl
+    push de
+    push bc
+    ex de,hl
+    ld bc,lgBase
+    call lgSingle
+    ex de,hl
+log_inject:
+;;HL points to X
+;;BC points to lg(Y)
+    push bc
+    ld bc,scrap
+    call lgSingle
+    pop de
+    ld h,b
+    ld l,c
+    pop bc
+    call divSingle
+    pop de
+    pop hl
+    ret
+    
+lgSingle:
+    push af
+    push hl
+    push de
+    push bc
+    xor a \ ld de,lgvar_x \ ld (de),a \ inc de \ ld c,a   ;\
+    sbc a,(hl) \ ld (de),a \ inc de \ inc hl \ ld a,c   ; |
+    sbc a,(hl) \ ld (de),a \ inc de \ inc hl \ ld a,(hl); |1.0-mantissa/2 -> x
+    bit 7,a \ jp nz,lg_is_cplx \ ld b,a \ ld a,c        ; |
+    sbc a,b \ xor 80h \  ld (de),a \ inc de \ inc hl    ;/
+    xor a \ ld (de),a \ inc de \ ld (de),a \ inc de     ;\
+    ld a,(hl) \ or a \ jp z,lg_spec
+    add a,80h \ add a,a \ push af \ inc a               ; |1+exp_x -> c
+    inc a \ jr nc,$+4 \ neg \ jr nz,$+6 \ ld b,-1 \ jr $+8;
+    ld b,87h \ dec b \ add a,a \ jr nc,$-2 \ ld c,a     ; |
+    pop af \ ld a,c \ rra \ ld (de),a \ inc de \ ld a,b ; |
+    ld (de),a                                           ;/
+    ld bc,$1801
+    ld hl,lglut
+    ld (lglutptr),hl
+_forloop:
+    ld hl,lgvar_x
+    sla (hl)
+    inc hl
+    rl (hl)
+    inc hl
+    rl (hl)
+    inc hl
+    rl (hl)
+    jr nc,_endwhile
+_whileloop:
+    push bc
+    ld a,c
+    ld hl,(lglutptr)
+    ld de,lgtemp1
+    ldi
+    ldi
+    ldi
+    ldi
+    ld hl,lgtemp1
+    ld de,lgvar_c
+    ld b,d
+    ld c,e
+    call rsubSingle
+    ld bc,1
+    ld hl,(lgvar_x)
+    ld de,(lgvar_x+2)
+    sub 8
+    jr c,$+13
+    ld b,l
+    ld l,h
+    ld h,e
+    ld e,d
+    ld d,c
+    ld c,0
+    sub 8
+    jr nc,$-9
+    add a,8
+    jr nz,shiftmore
+    rl b
+    ld b,a
+    ld c,a
+    jp addx
+shiftmore:
+    ld b,a \ ld a,l
+    srl c \ rr d \ rr e \ rr h \ rra \ djnz $-9 \ ld l,a
+addx:
+    adc hl,bc \ ex de,hl \ adc hl,bc \ ex de,hl
+    ld bc,(lgvar_x) \ add hl,bc \ ld (lgvar_x),hl
+    ex de,hl
+    ld bc,(lgvar_x+2) \ adc hl,bc \ ld (lgvar_x+2),hl
+    pop bc
+    jp c,_whileloop
+_endwhile:
+    ld hl,(lglutptr)
+    ld de,4
+    add hl,de
+    ld (lglutptr),hl
+    inc c
+    dec b
+    jp nz,_forloop
+    ld hl,lgvar_c
+lg_out:
+    pop de
+    push de
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    ld (de),a
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+lg_is_cplx:
+    ld hl,const_NAN \ jr lg_out
+lg_spec:
+;zero-> neginf
+;inf -> inf
+;NAN -> NAN
+    dec hl
+    ld a,(hl)
+    add a,a
+    jr z,lg_zero
+    dec hl
+    jr lg_out
+lg_zero:
+    ld hl,const_NegInf \ jr lg_out
+
+lglut:
+;;lg(1+2^-k), k from 1 to 32
+;;Single precision floats
+.db $1B,$C0,$15,$7F
+.db $C3,$D3,$24,$7E
+.db $D2,$00,$2E,$7D
+.db $B8,$1F,$33,$7C
+.db $9C,$D6,$35,$7B
+.db $B5,$3C,$37,$7A
+.db $86,$F2,$37,$79
+.db $24,$4E,$38,$78
+.db $20,$7C,$38,$77
+.db $2A,$93,$38,$76
+.db $B2,$9E,$38,$75
+.db $77,$A4,$38,$74
+.db $59,$A7,$38,$73
+.db $CA,$A8,$38,$72
+.db $83,$A9,$38,$71
+.db $DF,$A9,$38,$70
+.db $0D,$AA,$38,$6F
+.db $25,$AA,$38,$6E
+.db $30,$AA,$38,$6D
+.db $36,$AA,$38,$6C
+.db $39,$AA,$38,$6B
+.db $3A,$AA,$38,$6A
+.db $3B,$AA,$38,$69
+.db $3B,$AA,$38,$68
+.db $3B,$AA,$38,$67
+.db $3C,$AA,$38,$66
+.db $3C,$AA,$38,$65
+.db $3C,$AA,$38,$64
+.db $3C,$AA,$38,$63
+.db $3C,$AA,$38,$62
+.db $3C,$AA,$38,$61
+.db $3C,$AA,$38,$60
+.echo "lg:",$-lgSingle

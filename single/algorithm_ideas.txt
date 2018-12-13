@@ -1,0 +1,19 @@
+ln(x) = .5pi/AGM(1,1/x * 2^-30) - 32ln(2)
+
+geomean:
+;;Inputs: X,Y are elements of [1,4)
+;;  c=1
+;;  iterate 16 times
+;;      a=y-x
+;;      if underflow
+;;          a=-a
+;;          (x,y)=(y,x)
+;;      n=-2+intlog2(a)         ;basically find the first '1' bit
+;;      c-=c>>2n
+;;      c-=c>>2n
+;;      x+=x>>n
+;;      x+=x>>n
+;;      y-=y>>n
+;;      y-=y>>n
+;;  return mean(list)/c
+

@@ -1,0 +1,311 @@
+;==========================================================
+;Useful Routines
+;==========================================================
+;  add_64b
+;  FloatInvFPOP1
+;  FloatDiv_80
+;  fpOP2_Div_fpOP1
+;  SetfpOP3_NAN
+;  Set_NAN
+;  SetfpOP3_inf
+;  Set_inf
+;  Set_fpOP3_0
+;  Set_0
+;==========================================================
+;Special case division
+;==========================================================
+;inf/inf = NAN
+;inf/0   = inf
+;inf/NAN = NAN
+;inf/fin = inf
+;0  /inf = 0
+;0  /0   = NAN
+;0  /NAN = NAN
+;0  /fin = 0
+;NAN/inf = NAN
+;NAN/0   = NAN
+;NAN/NAN = NAN
+;NAN/fin = NAN
+;fin/inf = 0
+;fin/0   = inf
+;fin/NAN = NAN
+;==========================================================
+
+FloatInv_80:
+	call LoadFPOP1
+fpOP1_inv:
+	ld hl,const_1
+	call LoadFPOP2
+	jp fpOP2_Div_fpOP1
+
+FloatDiv_80:
+; 1 bit sign + 15 bits signed exponent (16384 is exp = 0)	(little endian)
+; 64 bits mantissa, (little endian)
+;Inputs:
+;  HL points to dividend
+;  DE points to divisor
+;Output:
+;  fpOP3 contains the quotient
+	ex de,hl
+	call LoadFPOPs
+fpOP2_Div_fpOP1:
+	ld hl,(fpOP2+12)
+	ld de,(fpOP1+12)
+	ld a,h
+	xor d
+	push af
+	res 7,d
+	res 7,h
+	ld a,h \ or a \ jr nz,$+6 \ or l \ jp z,casediv
+	ld a,d \ or a \ jr nz,$+6 \ or e \ jp z,casediv2
+	sbc hl,de
+	jp m,$+8
+	bit 6,h \ jp nz,divoverflow
+	ld bc,16384
+	add hl,bc
+	jp m,divunderflow
+	pop af
+	and $80
+	or h
+	ld h,a
+	push hl
+;Now perform the division of fpOP2/fpOP1
+;The algo works like this:
+;  Take the first byte of fpOP2, compare against that of fpOP1
+;  If it is bigger, since fpOP1 should have bit 7 set (normalized numbers),
+;    it divides at most once. So the first byte is 1, subtract fpOP2-fpOP1->fpOP2
+;  After this, we repeatedly compare the upper two bytes of fpOP1 to the first byte
+;    of fpOP1. This is to estimate how many times fpOP1 can be divided by fpOP1.
+;  This is just a guestimate, but each digit is an overestimate by at most 1!
+;
+;  Example with smaller numbers. Take 8AD176/AC0980
+;	First digit = 0	('digits' are 8-bit ints, so on [0,255])
+;	Now 8AD1/AC = CE, so 8AD176.00 - AC0980*0.CE    = 8AD176-8A6FAF = 61D1
+;	Now 61D1/AC = 91, so 61D1.0000 - AC0980*.0091   = 61D1.0-6171.6180 = 5F.9E80
+;	Now 5F9E/AC = 8E, so 5F.9E80   - AC0980*.00008E = 5F.9E8000-5F.6D4500 = .313B
+;  In this case, there were no over estimates. We would have know if the subtraction step
+;  yeilded a negative output. To adjust this, decrement the new digit by 1 and add AC0980 to the int.
+;  So the example gives 8AD176/AC0980 = 0.CE918E, or in base 10, 9097590/11274624=.806908488274
+
+;fpOP1+2 has denom
+;fpOP2+2 has num
+
+	ld hl,(fpOP2+10) \ ld (fpOP2+12),hl
+	ld hl,(fpOP2+8) \ ld (fpOP2+10),hl
+	ld hl,(fpOP2+6) \ ld (fpOP2+8),hl
+	ld hl,(fpOP2+4) \ ld (fpOP2+6),hl
+
+denom = fpOP1+4
+numer = fpOP2+6
+	ld hl,denom+7
+	ld de,numer+7
+	call cp_64b
+	ld hl,numer+8
+	ld (hl),0
+	jr c,noadjust
+		inc (hl)
+		ld de,numer
+		ld hl,denom
+		call sub_64b
+noadjust:
+	ld hl,numer+7
+	ld de,numer
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	call div_sub_1
+	ld de,fpOP3+11
+	ld hl,numer+8
+	ld a,(hl)
+	rra
+	jr nc,directcopy
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a \ dec de
+		dec hl \ ld a,(hl) \ rra \ ld (de),a
+	pop hl
+	ld (fpOP3+12),hl
+	ret
+directcopy:
+	dec hl
+	ldd
+	ldd
+	ldd
+	ldd
+	ldd
+	ldd
+	ldd
+	ldd
+	pop hl
+	dec hl
+	ld (fpOP3+12),hl
+	ret
+div_sub_1:
+	ld bc,(denom+7)
+	ld a,(hl)
+	dec hl
+	push hl
+	dec de
+	push de
+	ld l,(hl)
+	ld h,a
+	ex de,hl
+	call Div_Sub
+	ld a,e \ or a
+	ld c,e
+	call nz,fused_mul_sub
+	pop de
+	pop hl
+	ret
+fused_mul_sub:
+	push hl
+	ld b,0
+	ld de,(denom)
+	ld h,b \ ld l,b \ ld a,c
+	add a,a \ jr nc,$+4 \ ld h,d \ ld l,e
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	ld (fpOP3+4),hl \ ld (fpOP3+6),a
+
+	ld de,(denom+2)
+	ld h,b \ ld l,b \ ld a,c
+	add a,a \ jr nc,$+4 \ ld h,d \ ld l,e
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	ld de,(fpOP3+6) \ ld d,b
+	add hl,de \ adc a,b \ ld (fpOP3+6),hl \ ld (fpOP3+8),a
+
+	ld de,(denom+4)
+	ld h,b \ ld l,b \ ld a,c
+	add a,a \ jr nc,$+4 \ ld h,d \ ld l,e
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	ld de,(fpOP3+8) \ ld d,b
+	add hl,de \ adc a,b \ ld (fpOP3+8),hl \ ld (fpOP3+10),a
+
+	ld de,(denom+6)
+	ld h,b \ ld l,b \ ld a,c
+	add a,a \ jr nc,$+4 \ ld h,d \ ld l,e
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	add hl,hl \ rla \ jr nc,$+4 \ add hl,de \ adc a,b
+	ld de,(fpOP3+10) \ ld d,b
+	add hl,de \ adc a,b \ ld (fpOP3+10),hl \ ld (fpOP3+12),a
+
+	pop de \ ld hl,fpOP3+4
+	xor a
+	call sub_64b+1
+	inc hl \ inc de
+	ld a,(de) \ sbc a,(hl)
+	ld a,c \ ld (de),a
+;if c flag is set, overestimate
+	ret nc
+	ex de,hl
+	dec (hl)
+	ld de,-8
+	add hl,de
+	ex de,hl
+	ld hl,denom
+add_64b:
+	ld a,(de) \ add a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ inc hl \ inc de
+	ld a,(de) \ adc a,(hl) \ ld (de),a \ ret
+Div_Sub:
+;DE/C, DE <C*256, C>127
+	ld a,d
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ rla \ jr c,$+5 \ cp c \ jr c,$+4 \ sub c \ inc e
+	sla e \ adc a,a \ jr c,$+5 \ ret p \ cp c \ ret c \ inc e \ ret
+casediv:
+;  numerator is either Infinity, NAN, or Zero
+	ld a,(fpOP2+11)
+	or a
+	jp p,zero_div
+	add a,a \ jp p,SetfpOP3_NAN-1
+	ld a,d \ or a \ jr nz,divoverflow
+	or e \ jp nz,divoverflow
+	ld a,(fpOP1+11)
+	add a,a \ jp nc,divoverflow
+	jp SetfpOP3_NAN-1
+casediv2:
+;  numerator is a number, denom is either Infinity, NAN, or Zero
+	ld a,(fpOP1+11)
+	add a,a \ jp nc,divoverflow
+	jp m,divunderflow
+	pop af
+SetfpOP3_NAN:
+	ld hl,fpOP3+13
+Set_NAN:
+	xor a
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),$80 \ ret
+divoverflow:
+	pop af
+SetfpOP3_inf:
+	ld hl,fpOP3+13
+Set_inf:
+;sign flag reflects which infinity
+	ld de,0
+	jp p,$+5
+	ld d,$80
+	ld (hl),d \ dec hl
+	ld (hl),e \ dec hl
+	ld (hl),$C0 \ ret
+zero_div:
+	ld a,d \ or a \ jr nz,divunderflow
+	or e \ jr nz,divunderflow
+	ld a,(fpOP1+11)
+	add a,a \ jr nc,SetfpOP3_NAN-1
+	jp p,SetfpOP3_NAN-1
+divunderflow:
+	pop af
+SetfpOP3_0:
+	ld hl,fpOP3+13
+Set_0:
+;sign flag reflects which zero
+	ld de,0
+	jp p,$+5
+	ld d,80h
+	ld (hl),d \ dec hl
+	ld (hl),e \ dec hl
+	ld (hl),e \ ret
+
+.echo "FloatDiv Size:",$-FloatDiv_80

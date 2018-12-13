@@ -1,0 +1,236 @@
+;==========================================================
+;Useful Routines
+;==========================================================
+;  FloatSqrt_80
+;  NewtonIter_sqrt
+;==========================================================
+;Special case square root
+;==========================================================
+;  sqrt(0) = 0
+;  sqrt(NAN) = NAN
+;  sqrt(inf) = inf
+;==========================================================
+
+FloatSqrt_80:
+;  Newton's Iteration for Square Roots
+	call LoadFPOP1
+fpOP1_sqrt:
+	ld hl,(fpOP1+12)
+	bit 7,h \ ret nz
+	ld a,h \ or a \ jr nz,$+4 \ or l \ ret z
+	sub 40h \ rra \ rr l \ ld h,a
+	push hl
+	ld hl,4000h
+	rl l
+	ld (fpOP1+12),hl
+	ld de,temp1
+	call fpOP1_to
+
+;First iteration
+;Combining my algorithm's first iteration to get a decent approximation for newton's method.
+;  if fpOP1<2, use my algo, else rotate in a 1 bit and decrement the exponent
+;for most values, it takes off 2 iterations, but for some clusters it only saves 1 Newton iteration
+	ld hl,(fpOP1+12)
+	dec l \ jr nz,newton_sqrt_approx
+	ld (fpOP1+12),hl
+	ld hl,fpOP1+11
+	sra (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ jp sqrt_iter
+
+newton_sqrt_approx:
+	ld hl,fpOP1+11
+	call clzfpart
+	jr z,endsqrt
+;need to perform fpOP1-fpOP1>>(a+1)
+;as well as add 1+1/(2^(a+1)-1) which is 1.00...0100...0100... where there are "a" zeroes between each bit, then divide by 2
+	inc a
+	push af
+	inc a
+	ld hl,fpOP1+11
+	call rshift	;stored to outp128
+	ld de,fpOP1+4
+	ld hl,outp128+8
+	call sub_64b
+	pop af
+	ld hl,fpOP2+11
+	call bitunroll_64b
+	ld hl,fpOP2+4
+	ld de,fpOP1+4
+	call add_64b
+	ex de,hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl)
+
+
+;	ld hl,const_1
+;	call LoadfpOP2
+;	call fpOP1_Add_fpOP2
+;	ld hl,(fpOP1+12)
+;	dec hl
+;	ld (fpOP1+12),hl
+;4 of these iterations gets 56 bits of precision.
+;So close, but full precision is necessary.
+sqrt_iter:
+	call NewtonIter_sqrt
+	call NewtonIter_sqrt
+	call NewtonIter_sqrt
+	call NewtonIter_sqrt
+;	call NewtonIter_sqrt
+endsqrt:
+	pop de
+	ld hl,(fpOP1+12)
+	add hl,de
+	ld (fpOp1+12),hl
+	ret
+NewtonIter_sqrt:
+;  temp has the value of which to find the square root
+;  fpOP1 has the last value
+	call fpOP1_to_Ans
+	ld hl,temp1+4
+	call LoadFPOP2
+	call fpOP2_div_fpOP1
+	ld hl,Ans
+	ld de,fpOP3+4
+	call FloatAdd_80
+	ld hl,(fpOP1+12)
+	dec hl
+	ld (fpOP1+12),hl
+	ret
+
+clzfpart:
+;count the number of leading zeroes after the first 1 bit
+	ld e,8
+	ld a,(hl) \ add a,a \ jr nz,clzbyte
+	dec e \ ret z \ dec hl \ or (hl) \ jr z,$-4
+clzbyte:
+	sla e \ sla e \ sla e
+	dec e
+	add a,a
+	jr nc,$-2
+	ld a,63 \ sub e
+	inc e		; in order to ensure nz
+	ret
+rshift:
+;a is the number of bits to right shift
+;hl points to the data to shift
+;shifted result in outp128
+	ld c,a
+	ld de,outp128+15
+	and $F8
+	jr z,shiftbits
+	rra \ rra \ rra
+	ld b,a
+	xor a
+	ld (de),a
+	dec de
+	djnz $-2
+shiftbits:
+	ld a,64
+	sub c \ and $F8 \ rra \ rra \ rra \ inc a
+	ld b,c
+	ld c,a
+	ld a,b
+	ld b,0
+	push bc
+	push de
+	lddr
+	pop hl
+	pop bc
+	and 7
+	ret z
+	push hl \ or a \ ld b,c	;number of bytes to shift
+	rr (hl) \ dec hl \ djnz $-3
+	pop hl \ dec a \ jr nz,$-10
+	ret	
+bitunroll_64b:
+;A is the number of 0 bits between 1s
+	ld c,a
+	cp 8 \ jp nc,arbu
+	dec a \ jp m,bu_0
+	jr z,bu_1
+	dec a \ jr z,bu_2
+	dec a \ jr z,bu_3
+	dec a \ jr z,bu_4
+	dec a \ jr z,bu_5
+	dec a \ jr z,bu_6
+	dec a \ jr z,bu_7
+bu_7:
+	ld a,80h
+	jp bu_0+1
+bu_1:
+	ld a,$AB
+bu_0:
+	dec a
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ dec hl
+	ld (hl),a \ ret
+bu_6:
+	ld (hl),%10000001 \ dec hl
+	ld (hl),%00000010 \ dec hl
+	ld (hl),%00000100 \ dec hl
+	ld (hl),%00001000 \ dec hl
+	ld (hl),%00010000 \ dec hl
+	ld (hl),%00100000 \ dec hl
+	ld (hl),%01000000 \ dec hl
+	ld (hl),%10000001 \ dec hl
+
+bu_5:
+	ld (hl),%10000010 \ dec hl
+	ld (hl),%00001000 \ dec hl
+	ld (hl),%00100000 \ dec hl
+	ld (hl),%10000010 \ dec hl
+	ld (hl),%00001000 \ dec hl
+	ld (hl),%00100000 \ dec hl
+	ld (hl),%10000010 \ dec hl
+	ld (hl),%00001000 \ ret
+
+bu_4:
+	ld (hl),%10000100 \ dec hl
+	ld (hl),%00100001 \ dec hl
+	ld (hl),%00001000 \ dec hl
+	ld (hl),%01000010 \ dec hl
+	ld (hl),%00010000 \ dec hl
+	ld (hl),%10000100 \ dec hl
+	ld (hl),%00100001 \ dec hl
+	ld (hl),%00001000 \ ret
+bu_3:
+	ld a,$88
+	jp bu_0+1
+bu_2:
+	ld (hl),%10010010 \ dec hl
+	ld (hl),%01001001 \ dec hl
+	ld (hl),%00100100 \ dec hl
+	ld (hl),%10010010 \ dec hl
+	ld (hl),%01001001 \ dec hl
+	ld (hl),%00100100 \ dec hl
+	ld (hl),%10010010 \ dec hl
+	ld (hl),%01001001 \ ret
+arbu:
+;okay, enough of the custom ones
+	ld (hl),80h \ dec hl
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
+	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ ret nc \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a \ ret
+
+.echo "FloatSqrt    :",$-FloatSqrt_80

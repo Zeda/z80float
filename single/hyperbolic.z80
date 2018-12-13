@@ -1,0 +1,117 @@
+hyperout=scrap+9
+hyperout2=scrap+13
+tanhSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld de,hyperout
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    or a
+    jr z,tanh_inf
+    inc a
+    jr z,tanh_zero
+    ld (de),a
+    ld hl,hyperout
+    ld b,h
+    ld c,l
+    call expSingle
+    ld de,const_1
+    call ameanSingle
+    call invSingle
+    pop bc
+    call rsubSingle
+    pop hl
+    pop de
+    pop af
+    ret
+tanh_zero:
+    pop hl
+    ld b,h
+    ld c,l
+    xor a
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    dec a
+    ld (hl),a
+    pop hl
+    pop de
+    pop af
+    ret
+tanh_inf:
+    dec hl
+    ld a,(hl)
+    add a,a
+    jp p,tanh_NAN
+    pop hl
+    ld b,h
+    ld c,l
+    ld a,0
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    rra
+    ld (hl),a \ inc hl
+    ld (hl),80h
+    pop hl
+    pop de
+    pop af
+    ret
+tanh_NAN:
+    pop hl
+    ld b,h
+    ld c,l
+    xor a
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    ld (hl),a \ inc hl
+    ld (hl),a
+    pop hl
+    pop de
+    pop af
+    ret
+    
+sinhSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld bc,hyperout
+    call expSingle
+    ld h,b
+    ld l,c
+    ld bc,hyperout2
+    call invSingle
+    ld d,b
+    ld e,c
+    ex de,hl
+    call negSingle
+    pop bc
+    call ameanSingle
+    pop de
+    pop hl
+    pop af
+    ret
+coshSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld bc,hyperout
+    call expSingle
+    ld h,b
+    ld l,c
+    ld bc,hyperout2
+    call invSingle
+    ld d,b
+    ld e,c
+    pop bc
+    call ameanSingle
+    pop de
+    pop hl
+    pop af
+    ret
+

@@ -1,0 +1,2 @@
+Thanks to Runer112 for help optimizing some of these routines!
+Thanks Runer112 for ppinting out I can negate the denominator in division beforehand !

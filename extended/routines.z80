@@ -1,0 +1,83 @@
+sub64:
+;266cc
+  or a
+sbc64:
+;262cc
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a
+  ret
+rsub40:
+  ld a,(de) \ sub (hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a
+  ret
+add64:
+;266cc
+  or a
+adc64:
+;262cc
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a
+  ret
+cmp64:
+;avg: 25.12156863cc
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
+  ld a,(de) \ cp (hl) \ ret
+mov10:
+  ldi
+  ldi
+mov8:
+  ldi
+  ldi
+  ldi
+  ldi
+  ldi
+  ldi
+  ldi
+  ldi
+  ret
+swapfpOP2fpOP3:
+;370cc
+  ld hl,(fpOP2+8)
+  ld de,(fpOP3+8)
+  ld (fpOP3+8),hl
+  ld (fpOP2+8),de
+swapfpOP2fpOP3_mantissa:
+;298cc
+  ld hl,(fpOP2)
+  ld de,(fpOP3)
+  ld (fpOP3),hl
+  ld (fpOP2),de
+  ld hl,(fpOP2+2)
+  ld de,(fpOP3+2)
+  ld (fpOP3+2),hl
+  ld (fpOP2+2),de
+  ld hl,(fpOP2+4)
+  ld de,(fpOP3+4)
+  ld (fpOP3+4),hl
+  ld (fpOP2+4),de
+  ld hl,(fpOP2+6)
+  ld de,(fpOP3+6)
+  ld (fpOP3+6),hl
+  ld (fpOP2+6),de
+  ret

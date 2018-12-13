@@ -1,0 +1,201 @@
+;==========================================================
+;Useful Routines
+;==========================================================
+;  FloatSub_80
+;  FloatAdd_80
+;  fpOP1_Add_fpOP2
+;==========================================================
+;Special case addition/subtraction
+;==========================================================
+;inf+inf = inf
+;inf+0   = inf
+;inf+NAN = NAN
+;inf+fin = inf
+;0  +0   = 0
+;0  +NAN = NAN
+;0  +fin = fin
+;NAN+NAN = NAN
+;NAN+fin = NAN
+;==========================================================
+FloatSub_80:
+	call LoadFPOPs
+fpOP1_Sub_fpOP2:
+	ld hl,fpOP2+13
+	ld a,(hl)
+	xor 80h
+	ld (hl),a
+	jp FloatAdd_80+3
+FloatAdd_80:
+; This is not an excellent implementation
+; In fact, it has a bunch of flaws, but I need to get a slightly working one ready.
+; Specifically, rounding has no specific format, and it doesn't use any extra precision
+	call LoadFPOPs
+fpOP1_Add_fpOP2:
+	ld hl,(fpOP1+12)
+	ld de,(fpOP2+12)
+	res 7,h
+	res 7,d
+	ld a,h \ or a \ jr nz,$+6 \ or l \ jp z,caseadd
+	ld a,d \ or a \ jr nz,$+6 \ or e \ jp z,caseadd2
+	xor a
+	sbc hl,de
+	jr z,addops
+	jr c,shiftfpOP1
+;shift fpOP2, HL times
+	inc h \ dec h \ ret nz
+	ld a,l
+	add hl,de
+	ex de,hl
+	ld hl,fpOP2+11
+	jp shiftop
+shiftfpOP1:
+	inc h \ ret nz \ sub l
+	ld hl,fpOP1+9
+shiftop:
+	push de
+	ld c,a \ ld b,0
+	sra c \ sra c \ sra c
+;C is the number of byte to shift down
+	ld d,h \ ld e,l
+	or a \ sbc hl,bc
+	push hl
+	ex de,hl
+	ld b,a
+	ld a,9 \ sub c
+	ld c,a
+	ld a,b
+	ld b,0
+	push bc
+	lddr
+	pop bc
+	pop hl
+	and 7 \ jr z,addops-1
+	ld b,a
+shiftloop:
+	or a \ push hl \ push bc \ rr (hl) \ dec hl \ dec c \ jr nz,$-4 \ pop bc \ pop hl \ djnz shiftloop
+	pop de
+addops:
+	push af
+	ld a,(fpOP1+13)
+	ld hl,(fpOP2+12)
+	xor h
+	jp p,actualaddops
+	ld a,(fpOP1+13) \ and 80h \ xor d \ ld d,a \ ld (fpOP1+12),de
+	pop af
+;subtract, if carry, invert, toggle carry flag of fpOP1
+	ld bc,fpOP1+3
+	ld hl,fpOP2+3
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ sbc a,(hl) \ ld (bc),a \ jr c,negate
+	ret m
+normFPOP1:
+	ld hl,fpOP1
+normalize:
+	ld de,0
+;check if zero
+	ld a,(hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ inc hl
+	or (hl) \ ret z
+	push hl
+	ld bc,11
+	push de
+shiftloop2:
+	ld a,(hl) \ or a \ jr nz,shiftloop1
+	push hl \ ld d,h \ ld e,l \ dec hl \ ld a,c \ lddr \ ld c,a \ pop hl \ dec c \ jp nz,shiftloop2
+shiftloop1:
+;C+1 is number of bytes to shift
+	pop de
+	sbc hl,bc \ inc c
+shiftloop3:
+	or a
+	push hl \ ld b,c \ rl (hl) \ inc hl \ djnz $-3 \ dec de \ pop hl \ jp p,shiftloop3
+;now adjust DE by doing DE-8*(12-c)
+	ld a,12 \ sub c
+	add a,a
+	add a,a
+	add a,a
+	ld c,a
+	ex de,hl
+	sbc hl,bc
+	pop de
+	ex de,hl
+	inc hl
+	ld c,(hl) \ inc hl \ ld b,(hl)
+	ex de,hl
+	add hl,bc
+	ex de,hl
+	ld (hl),d \ dec hl \ ld (hl),e
+	ret
+negate:
+	ld hl,-8 \ add hl,bc
+	xor a \ ld b,a
+	sub (hl) \ ld (hl),a \ dec hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a \ inc hl
+	ld a,b \ sbc a,(hl) \ ld (hl),a
+	ld bc,-9
+	add hl,bc
+	ld a,(hl)
+	xor 80h
+	ld (hl),a
+	dec hl
+	jp normalize
+
+actualaddops:
+	pop af
+	ld bc,fpOP1+3
+	ld hl,fpOP2+3
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ inc bc \ inc hl
+	ld a,(bc) \ adc a,(hl) \ ld (bc),a \ ld (fpOP1+12),de
+	ret nc
+	ld h,b \ ld l,c
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl) \ dec hl
+	rr (hl)
+	inc de
+	ld (fpOP1+12),de
+	ret
+caseadd:
+	ld a,(fpOP1+11)
+	add a,a
+	jp nc,fpOP2_to_fpOP1
+	ret
+caseadd2:
+	ld a,(fpOP2+11)
+	add a,a
+	ret nc
+	jp fpOP2_to_fpOP1
+.echo "FloatAdd/Sub :",$-FloatSub_80

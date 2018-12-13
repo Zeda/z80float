@@ -1,0 +1,73 @@
+seedRand:
+    push af
+    push hl
+    ld a,r
+    ld h,a
+    cpl
+    ld l,a
+    ld (seed2_0),hl
+    ld (seed2_1),hl
+    ld (seed1_0),hl
+    pop hl
+    pop af
+    ret
+randSingle:
+    push af
+    push hl
+    push de
+    push bc
+    call rand
+;ADECHL
+    ld a,b
+    ld b,7Fh
+    or a
+    jp m,$+15
+    dec b \ add hl,hl \ rl c \ rl e \ rl d \ adc a,a \ jp p,$-9
+    pop hl
+    ld (hl),e
+    ld e,b
+    ld b,h
+    ld c,l
+    inc hl
+    ld (hl),d \ inc hl
+    and 7Fh
+    ld (hl),a \ inc hl
+    ld (hl),e
+    pop de
+    pop hl
+    pop af
+    ret
+rand:
+;;Tested and passes all CAcert tests
+;;Uses a very simple 32-bit LCG and 32-bit LFSR
+;;it has a period of 18,446,744,069,414,584,320
+;;roughly 18.4 quintillion.
+;;LFSR taps: 0,2,6,7  = 11000101
+;;323cc
+    ld hl,(seed1_0)
+    ld de,(seed1_1)
+    ld b,h
+    ld c,l
+    add hl,hl \ rl e \ rl d
+    add hl,hl \ rl e \ rl d
+    inc l
+    add hl,bc
+    ld (seed1_0),hl
+    ld hl,(seed1_1)
+    adc hl,de
+    ld (seed1_1),hl
+    ex de,hl
+;;lfsr
+    ld hl,(seed2_0)
+    ld bc,(seed2_1)
+    add hl,hl \ rl c \ rl b
+    ld (seed2_1),bc
+    sbc a,a
+    and %11000101
+    xor l
+    ld l,a
+    ld (seed2_0),hl
+    ex de,hl
+    add hl,bc
+    ret
+.echo "randSingle:",$-randSingle

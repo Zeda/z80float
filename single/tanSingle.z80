@@ -1,0 +1,30 @@
+tanSingle:
+    push af
+    push hl
+    push de
+    push bc
+    
+    ld de,scrap
+    xor a
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    ld (de),a \ inc de
+    dec a
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    ld (de),hl
+    ld hl,scrap
+    ld b,h
+    ld c,l
+    call cexpSingle
+    ld de,scrap+4
+    ex de,hl
+    pop bc
+    call divSingle
+    pop de
+    pop hl
+    pop af
+    ret
+.echo "tanSingle:",$-tanSingle

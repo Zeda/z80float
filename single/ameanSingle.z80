@@ -1,0 +1,23 @@
+ameanSingle:
+;Not entirely correct. addSingle might overflow to infinity before dividing by 2
+    push af
+    push hl
+    push de
+    push bc
+    call addSingle
+    ld h,b
+    ld l,c
+    inc hl
+    inc hl
+    inc hl
+    ld a,(hl)
+    or a
+    jr z,endamean
+    dec (hl)
+endamean:
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+

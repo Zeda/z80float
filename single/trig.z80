@@ -1,0 +1,131 @@
+trig_y = scrap+10
+trig_x = scrap+14
+trig_a = scrap+18
+trig_z = scrap+22
+tanSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld bc,trig_y
+    call cosSingle
+    ld d,b
+    ld e,c
+    ld h,d
+    ld l,e
+    ld bc,trig_x
+    call mulSingle
+    ld hl,const_1
+    ld d,b
+    ld e,c
+    call subSingle
+    ex de,hl
+    call sqrtSingle
+    ld de,trig_y
+    pop bc
+    call divSingle
+    pop de
+    pop hl
+    pop af
+    ret
+sinSingle:
+;y=x*x
+;x(1-y/6(1-y/20(1-y/42(1-y/72(1-y/110)))))
+    push af
+    push hl
+    push de
+    push bc
+    ld de,trig_x
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    ld (de),a
+    ld hl,trig_a
+    xor a \ ld (hl),a
+    inc hl \ ld (hl),a
+    inc hl \ ld (hl),a
+    or 80h
+    inc hl \ ld (hl),a
+    ld hl,trig_x
+    ld d,h
+    ld e,l
+    ld bc,trig_y
+    call mulSingle
+    
+    ld de,const_110_inv+1
+    call trigsub
+    ld de,const_72_inv+1
+    call trigsub
+    ld de,const_42_inv+1
+    call trigsub
+    ld de,const_20_inv+1
+    call trigsub
+    ld de,const_6_inv+1
+    call trigsub
+    ld hl,trig_x
+    pop bc
+    call mulSingle
+    pop de
+    pop hl
+    pop af
+    ret
+cosSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld d,h
+    ld e,l
+    ld bc,trig_y
+    call mulSingle
+    ld hl,trig_a
+    xor a \ ld (hl),a
+    inc hl \ ld (hl),a
+    inc hl \ ld (hl),a
+    or 80h
+    inc hl \ ld (hl),a
+    
+    ld de,const_90_inv+1
+    call trigsub
+    ld de,const_56_inv+1
+    call trigsub
+    ld de,const_30_inv+1
+    call trigsub
+    ld de,const_12_inv+1
+    call trigsub
+    ld de,const_2_inv+1
+    call trigsub
+    pop de
+    push de
+    ld hl,trig_a
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    ld (de),a
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+trigsub:
+    ld hl,trig_y
+    ld bc,trig_z
+    call mulSingle
+    ld h,b \ ld l,c
+    ld de,trig_a
+    ld bc,trig_a
+    call mulSingle
+    ld hl,const_1
+    jp subSingle
+const_110_inv:  .db $4f,$09,$f2,$14,$79
+const_90_inv:   .db $b6,$60,$0b,$36,$79
+const_72_inv:   .db $e4,$38,$8e,$63,$79
+const_56_inv:   .db $92,$24,$49,$12,$7a
+const_42_inv:   .db $c3,$30,$0c,$43,$7a
+const_30_inv:   .db $89,$88,$88,$08,$7b
+const_20_inv:   .db $cd,$cc,$cc,$4c,$7b
+const_12_inv:   .db $ab,$aa,$aa,$2a,$7c
+const_6_inv:    .db $ab,$aa,$aa,$2a,$7d
+const_2_inv:    .db $00,$00,$00,$00,$7f

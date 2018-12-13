@@ -1,0 +1,37 @@
+div64:
+;var_n / var_x
+;570+2*div64_32+mul32+{0,338+{0,31+{0,31+{0,15
+;570+2*3396.768+2389.652cc+{0,338+{0,31+{0,31+{0,15
+;avg: 9922.248784cc
+  call div64_32
+  ld (var_q+4),ix
+  ld (var_q+6),bc
+;Need to adjust the remainder
+  ld (var_n+6),hl
+  ld (var_n+4),de
+  ld hl,(var_x)
+  ld de,(var_x+2)
+  call mul32  ;DEHL * BCIX
+  ;var_z0 holds the 64-bit result
+  ;need var_n-z0_32
+  ld hl,0
+  ld (var_n),hl
+  ld (var_n+2),hl
+  ld de,var_n
+  ld hl,z0_32
+  call sub64
+  jr nc,+_
+  ld de,var_n
+  ld hl,var_x
+  call add64
+  ld hl,var_q+4
+  ld a,(hl) \ dec (hl) \ or a \ jr nz,+_
+  inc hl \ ld a,(hl) \ dec (hl) \ or a \ jr nz,+_
+  inc hl \ ld a,(hl) \ dec (hl) \ or a \ jr nz,+_
+  inc hl \ ld a,(hl) \ dec (hl)
+_:
+  call div64_32
+  ld (var_q),ix
+  ld (var_q+2),bc
+  ret
+.echo "  div64: +",$-div64

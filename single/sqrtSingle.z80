@@ -1,0 +1,211 @@
+sqrtSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld c,0
+    ld b,(hl) \ inc hl
+    ld e,(hl) \ inc hl
+    ld a,(hl) \ inc hl
+    add a,a
+    jr c,sqrt_nan
+    scf
+    rra
+    ld d,a
+    ld a,(hl)
+    or a
+    jr z,sqrt_spec
+    rra
+;80 -> 80
+;81 -> 80
+    jr c,$+10
+    srl d \ rr e \ rr b \ rr c
+    add a,a
+    add a,80h
+    rra
+    push af     ;exponent
+    ld h,b
+    ld l,c
+    push ix
+    call sqrt
+    pop ix
+;result in DEBC
+    rl c
+    pop af
+    jr nc,$+12 \ inc b \ jr nz,$+9 \ inc e \ jr nz,$+6 \ inc d \ jr nz,$+3 \ inc a
+    pop hl
+    push hl
+    ld (hl),b \ inc hl
+    ld (hl),e \ inc hl
+    res 7,d
+    ld (hl),d \ inc hl
+    ld (hl),a
+    pop bc
+    pop de
+    pop hl
+    pop af
+    ret
+sqrt_spec:
+    ld a,e
+    add a,a
+    pop hl
+    ld b,h
+    ld c,l
+    ld de,0
+    jr z,sqrt_ret
+    jp m,sqrt_inf
+sqrt_NAN:
+    ld d,$20
+    jr sqrt_ret
+sqrt_inf:
+    ld d,$40
+sqrt_ret:
+    ld (hl),e \ inc hl
+    ld (hl),e \ inc hl
+    ld (hl),d \ inc hl
+    ld (hl),e
+    pop de
+    pop hl
+    pop af
+    ret
+sqrt:
+;32 bits returned, sqrt(x), x is a 0.32 fixed-point value
+;;input x=DEHL
+    exx
+    ld hl,0 ; |r1=0
+    ld d,h  ;\
+    ld e,l  ; |r2=0
+    ld b,h  ; |
+    ld c,l  ;/
+    call sqrtsub1
+    call sqrtsub2
+    push hl
+    pop ix
+    ld l,d
+    ld h,d
+    ld a,8
+;    ld ix,0
+;    ld a,16
+loop1:
+    push af
+    ld a,ixl \ add ix,ix \ adc hl,hl;\
+    add ix,ix \ adc hl,hl \ exx     ; |Basically does
+    add hl,hl \  rla  ; | sla r0 \ rl r1
+    add hl,hl \  rla  ; | sla r0 \ rl r1
+    ld ixl,a \ exx                  ;/
+    sla c \ rl b; |sla r2
+    rl e \ rl d ;/
+    inc c
+    push ix     ;\
+    ex (sp),hl  ; |
+    sbc hl,bc   ; |r1=r1-r2
+    ex (sp),hl  ; |
+    pop ix      ; |
+    sbc hl,de   ;/
+    jr c,$+5
+    inc c
+    jr $+7
+    add ix,bc   ; |r1=r1+r2
+    adc hl,de   ;/
+    dec c
+    pop af      ; |r3--
+    dec a       ;/
+    jr nz,loop1
+    ld a,14     ;r3=14
+loop2:
+    add ix,ix \ adc hl,hl   ;sla r1
+    add ix,ix \ adc hl,hl   ;sla r1
+    sla c \ rl b;\
+    rl e \ rl d ; |sla r2 \ inc r2
+    inc c       ;/
+    push ix     ;\
+    ex (sp),hl  ; |
+    sbc hl,bc   ; |r1=r1-r2
+    ex (sp),hl  ; |
+    pop ix      ; |
+    sbc hl,de   ;/
+    jr c,endofloop2
+    inc c       ;inc r2
+    jr skipfix2
+endofloop2:
+    add ix,bc   ; |r1=r1+r2
+    adc hl,de   ;/
+    dec c       ;inc r2
+skipfix2:
+    dec a       ;/
+    jr nz,loop2
+    add ix,ix \ adc hl,hl \ rla
+    add ix,ix \ adc hl,hl \ rla
+;ixhl - DEBC-DEBC-1
+    sla c \ rl b
+    rl e \ rl d
+    inc c
+    push ix     ;\
+    ex (sp),hl  ; |
+    sbc hl,bc   ; |r1=r1-r2
+    ex (sp),hl  ; |
+    pop ix
+    sbc hl,de   ;/
+    sbc a,0
+    jr c,endofloop3
+    inc c       ;inc r2
+    jr skipfix3
+endofloop3:
+    add ix,bc   ; |r1=r1+r2
+    adc hl,de   ;/
+    dec c
+skipfix3:
+    add ix,ix \ adc hl,hl \ rla
+;ixhl - DEBC
+    push ix     ;\
+    ex (sp),hl  ; |
+    sbc hl,bc   ; |r1=r1-r2
+    ex (sp),hl  ; |
+    pop ix
+    sbc hl,de   ;/
+    sbc a,0
+    ret c
+    inc c
+    ret
+sqrtsub2:
+    call +_
+_:
+    call +_
+_:
+    ld a,l
+    add hl,hl
+    add hl,hl
+    exx
+    sla e \ rla ; | sla r0 \ rl r1
+    rl e \ rla  ; | sla r0 \ rl r1
+    exx
+    ld l,a
+    sla c \ rl b
+    inc c
+    sbc hl,bc
+    inc c
+    ret nc
+    dec c
+    add hl,bc
+    dec c
+    ret
+sqrtsub1:
+    call +_
+_:
+    call +_
+_:
+    ld a,l \ exx;\
+    sla d \ rla ; | sla r0 \ rl r1
+    rl d \ rla  ; | sla r0 \ rl r1
+    exx
+    ld l,a
+    sla c
+    scf
+    sbc a,c
+    ret c
+    ld l,a
+    inc c
+    inc c
+    ret
+
+.echo "sqrtSingle:",$-sqrtSingle
