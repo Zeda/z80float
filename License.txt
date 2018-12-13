@@ -1,6 +1,0 @@
-This is a tentative license.
-
-Do with these codes what you want, just give credit where it is due.
-
-As hard as we may work on these routines, they may still have bugs and damage-causing errors, so be careful.
-Take that as a warning. Don't put the fate of the world or a life in the hands of these routines without acknowledging the potential consequences.
