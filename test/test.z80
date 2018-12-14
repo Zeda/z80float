@@ -1,13 +1,100 @@
-#define Karatsuba   ;use the faster Karatsuba multiplication
+#define bcall(x) rst 28h \ .dw x
 #include "../extended/float.inc"
-
+#define test(x,y,s) call testputs \ .db s,0 \ ld hl,x \ ld de,y \ call subtest
+penCol    = 86D7h
+penRow    = 86D8h
+_VPutS    = 4561h
+fontFlags     = 32h
+fracDrawLFont = 2
+sGrFlags      = 14h
+textWrite     = 7
+_GrBufClr     = 4BD0h
+_GrBufCpy     = 486Ah
 .db $BB,$6D
 .org $9D95
-  ld de,const_e+7
-  ld hl,const_pi+7
-  ld bc,fpOP1
-;ADF85458 A2BB4A91 + C90FDAA2 2168C234
-  call xrsub
+  bcall(_GrBufClr)
+  res fracDrawLFont,(iy + fontFlags)
+  set textWrite, (IY + sGrFlags)
+  ld hl,0
+  ld (penCol),hl
+  call +_
+  bcall(_GrBufCpy)
+  ret
+_:
+;;Hey, add more tests here!
+
+  rsubx(const_pi,const_e,fpOP4)
+  test(fpOP4,e_min_pi,"e - pi")
+  ret
+e_min_pi:
+  .db $18,$BD,$6B,$F5,$4B,$32,$BC,$D8,$FE,$BF
+
+
+
+subtest:
+  ld bc,8000h
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex \ inc hl \ inc de
+  ld a,(de) \ xor (hl) \ call tohex
+  xor a
+  ld (bc),a
+  ld l,a
+  ld h,b
+  bcall(_VPutS)
+  ld hl,(penCol)
+  ld l,0
+  ld a,6
+  add a,h
+  ld h,a
+  ld (penCol),hl
+  ret
+tohex:
+  push af
+  and $0F
+  add a,'0'
+  cp $3A
+  jr c,$+4
+  add a,7
+  ld (bc),a
+  inc bc
+  pop af
+  rrca
+  rrca
+  rrca
+  rrca
+  and $0F
+  add a,'0'
+  cp $3A
+  jr c,$+4
+  add a,7
+  ld (bc),a
+  inc bc
+  ret
+testputs:
+  ex (sp),hl
+  push de
+  push bc
+  push af
+  bcall(_VPutS)
+  ex de,hl
+  ld hl,(penCol)
+  ld l,8
+  ld a,6
+  add a,h
+  ld h,a
+  ld (penCol),hl
+  ex de,hl
+  pop af
+  pop bc
+  pop de
+  ex (sp),hl
   ret
 
 
