@@ -2,18 +2,30 @@
 ;The following constants are accurate to 120 bits of precision.
 ;Obtained via Wolfram Alpha.
 ;==========================================================
+const_log10_2_ext:
+  .db $91,$7C,$0B,$AC,$59,$89,$8F
 const_log10_2:
-  .db $91,$7C,$0B,$AC,$59,$89,$8F,$98,$F7,$CF,$FB,$84,$9A,$20,$9A \ .dw $3FFE
+  .db $98,$F7,$CF,$FB,$84,$9A,$20,$9A \ .dw $3FFE
+const_log2_10_ext:
+  .db $DB,$AF,$4D,$FF,$F6,$2B,$49
 const_log2_10:
-  .db $DB,$AF,$4D,$FF,$F6,$2B,$49,$FE,$8A,$1B,$CD,$4B,$78,$9A,$D4 \ .dw $4001
+  .db $FE,$8A,$1B,$CD,$4B,$78,$9A,$D4 \ .dw $4001
+const_e_ext:
+  .db $3C,$3D,$27,$20,$56,$dc,$af
 const_e:
-  .db $3C,$3D,$27,$20,$56,$dc,$af,$91,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
+  .db $91,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
+const_pi_ext:
+  .db $1C,$DC,$80,$8B,$62,$C6,$C4
 const_pi:
-  .db $1C,$DC,$80,$8B,$62,$C6,$C4,$34,$C2,$68,$21,$a2,$da,$0f,$c9 \ .dw $4001
+  .db $34,$C2,$68,$21,$a2,$da,$0f,$c9 \ .dw $4001
+const_log2_e_ext:
+  .db $3E,$1d,$69,$d0,$fe,$87,$be
 const_log2_e:
-  .db $3E,$1d,$69,$d0,$fe,$87,$be,$bb,$f0,$17,$5c,$29,$3b,$aa,$b8 \ .dw $4000
+  .db $bb,$f0,$17,$5c,$29,$3b,$aa,$b8 \ .dw $4000
+const_loge_2_ext:
+  .db $f6,$f2,$03,$98,$b3,$e3,$c9
 const_loge_2:
-  .db $f6,$f2,$03,$98,$b3,$e3,$c9,$ab,$79,$cf,$d1,$f7,$17,$72,$b1 \ .dw $3FFF
+  .db $ab,$79,$cf,$d1,$f7,$17,$72,$b1 \ .dw $3FFF
 ;==========================================================
 
 ;==========================================================
@@ -27,5 +39,3 @@ const_NAN:
   .db $00,$00,$00,$00,$00,$00,$00,$80 \ .dw $0000
 const_INF:
   .db $00,$00,$00,$00,$00,$00,$00,$C0 \ .dw $0000
-
-
