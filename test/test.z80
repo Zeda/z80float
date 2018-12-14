@@ -1,0 +1,23 @@
+#define Karatsuba   ;use the faster Karatsuba multiplication
+#include "../extended/float.inc"
+
+.db $BB,$6D
+.org $9D95
+  ld de,const_e+7
+  ld hl,const_pi+7
+  ld bc,fpOP1
+;ADF85458 A2BB4A91 / C90FDAA2 2168C234
+  call xdiv
+  ret
+
+
+#include "../extended/xsqrt.z80"
+#include "../extended/xdiv.z80"
+#include "../extended/xmul.z80"
+#include "../extended/xadd.z80"
+#include "../extended/mul/sqr32.z80"
+xroutines:
+#include "../extended/routines.z80"
+.echo "routines: ",$-xroutines
+.echo "Total: ",$-$9D95
+#include "../extended/constants.z80"
