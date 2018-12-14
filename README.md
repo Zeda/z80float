@@ -20,6 +20,19 @@ Extended precision floats are stored as 8 little-endian bytes for the (normalize
     inf is represented with %11
     NaN is represented with %01
 ```
+### Testing
+
+In `/test/test.z80` are some examples. For example:
+```
+  rsubx(const_pi,const_e,fpOP4) ;e-pi -> fpOP4
+  test(fpOP4,e_min_pi,"e - pi")     ;Display "e-pi", then XOR the float at fpOP4
+                                    ;with e_min_pi, displaying the hex.
+...
+
+e_min_pi:
+  .db $18,$BD,$6B,$F5,$4B,$32,$BC,$D8,$FE,$BF   ;what should be returned by e-pi
+```
+
 ---
 ## Single Precision Floats
 
