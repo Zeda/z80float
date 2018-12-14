@@ -6,8 +6,8 @@
   ld de,const_e+7
   ld hl,const_pi+7
   ld bc,fpOP1
-;ADF85458 A2BB4A91 / C90FDAA2 2168C234
-  call xdiv
+;ADF85458 A2BB4A91 + C90FDAA2 2168C234
+  call xrsub
   ret
 
 
