@@ -1,3 +1,67 @@
+xsub:
+;Input:
+;  HL points to one number
+;  DE points to another
+
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop de
+  ld hl,fpOP3
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+;copy the inputs to fpOP2 and fpOP3, leaving fpOP1 open for shifting
+  push de
+  ld de,fpOP2
+  call mov10
+  dec de
+  ld a,(de)
+  xor 80h
+  ld (de),a
+  inc de
+  pop hl
+  call mov10
+  jp subadd_stepin
+xrsub:
+;Input:
+;  HL points to one number
+;  DE points to another
+
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop de
+  ld hl,fpOP3
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+;copy the inputs to fpOP2 and fpOP3, leaving fpOP1 open for shifting
+  push de
+  ld de,fpOP2
+  call mov10
+  pop hl
+  call mov10
+  dec de
+  ld a,(de)
+  xor 80h
+  ld (de),a
+  jp subadd_stepin
+
 xadd:
 ;Input:
 ;  HL points to one number
@@ -24,13 +88,13 @@ _:
   call mov10
   pop hl
   call mov10
+subadd_stepin:
 	ld hl,(fpOP2+8)
 	ld de,(fpOP3+8)
+  res 7,h
+  res 7,d
   xor a
   ld (fpOP2-1),a
-  ld a,h
-  xor d
-  ld b,a
   ld a,h
   or l
   jp z,caseadd
@@ -38,8 +102,6 @@ _:
   or e
   jp z,caseadd1
 ; Now make sure fpOP3 has the bigger exponent
-  res 7,h
-  res 7,d
   sbc hl,de
   jr nc,+_
   xor a
@@ -107,7 +169,8 @@ add_shifted:
   ld c,a
   sub (hl)
   ld (hl),a
-  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  ld hl,fpOP3
+  ld a,c \ sbc a,(hl) \ ld (hl),a
   inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
   inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
   inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
@@ -118,7 +181,25 @@ add_shifted:
 _:
   ret m
 ;need to shift up until top bit is 1. Should be at most 1 shift, I think
+
+
   ld de,(fpOP3+8)
+  ld a,(fpOP2-1)
+  ld hl,fpOP3-1
+  ld (hl),a
+;We need to make sure that the mantissa isn't zero
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  inc hl \ or (hl) \ jr nz,+_
+  ld h,a
+  ld l,a
+  ld (fpOP3+8),hl
+  ret
 _:
   dec de
   ld a,d
@@ -126,7 +207,7 @@ _:
   or e
   jp z,add_zero
 
-  ld hl,fpOP2-1
+  ld hl,fpOP3-1
   sla (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
@@ -137,7 +218,7 @@ _:
   rl (hl) \ inc hl
   rl (hl)
   jp p,-_
-  ld (fpOP3),de
+  ld (fpOP3+8),de
   ret
 xadd_add:
   ;add the mantissas
