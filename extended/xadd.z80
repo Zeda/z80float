@@ -9,16 +9,9 @@ xadd:
   push af
   push bc
   call +_
-  pop hl
-  push de
-  ex de,hl
-  ld hl,var_z+8
-  call mov8
-  ex de,hl
   pop de
-  ld (hl),e
-  inc hl
-  ld (hl),d
+  ld hl,fpOP3
+  call mov10
   pop af
   pop bc
   pop de
@@ -33,15 +26,17 @@ _:
   call mov10
 	ld hl,(fpOP2+8)
 	ld de,(fpOP3+8)
+  xor a
+  ld (fpOP2-1),a
   ld a,h
   xor d
   ld b,a
   ld a,h
   or l
-  jr z,caseadd
+  jp z,caseadd
   ld a,d
   or e
-  jr z,caseadd1
+  jp z,caseadd1
 ; Now make sure fpOP3 has the bigger exponent
   res 7,h
   res 7,d
@@ -63,9 +58,141 @@ _:
   ld a,l
   cp 66
   ret nc
+;Now we need to shift down by A bits.
+  or a
+  jr z,add_shifted
+  rra \ call c,srlfpOP2_mantissa
+  rra \ call c,srl2fpOP2_mantissa
+  rra \ call c,srl4fpOP2_mantissa
+  and $1F
+  ld l,a
+  ld bc,fpOP2&255
+  ld h,fpOP2>>8
+  add hl,bc
+  sub 10
+  cpl
+  ld c,a
+  ldir
+  ld c,a
+  ld a,9
+  sub c
+  jr nz,add_shifted
+  ld b,a
+  xor a
+  ld (de),a \ inc de \ djnz $-2
+add_shifted:
+;If the signs match, then just add
+;If they differ, then subtract
+	ld hl,fpOP2+9
+	ld a,(fpOP3+9)
+  xor (hl)
+  jp p,xadd_add
+;subtract the mantissas
+  xor a
+  ld hl,fpOP2-1
+  sub (hl)
+  ld (hl),a
+  inc hl
+  ld de,fpOP3
+  call sbc64
+  jr nc,+_
+  ;now we need to negate the mantissa, invert the sign
+  inc hl
+  inc hl
+  ld a,(hl)
+  xor 80h
+  ld (hl),a
+  ld hl,fpOP2-1
+  xor a
+  ld c,a
+  sub (hl)
+  ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+  inc hl \ ld a,c \ sbc a,(hl) \ ld (hl),a
+_:
+  ret m
+;need to shift up until top bit is 1. Should be at most 1 shift, I think
+  ld de,(fpOP3+8)
+_:
+  dec de
+  ld a,d
+  and $7F
+  or e
+  jp z,add_zero
 
-
-
+  ld hl,fpOP2-1
+  sla (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl)
+  jp p,-_
+  ld (fpOP3),de
+  ret
+xadd_add:
+  ;add the mantissas
+  ld hl,fpOP2-1
+  rl (hl)
+  inc hl
+  ld de,fpOP3
+  call adc64
+  ret nc
+  inc hl
+  inc (hl) \ jr z,+_
+  inc hl
+  inc (hl)
+  dec hl
+  ld a,(hl)
+  and $7F
+  jr z,add_inf
+  scf
+_:
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  dec hl \ rr (hl)
+  ret
+srl4fpOP2_mantissa:
+  ld hl,fpOP2+7
+  xor a
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd
+  ret
+srl2fpOP2_mantissa:
+  call srlfpOP2_mantissa
+srlfpOP2_mantissa:
+  ld hl,fpOP2+7
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ret
 caseadd:
 ;zero+x => x for all x
 ;NaN +x => NaN for all x
@@ -77,3 +204,19 @@ caseadd1:
 ;x+inf  => inf
 ;x+NaN  => NaN
   ret
+add_zero:
+  xor a
+  ld (fpOP3+7),a
+  ld h,a
+  ld l,a
+  ld (fpOP3+8),hl
+  ret
+add_inf:
+  xor a
+  ld (fpOP3+7),a
+  dec a
+  ld h,a
+  ld l,a
+  ld (fpOP3+8),hl
+  ret
+.echo "xadd: ",$-xadd
