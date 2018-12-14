@@ -49,7 +49,7 @@ _:
   ld hl,16383
   add hl,de
   ld (fpOP1+8),hl
-#include "sqrt/sqrt64.z80"
+#include "../extended/sqrt/sqrt64.z80"
 sqrt_special:
 ;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
   ld de,fpOP1
@@ -70,9 +70,9 @@ shiftright_mantissa_sqrt:
   dec hl \ rr (hl)
   ret
 .echo "xsqrt: ",$-xsqrt
-#include "sqrt/sqrt32.z80"
+#include "../extended/sqrt/sqrt32.z80"
 .echo "  sqrt32: +",$-sqrt32
-#include "sqrt/sqrt16.z80"
+#include "../extended/sqrt/sqrt16.z80"
 .echo "  sqrt16: +",$-sqrtHL
 
 #undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways

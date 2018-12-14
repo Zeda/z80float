@@ -109,7 +109,7 @@ casemul:
   cp c
   jr z,+_
   ld a,$40
-_:  
+_:
   ld (var_z+15),a
   ret
 casemul2:
@@ -136,9 +136,8 @@ mul_inf:
   ld (var_z+15),a
   ret
 .echo "xmul: ",$-xmul
-#include "mul/mul64.z80"
-#include "mul/mul32.z80"
-#include "mul/mul16.z80"
+#include "../extended/mul/mul64.z80"
+#include "../extended/mul/mul32.z80"
+#include "../extended/mul/mul16.z80"
 .echo "  mul16: +",$-mul16
 .echo "  Total: ",$-xmul
-
