@@ -98,6 +98,7 @@ testputs:
   ret
 
 
+#include "../extended/xtostr.z80"
 #include "../extended/xsqrt.z80"
 #include "../extended/xdiv.z80"
 #include "../extended/xmul.z80"
@@ -106,5 +107,7 @@ testputs:
 xroutines:
 #include "../extended/routines.z80"
 .echo "routines: ",$-xroutines
+#include "../extended/data.z80"
+#include "../extended/tables.z80"
 .echo "Total: ",$-$9D95
 #include "../extended/constants.z80"

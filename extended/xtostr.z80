@@ -1,4 +1,5 @@
-#define pow10exp  fpOP
+#define pow10exp  fpOP3+32
+#define strout fpOP3+34
 xtostr:
   push hl
   push de
@@ -20,8 +21,8 @@ xtostr:
 _:
   ld de,fpOP1
   call mov10
-  ld hl,(fpOP1+8)   ;this is the exponent and sign
-  ex de,hl    ;HL point to fpOP2
+  ld de,(fpOP1+8)   ;this is the exponent and sign
+  ld hl,strout
   bit 7,d
   jr z,+_
   res 7,d
@@ -39,6 +40,90 @@ _:
   ld hl,-4932
   add hl,de
   ld (pow10exp),hl
+  ld de,pow10table
+  jr c,+_
+;the exponent is negative, need to be multiplying by 10^-exponent
+  xor a
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
+  ld h,a
+  ld de,pown10table   ;get the table of 10^-(2^k)
+_:
+  ld bc,fpOP1
+  add hl,hl
+  add hl,hl
+  add hl,hl
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+  call xtostr_mul
+;now the number is pretty close to a nice value
+_:
+  ld a,(fpOP1+8)
+  add a,a
+  jr nc,+_
+  call fpOP1mul10
+  ld hl,(pow10exp)
+  dec hl
+  ld (pow10exp),hl
+  jr -_     ;For speed, could perform test here instead.
+_:
+;quick, convert to a fixed-point number !
+  rra
+  inc a
+  ;number of bits to shift
+  ld b,a
+  xor a
+  ld (fpOP1+8),a
+_:
+  ld hl,fpOP1
+  sla (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl)
+  djnz -_
+  ld a,(hl) ;the first digit, might be as large as twenty
+  pop hl
+  cp 10
+  jr z,+_
+  ld de,(pow10exp)
+  dec de
+  ld (hl),30h
+  inc de \ inc (hl) \ sub 10 \ jr nc,$-4
+  ld (pow10exp),de
+  add a,10
+  inc hl
+_:
+  add a,'0'
+  ld (hl),a
+  inc hl
+  ld a,l
+  cp (strout+20)&255
+  jr z,+_
+  push hl
+  call xtostrmul10
+  pop hl
+  ld a,(fpOP1+8)
+  jr -_
+_:
+;now I need to format the string data
+
 
   ret
 strcase:
@@ -51,3 +136,20 @@ strcase:
   ld de,str_NaN
 _:
   jp mov4
+xtostr_mul:
+  add hl,hl
+  push hl
+  call c,+_
+  ld hl,10
+  add hl,de
+  ex de,hl
+  pop hl
+  ret
+_:
+  ld h,b
+  ld l,c
+  jp xmul
+xtostrmul10:
+;multiply the 8.64 fixed point number at fpOP1 by 10
+  ret
+#include "../extended/mul/fpOP1mul10.z80"
