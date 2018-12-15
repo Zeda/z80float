@@ -45,12 +45,17 @@ cmp64:
   ld a,(de) \ cp (hl) \ ret
 mov10:
   ldi
+mov9:
   ldi
 mov8:
   ldi
+mov7:
   ldi
+mov6:
   ldi
+mov5:
   ldi
+mov4:
   ldi
   ldi
   ldi
