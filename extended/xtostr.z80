@@ -119,7 +119,6 @@ _:
   push hl
   call xtostrmul10
   pop hl
-  ld a,(fpOP1+8)
   jr -_
 _:
 ;now I need to format the string data
@@ -150,6 +149,46 @@ _:
   ld l,c
   jp xmul
 xtostrmul10:
-;multiply the 8.64 fixed point number at fpOP1 by 10
+;multiply the 0.64 fixed point number at fpOP1 by 10
+;overflow in A register
+  ld hl,fpOP1
+  ld de,fpOP2
+  call mov9
+  xor
+  inc hl \ sla (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  rla
+  ld hl,fpOP2
+  sla (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  rla
+  inc hl
+  ld (hl),a
+  ld de,fpOP1
+  ld hl,fpOP2
+  call add64
+  inc hl \ inc de \ ld a,(de) \ adc a,(hl)
+  ld hl,fpOP2
+  sla (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  rla
   ret
 #include "../extended/mul/fpOP1mul10.z80"
