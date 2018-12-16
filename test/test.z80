@@ -25,14 +25,17 @@ _:
 ;;Hey, add more tests here!
 
   rsubx(const_pi,const_e,fpOP4)
-  test(fpOP4,e_min_pi,"e-pi")
+  mulx(fpOP4,pown10table+100,fpOP4)
+  call testputs \ .db "(e-pi)/10000=",0
+;  test(fpOP4,e_min_pi,"(e-pi)/10000")
   strx(fpOP4,fpOP1)
   ld h,b
   ld l,c
   call puts
 
   mulx(const_pi,const_e,fpOP4)
-  call testputs \ .db "e*pi=",0
+  mulx(fpOP4,pow10table+80,fpOP4)
+  call testputs \ .db "(e*pi)*10^16=",0
   strx(fpOP4,fpOP1)
   ld h,b
   ld l,c
