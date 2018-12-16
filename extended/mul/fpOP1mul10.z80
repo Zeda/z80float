@@ -1,2 +1,50 @@
 fpOP1mul10:
+;Note! Does not check for special numbers! Does not check overflow!
+  ld hl,fpOP1
+  ld de,fpOP2
+  call mov8
+  ld hl,fpOP1+8
+  ld a,3
+  add a,(hl)
+  ld (hl),a
+  jr nc,+_
+  inc hl
+  inc (hl)
+_:
+  ld hl,fpOP2+7
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ld hl,fpOP2+7
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ld de,fpOP1
+  call adc64
+  ret nc
+  ld hl,fpOP1+8
+  inc (hl)
+  jr nz,+_
+  inc hl
+  inc (hl)
+_:
+  ex de,hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
   ret
