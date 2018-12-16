@@ -1,0 +1,14 @@
+xgeomean:
+;Input:
+;  HL points to one number
+;  DE points to anothers
+  push hl
+  push bc
+  ld bc,fpOP1
+  call xmul
+  ld h,b
+  ld l,c
+  pop bc
+  call xsqrt
+  pop hl
+  ret
