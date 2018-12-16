@@ -10,6 +10,7 @@ sGrFlags      = 14h
 textWrite     = 7
 _GrBufClr     = 4BD0h
 _GrBufCpy     = 486Ah
+_PutS         = 450Ah
 .db $BB,$6D
 .org $9D95
   bcall(_GrBufClr)
@@ -24,7 +25,28 @@ _:
 ;;Hey, add more tests here!
 
   rsubx(const_pi,const_e,fpOP4)
-  test(fpOP4,e_min_pi,"e - pi")
+  test(fpOP4,e_min_pi,"e-pi")
+  strx(fpOP4,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+
+  mulx(const_pi,const_e,fpOP4)
+  call testputs \ .db "e*pi=",0
+  strx(fpOP4,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+
+  sqrtx(const_pi,fpOP1)
+  call testputs \ .db "sqrt(pi)=",0
+  strx(fpOP1,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+
+
+
   ret
 e_min_pi:
   .db $18,$BD,$6B,$F5,$4B,$32,$BC,$D8,$FE,$BF
@@ -79,13 +101,17 @@ tohex:
   ret
 testputs:
   ex (sp),hl
+  call puts
+  ex (sp),hl
+  ret
+puts:
   push de
   push bc
   push af
   bcall(_VPutS)
   ex de,hl
   ld hl,(penCol)
-  ld l,8
+  ld l,0
   ld a,6
   add a,h
   ld h,a
@@ -94,9 +120,7 @@ testputs:
   pop af
   pop bc
   pop de
-  ex (sp),hl
   ret
-
 
 #include "../extended/xtostr.z80"
 #include "../extended/xsqrt.z80"

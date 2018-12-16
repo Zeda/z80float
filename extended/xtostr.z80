@@ -1,5 +1,5 @@
-#define pow10exp  fpOP3+40
-#define strout fpOP3+42
+#define pow10exp  fpOP3+42
+#define strout fpOP3+45
 xtostr:
   push hl
   push de
@@ -25,7 +25,7 @@ _:
   bit 7,d
   jr z,+_
   res 7,d
-  ld (hl),'-'
+  ld (hl),$1A    ;negative sign
   inc hl
 _:
   ld a,d
@@ -80,7 +80,8 @@ _:
 _:
 ;quick, convert to a fixed-point number !
   rra
-  jr z,noadjustxtostr
+  inc a
+;  jr z,noadjustxtostr
   ;number of bits to shift
   ld b,a
   xor a
@@ -127,13 +128,13 @@ _:
   ld hl,(pow10exp)
   ;if -4<=HL<=10, then need to insert the decimal place somewhere.
   ld bc,4
-  add hl,de
+  add hl,bc
   ld a,h
   or a
   jr nz,+_
   ld a,l
   cp 15
-  jr c,movdec
+  jp c,movdec
 _:
   ;for this, we need to insert the decimal after the first digit
   ;Then, we need to append the exponent string
@@ -141,7 +142,7 @@ _:
   ld de,strout-1
   ld a,(hl)
   ldi
-  cp '-'
+  cp $1A    ;negative sign
   jr nz,$+4
   ldi
   ld a,'.'
@@ -152,14 +153,14 @@ _:
   ld l,a
   jr nc,$+3
   inc h
-  pop de
-  push hl
+  ex (sp),hl
 ;Now we are going to round
+  dec hl
   ld a,(hl)
   cp '5'
   jr c,strround_done
 _:
-  ld (hl),0
+  ld (hl),'0'
   dec hl
   inc (hl)
   ld a,(hl)
@@ -172,7 +173,7 @@ strround_done:
   ld de,(pow10exp)
   bit 7,d
   jr z,+_
-  ld (hl),'-'
+  ld (hl),$1A    ;negative sign
   inc hl
   xor a
   sub e
@@ -181,6 +182,7 @@ strround_done:
   sub d
   ld d,a
 _:
+  push hl
   ex de,hl
   ld bc,-1000
   ld a,'0'-1
@@ -206,27 +208,78 @@ _:
   ld (de),a
   inc de
 
-  ld b,$2A0A
+  ld bc,$2F0A
   ld a,l
 _:
   inc b
   sub c
   jr nc,-_
   ex de,hl
-  ld (hl),c
+  ld (hl),b
   inc hl
   add a,$3A
-  ld (hl),c
+  ld (hl),a
   inc hl
   xor a
   ld (hl),a
+  pop de
+  ld h,d
+  ld l,e
+  ld a,'0'
+_:
+  cpi
+  jr z,-_
+  dec hl
+  call mov4
+  ld hl,strout-1
   ret
 movdec:
-  ld hl,strout
-
-  pop hl
-  xor a
+  ld hl,(pow10exp)
+  bit 7,h
+  jr z,posdec
+;need to put zeroes before everything
+  ld de,strout
+  ld a,(de)
+  cp $1A    ;negative sign
+  push af
+  ld a,'0'
+  jr z,$+3
+_:
+  dec de
+  ld (de),a
+  inc l
+  jr nz,-_
+  inc h
+  jr nz,-_
+_:
+  ld a,'.'
+  ld (de),a
+  pop af
+  ex de,hl
+  jr nz,+_
+  dec hl
   ld (hl),a
+_:
+  pop de
+  xor a
+  ld (de),a
+  ret
+posdec:
+  ld hl,strout
+  ld de,strout-1
+  ld a,(hl)
+  ld bc,(pow10exp)
+  cp $1A    ;negative sign
+  jr nz,$+3
+  inc bc
+  inc bc
+  ldir
+  pop hl
+  ex de,hl
+  ld (hl),'.'
+  xor a
+  ld (de),a
+  ld hl,strout-1
   ret
 strcase:
   ld de,str_Zero
@@ -237,6 +290,7 @@ strcase:
   jp pe,+_
   ld de,str_NaN
 _:
+  ex de,hl
   call mov4
   ld hl,strout
   ret
