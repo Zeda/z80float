@@ -1,3 +1,32 @@
+xamean:
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  ld bc,fpOP1
+  call xadd
+  ld hl,(fpOP1+8)
+  ld a,h
+  and $7F
+  or l
+  jr z,+_
+  dec hl
+  ld (fpOP1+8),hl
+  ld a,h
+  and $7F
+  or l
+  jr nz,+_
+  ld (fpOP1+7),a
+_:
+  ld hl,fpOP1
+  pop de
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
 xsub:
 ;Input:
 ;  HL points to one number
