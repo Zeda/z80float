@@ -49,7 +49,7 @@ _:
 	ld a,h \ or l \ jp z,casemul
 	ld a,d \ or e \ jp z,casemul2
   add hl,de
-  ld de,$3FFF
+  ld de,$4000
   sbc hl,de
   jp c,mul_zero
   jp m,mul_inf
@@ -65,6 +65,7 @@ _:
   pop de
   jr c,+_
   sla (hl) \ inc hl
+  rl (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
