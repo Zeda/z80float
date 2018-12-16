@@ -1,3 +1,56 @@
-#use range reduction to get x on [-ln(2)/2,ln(2)/2]
-#7 iterations of (2n+1+x)x^(2n)/(2n+1)! is exp(x) to approximately 74 bits.
-#6 iterations is only 61 bits :(
+;use range reduction to get x on [-ln(2)/2,ln(2)/2]
+;Actually using this algo I came up with a few years ago:
+;  https://www.omnimaga.org/math-and-science/pade-expansions-for-approximating-the-exponential-function/
+;
+;y=x*x
+;a=.5x* (1+5y/156(1+3y/550(1+y/1512))) / (1+3y/26(1+5y/396(1+y/450)))
+;e^x ~ (1+a)/(1-a)
+xexp2:
+  push hl
+  push de
+  push bc
+  push af
+  push ix
+  push bc
+  call +_
+  pop hl
+  push de
+  ex de,hl
+  ld hl,fpOP1
+  call mov8
+  ex de,hl
+  pop de
+  ld (hl),e
+  inc hl
+  ld (hl),d
+  pop ix
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  ld de,fpOP1
+  call mov10
+  ld hl,(fpOP1+8)
+  res 7,h
+  ld a,h
+  or l
+  jp z,caseexp
+  ;If HL<3FF3 or HL>=400E, then magnitudes are too high
+  ld bc,-$3EF3
+  add hl,bc
+  dec h
+  jp nz,exp_too_big
+  ld a,h
+  cp 28
+  jp nc,exp_too_big
+;Now we know the exponent isn't too big
+;
+;Range Reduction phase
+;e=int(x+.5)
+;x-=e
+;now we compute 2^e*2^x, where e is an integer
+;2^x = exp(x*ln(2))
+;
+  ret
