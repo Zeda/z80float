@@ -1,5 +1,5 @@
-#define pow10exp  fpOP3+32
-#define strout fpOP3+34
+#define pow10exp  fpOP3+40
+#define strout fpOP3+42
 xtostr:
   push hl
   push de
@@ -8,7 +8,6 @@ xtostr:
   push bc
   call +_
   pop de
-  ld hl,fpOP2
   ld a,(hl)
   ldi
   or a
@@ -40,7 +39,7 @@ _:
   ld hl,-4932
   add hl,de
   ld (pow10exp),hl
-  ld de,pow10table
+  ld de,pown10table
   jr c,+_
 ;the exponent is negative, need to be multiplying by 10^-exponent
   xor a
@@ -49,7 +48,7 @@ _:
   sbc a,a
   sub h
   ld h,a
-  ld de,pown10table   ;get the table of 10^-(2^k)
+  ld de,pow10table   ;get the table of 10^-(2^k)
 _:
   ld bc,fpOP1
   add hl,hl
@@ -81,7 +80,7 @@ _:
 _:
 ;quick, convert to a fixed-point number !
   rra
-  inc a
+  jr z,noadjustxtostr
   ;number of bits to shift
   ld b,a
   xor a
@@ -98,10 +97,11 @@ _:
   rl (hl) \ inc hl
   rl (hl)
   djnz -_
+noadjustxtostr:
   ld a,(hl) ;the first digit, might be as large as twenty
   pop hl
   cp 10
-  jr z,+_
+  jr c,+_
   ld de,(pow10exp)
   dec de
   ld (hl),30h
@@ -122,8 +122,111 @@ _:
   jr -_
 _:
 ;now I need to format the string data
+  push hl
 
+  ld hl,(pow10exp)
+  ;if -4<=HL<=10, then need to insert the decimal place somewhere.
+  ld bc,4
+  add hl,de
+  ld a,h
+  or a
+  jr nz,+_
+  ld a,l
+  cp 15
+  jr c,movdec
+_:
+  ;for this, we need to insert the decimal after the first digit
+  ;Then, we need to append the exponent string
+  ld hl,strout
+  ld de,strout-1
+  ld a,(hl)
+  ldi
+  cp '-'
+  jr nz,$+4
+  ldi
+  ld a,'.'
+  ld (de),a
+;now we need count 15 digits, truncating the last ~4 decimal digits
+  ld a,15
+  add a,l
+  ld l,a
+  jr nc,$+3
+  inc h
+  pop de
+  push hl
+;Now we are going to round
+  ld a,(hl)
+  cp '5'
+  jr c,strround_done
+_:
+  ld (hl),0
+  dec hl
+  inc (hl)
+  ld a,(hl)
+  cp $3A
+  jr z,-_
+strround_done:
+  pop hl
+  ld (hl),'e'
+  inc hl
+  ld de,(pow10exp)
+  bit 7,d
+  jr z,+_
+  ld (hl),'-'
+  inc hl
+  xor a
+  sub e
+  ld e,a
+  sbc a,a
+  sub d
+  ld d,a
+_:
+  ex de,hl
+  ld bc,-1000
+  ld a,'0'-1
+  or a
+_:
+  inc a
+  add hl,bc
+  jr c,-_
+  sbc hl,bc
+  cp $30
+  jr z,+_
+  ld (de),a
+  inc de
+_:
 
+  ld bc,-100
+  ld a,'0'-1
+_:
+  inc a
+  add hl,bc
+  jr c,-_
+  sbc hl,bc
+  ld (de),a
+  inc de
+
+  ld b,$2A0A
+  ld a,l
+_:
+  inc b
+  sub c
+  jr nc,-_
+  ex de,hl
+  ld (hl),c
+  inc hl
+  add a,$3A
+  ld (hl),c
+  inc hl
+  xor a
+  ld (hl),a
+  ret
+movdec:
+  ld hl,strout
+
+  pop hl
+  xor a
+  ld (hl),a
   ret
 strcase:
   ld de,str_Zero
@@ -134,7 +237,9 @@ strcase:
   jp pe,+_
   ld de,str_NaN
 _:
-  jp mov4
+  call mov4
+  ld hl,strout
+  ret
 xtostr_mul:
   add hl,hl
   push hl
@@ -154,7 +259,7 @@ xtostrmul10:
   ld hl,fpOP1
   ld de,fpOP2
   call mov9
-  xor
+  xor a
   inc hl \ sla (hl)
   inc hl \ rl (hl)
   inc hl \ rl (hl)
@@ -174,13 +279,14 @@ xtostrmul10:
   inc hl \ rl (hl)
   inc hl \ rl (hl)
   rla
-  inc hl
-  ld (hl),a
+  push af
   ld de,fpOP1
   ld hl,fpOP2
   call add64
-  inc hl \ inc de \ ld a,(de) \ adc a,(hl)
-  ld hl,fpOP2
+  pop hl
+  ld a,h
+  adc a,0
+  ld hl,fpOP1
   sla (hl)
   inc hl \ rl (hl)
   inc hl \ rl (hl)
