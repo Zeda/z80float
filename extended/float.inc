@@ -9,4 +9,5 @@ fpOP5 = 8028h
 #define rsubx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xrsub
 #define mulx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xmul
 #define divx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xdiv
-#define sqrtx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xsqrt
+#define sqrtx(o1,d) ld hl,o1 \ ld bc,d \ call xsqrt
+#define strx(o1,d) ld hl,o1 \ ld bc,d \ call xtostr
