@@ -126,6 +126,8 @@ puts:
   ret
 
 #include "../extended/xtostr.z80"
+#include "../extended/xbg.z80"
+#include "../extended/xgeomean.z80"
 #include "../extended/xsqrt.z80"
 #include "../extended/xdiv.z80"
 #include "../extended/xmul.z80"

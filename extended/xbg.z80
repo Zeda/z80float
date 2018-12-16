@@ -1,0 +1,118 @@
+#define var_a fpOP3+42
+#define var_g fpOP3+52
+#define var_a0 fpOP3+62
+#define var_a1 fpOP3+72
+#define var_a2 fpOP3+82
+#define var_a3 fpOP3+92
+#define var_a4 fpOP3+102
+#define var_a5 fpOP3+112
+
+;This is an accelerated Borchardt-Gauss algorithm
+;It is used in computing inverse trancendentals and the like.
+;
+;Basic outline:
+;  a0 is the initial a
+;  g0 is the initial g
+;  compute a_(n+1) = (a_n+g_n)/2
+;  compute a_(g+1) = (a_(n+1)+g_n)/2
+;
+;Then return the sum of:
+; a6 * 4398046511104  = a6 * 2^42
+;-a5 * 1465657589760  = a5 * 2^30 * 3*5*7*13 =a5 * 2^30 * 3*7*65
+;+a4 * 97615085568    = a4 * 2^20 * 3*7*11*13*31 = a4 * 2^20 * 7*13*(2^10-1)
+;-a3 * 1543393280     = a3 * 2^12 * 5*11*13*17*31 = a3 * 2^12 * 13*17*31*65
+;+a2 * 5957952        = a2 * 2^6  * 3*7*11*13*31
+;-a1 * 5460           = a1 * 2^2  * 3*5*7*13
+;+a0
+;all divided by: 3028466566125
+xbg:
+  push hl
+  push de
+  push bc
+  push af
+  push ix
+  push bc
+  call +_
+  pop de
+  ld hl,fpOP1
+  call mov10
+  pop ix
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  push de
+  ld de,var_a
+  call mov10
+  pop hl
+  call mov10
+	ld hl,(var_a+8)
+	ld de,(var_g+8)
+	ld a,h
+	or d
+  jp m,bg_NaN
+	ld a,h \ or l \ jp z,casebg
+	ld a,d \ or e \ jp z,casebg2
+  ld hl,var_a
+  ld de,var_a0
+  call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean
+  ld b,h \ ld c,l \ call xgeomean
+  ld hl,var_a1 \ ex de,hl \ call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean
+  ld b,h \ ld c,l \ call xgeomean
+  ld hl,var_a2 \ ex de,hl \ call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean
+  ld b,h \ ld c,l \ call xgeomean
+  ld hl,var_a3 \ ex de,hl \ call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean
+  ld b,h \ ld c,l \ call xgeomean
+  ld hl,var_a4 \ ex de,hl \ call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean
+  ld b,h \ ld c,l \ call xgeomean
+  ld hl,var_a5 \ ex de,hl \ call mov10
+
+  ld de,var_a \ ld b,d \ ld c,e \ call xamean   ;a7
+; a6 * 4398046511104  = a6 * 2^42
+;-a5 * 1465657589760  = a5 * 2^30 * 3*5*7*13 =a5 * 2^30 * 3*7*65
+;+a4 * 97615085568    = a4 * 2^20 * 3*7*11*13*31 = a4 * 2^20 * 7*13*(2^10-1)
+;-a3 * 1543393280     = a3 * 2^12 * 5*11*13*17*31 = a3 * 2^12 * 13*17*31*65
+;+a2 * 5957952        = a2 * 2^6  * 3*7*11*13*31
+;-a1 * 5460           = a1 * 2^2  * 3*5*7*13
+;+a0
+;all divided by: 3028466566125
+
+  ret
+casebg:
+;bg(0,x)    -> is actually permissable
+;bg(0,0)    -> 0
+;bg(inf,x)  -> inf
+;bg(inf,inf)-> inf
+;bg(0,inf)  -> inf  *** Not NaN, even though bg(inf,0)==NaN
+;bg(NaN,*)  -> NaN
+;bg(inf,NaN)-> NaN
+;bg(inf,0)  -> NaN
+;bg(0,NaN)  -> NaN
+
+  ret
+casebg2:
+;bg(x,NaN)  -> NaN
+;bg(x,0)    -> 0
+;bg(x,inf)  -> inf
+;so basically whatever the second operand is
+  ld de,fpOP1
+  ld hl,var_g
+  jp mov10
+bg_NaN:
+  ld hl,0
+  ld (fpOP1+8),hl
+  ld a,$40
+  ld (fpOP1+7),a
+  ret
