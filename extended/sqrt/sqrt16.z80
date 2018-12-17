@@ -34,7 +34,7 @@ _:
   sbc hl,de
   jr nc,+_
   add hl,de
-  .db $DA   ;start of jp c,** which is 10cc to skip the next two bytes.
+  .db $D2   ;start of jp nc,** which is 10cc to skip the next two bytes.
 _:
   set 3,d
   res 2,d
