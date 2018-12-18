@@ -1,0 +1,20 @@
+;x/BG(sqrt(1+x^2),1)
+#define var_x  fpOP1+152
+xasinh:
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  ex de,hl
+  pop de
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  ;<insert code here>
+  ret
