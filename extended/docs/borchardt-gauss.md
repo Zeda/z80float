@@ -50,3 +50,33 @@ d(4,4) = (256d(3,4)-d(3,3))/255
        = (256(4096a_4-1344a_3+84a_2-a_1) - (4096a_3-1344a_2+84a_1-a_0))/722925
        = (1048576a_4-348160a_3+22848a_2-340a_1+a_0))/722925
 ```
+
+## Python Example
+Here is the algorithm that we'll be using to compute the reciprocal Borchardt-Gauss algorithm, but in Python.
+```
+def bgc6(a,g):
+  a0=a
+  a=.5*(a+g)
+  a1=a*4
+  g=(a*g)**.5
+  a=.5*(a+g)
+  a2=a*64
+  g=(a*g)**.5
+  a=.5*(a+g)
+  a3=a*(1<<12)*85
+  g=(a*g)**.5
+  a=.5*(a+g)
+  a4=a*(1<<20)
+  g=(a*g)**.5
+  a=.5*(a+g)
+  a5=a*(1<<30)
+  g=(a*g)**.5
+  a=.5*(a+g)
+  a*=(1<<42)
+
+  b=(a5+a1)*105
+  e=(a4+a2)*21
+  f=(e-a3)*11*31
+  z=(f-b)*13+a+a0
+  return 3028466566125/z
+```
