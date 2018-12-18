@@ -1,3 +1,7 @@
+;NOTE! Doesn't yet check for special numbers!
+;Not accurate on x<1, or some large x.
+;ln(1) is pretty broken, probably an issue with subtraction.
+;
 ;We are going to compute ln(x) using teh B-G algo.
 ;(x-1)/BG(.5(1+x), sqrt(x))
 #define var_x  fpOP1+152
