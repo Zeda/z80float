@@ -1,0 +1,40 @@
+;We are going to compute ln(x) using teh B-G algo.
+;(x-1)/BG(.5(1+x), sqrt(x))
+#define var_x  fpOP1+152
+xln:
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop de
+  ld hl,fpOP4
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+;(x-1)/BG(.5(1+x),sqrt(x))
+  ld de,var_x
+  call mov10
+  ld hl,var_x
+  ld bc,fpOP5
+  call xsqrt
+  ld de,const_1
+  ld bc,fpOP4
+  call xamean
+  ld b,h
+  ld c,l
+  call xsub
+  ld hl,fpOP4
+  ld de,fpOP5
+  ld b,h
+  ld c,l
+  call xbg
+  ld hl,var_x
+  ld d,b
+  ld e,c
+  jp xmul
