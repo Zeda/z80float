@@ -48,15 +48,15 @@ sqrt32:
   rra
   rl e
   ld d,0
+  ld b,d
   rl d
 
   ld a,l
   ld (var_x+4),a
 
 ;no we need to compute l*l
-  ld b,d
   ld c,l
-  ld l,d
+  ld l,b
   add a,a
   ld h,a
   jr nc,$+3 \ ld l,c
@@ -101,7 +101,7 @@ _:
   push de
   pop ix
 #endif
-  
+
   ld bc,(var_x+4)
 #ifdef subsqrt32
   call div32_16   ;returns DE = result
