@@ -234,14 +234,7 @@ const_21:
 const_85:
   .db $00,$00,$00,$00,$00,$00,$00,$AA \ .dw $4006
 
-bg_disp_g:
-  push hl \ push de \ push bc
-  strx(fpOP1,fpOP1)
-  ld h,b
-  ld l,c
-  call puts
-  pop bc \ pop de \ pop hl
-  ret
+
 xmul3:
   push hl
   push de
@@ -317,16 +310,6 @@ _addshiftstepin:
   and $7F
   ret nz
   jp setfpOP1_inf
-rr64:
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl)
-  ret
 xmul7:
   push hl
   push de
@@ -526,18 +509,6 @@ _:
   pop af
   pop hl
   ret
-srlfpOP1_mantissa:
-  ld hl,fpOP1+7
-srl64:
-  srl (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl)
-  ret
 xmul11:
   push hl
   push de
@@ -583,35 +554,6 @@ _:
   call rsbc64
   jp nc,normalizefpOP1
   jp fpOP1_subunder
-rsbc64:
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a
-  ret
-setfpOP1_inf:
-  xor a
-  ld h,a
-  ld l,a
-  dec a
-  ld (fpOP1+8),hl
-  ld (fpOP1+7),a
-  ret
-neg64:
-  xor a
-  ld c,a \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
-  ld a,c \ sbc a,(hl) \ ld (hl),a
-  ret
 
 #undefine var_a
 #undefine var_g

@@ -33,6 +33,27 @@ adc64:
   ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
   ld a,(de) \ adc a,(hl) \ ld (de),a
   ret
+rsbc64:
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a
+  ret
+neg64:
+  xor a
+  ld c,a \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a
+  ret
 cmp64:
 ;avg: 25.12156863cc
   ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
@@ -43,6 +64,28 @@ cmp64:
   ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
   ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
   ld a,(de) \ cp (hl) \ ret
+srlfpOP1_mantissa:
+  ld hl,fpOP1+7
+srl64:
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ret
+rr64:
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ret
 mov10:
   ldi
 mov9:
@@ -85,4 +128,12 @@ swapfpOP2fpOP3_mantissa:
   ld de,(fpOP3+6)
   ld (fpOP3+6),hl
   ld (fpOP2+6),de
+  ret
+setfpOP1_inf:
+  xor a
+  ld h,a
+  ld l,a
+  dec a
+  ld (fpOP1+8),hl
+  ld (fpOP1+7),a
   ret
