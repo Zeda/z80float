@@ -19,19 +19,12 @@ xsqrt:
   call +_
   ld hl,var_x
   pop de
-  push de
   call mov8
   ld hl,(fpOP1+8)
   ex de,hl
   ld (hl),e
   inc hl
   ld (hl),d
-  pop de
-  ld hl,const_sqrt_2
-  ld b,d
-  ld c,e
-  ex de,hl
-  call c,xmul
   pop ix
   pop af
   pop bc
@@ -51,19 +44,16 @@ _:
   ld e,(hl)
   or e
   jp z,sqrt_special
-  ex de,hl
-  ld bc,-16383
-  add hl,bc
+  ld hl,-16383
+  add hl,de
   sra h
   rr l
+
   ex de,hl
-  push af
+  call c,srlfpOP1_mantissa
   ld hl,16383
   add hl,de
   ld (fpOP1+8),hl
-  call sqrt64
-  pop af
-  ret
 #include "../extended/sqrt/sqrt64.z80"
 sqrt_special:
 ;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
