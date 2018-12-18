@@ -118,8 +118,8 @@ _:
   pop hl
   call mov10
 subadd_stepin:
-	ld hl,(fpOP2+8)
-	ld de,(fpOP3+8)
+	ld de,(fpOP2+8)
+	ld hl,(fpOP3+8)
   res 7,h
   res 7,d
   xor a
@@ -157,17 +157,18 @@ _:
   rra \ call c,srl4fpOP2_mantissa
   and $1F
   ld l,a
-  ld bc,fpOP2&255
+  ld bc,(fpOP2&255)-1
   ld h,fpOP2>>8
   add hl,bc
   sub 10
   cpl
   ld c,a
+  ld de,fpOP2-1
   ldir
   ld c,a
   ld a,9
   sub c
-  jr nz,add_shifted
+  jr z,add_shifted
   ld b,a
   xor a
   ld (de),a \ inc de \ djnz $-2
