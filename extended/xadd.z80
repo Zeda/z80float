@@ -263,8 +263,8 @@ xadd_add:
   inc (hl) \ jr nz,+_
   inc hl
   inc (hl)
-  dec hl
   ld a,(hl)
+  dec hl
   and $7F
   jr z,add_inf
   scf
