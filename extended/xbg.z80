@@ -1,4 +1,4 @@
-#define var_a fpOP3+100   ;was +42
+#define var_a fpOP3+42
 #define var_g var_a+10
 #define var_a0 var_a+20
 #define var_a1 var_a+30
@@ -598,3 +598,12 @@ neg64:
   ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
   ld a,c \ sbc a,(hl) \ ld (hl),a
   ret
+
+#undefine var_a
+#undefine var_g
+#undefine var_a0
+#undefine var_a1
+#undefine var_a2
+#undefine var_a3
+#undefine var_a4
+#undefine var_a5
