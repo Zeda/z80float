@@ -257,8 +257,9 @@ xadd_add:
   ld de,fpOP3
   call adc64
   ret nc
+  ex de,hl
   inc hl
-  inc (hl) \ jr z,+_
+  inc (hl) \ jr nz,+_
   inc hl
   inc (hl)
   dec hl
