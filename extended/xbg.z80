@@ -1,11 +1,11 @@
-#define var_a fpOP3+42
-#define var_g fpOP3+52
-#define var_a0 fpOP3+62
-#define var_a1 fpOP3+72
-#define var_a2 fpOP3+82
-#define var_a3 fpOP3+92
-#define var_a4 fpOP3+102
-#define var_a5 fpOP3+112
+#define var_a fpOP3+100   ;was +42
+#define var_g var_a+10
+#define var_a0 var_a+20
+#define var_a1 var_a+30
+#define var_a2 var_a+40
+#define var_a3 var_a+50
+#define var_a4 var_a+60
+#define var_a5 var_a+70
 
 ;This is an accelerated Borchardt-Gauss algorithm
 ;It is used in computing inverse trancendentals and the like.
@@ -34,7 +34,7 @@ xbg:
   push bc
   call +_
   pop de
-  ld hl,fpOP1
+  ld hl,fpOP2
   call mov10
   pop ix
   pop af
@@ -62,7 +62,6 @@ _:
   ld de,var_a \ ld b,d \ ld c,e \ call xamean
   ld b,h \ ld c,l \ call xgeomean
   ld hl,var_a1 \ ex de,hl \ call mov10
-
 
   ld de,var_a \ ld b,d \ ld c,e \ call xamean
   ld b,h \ ld c,l \ call xgeomean
@@ -144,6 +143,7 @@ _:
   ld c,l
   call xmul5
   call xmul17
+
   ld hl,var_a1
   ld de,var_a5
   ld b,h
@@ -163,15 +163,17 @@ _:
   call xmul7
 
   ld de,var_a3
-  ld b,h
-  ld c,l
   call xsub
-  call xmul11
-  call xmul31
+;  call xmul11
+;  call xmul31
+  ld de,const_341
+  call xmul
 
   ld de,var_a1
   call xsub
-  call xmul13
+;  call xmul13
+  ld de,const_13
+  call xmul
   ld de,var_a
   ld bc,fpOP2
   call xadd
@@ -181,7 +183,6 @@ _:
   call xadd
   ex de,hl
   ld hl,const_3028466566125
-  ld bc,fpOP1
   jp xdiv
 casebg:
 ;1/bg(0,x)    -> is actually permissable
@@ -216,6 +217,18 @@ bg_NaN:
   ld (fpOP1+8),hl
   ld a,$40
   ld (fpOP1+7),a
+  ret
+const_341:
+  .db $00,$00,$00,$00,$00,$00,$80,$AA \ .dw $4008
+const_13:
+  .db $00,$00,$00,$00,$00,$00,$00,$D0 \ .dw $4003
+bg_disp_g:
+  push hl \ push de \ push bc
+  strx(fpOP1,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+  pop bc \ pop de \ pop hl
   ret
 xmul3:
   push hl
@@ -275,17 +288,21 @@ _:
   call srlfpOP1_mantissa
 _addshiftstepin:
   pop de
+  push de
   ex de,hl
   call adc64
+  pop hl
   ret nc
 ; Need to shift down, but also increment exponent
+  ex de,hl
   call rr64
-  ld hl,fpOP1+8
+  ex de,hl
+  inc (hl)
+  ret nz
   inc hl
-  ld (fpOP1+8),hl
-  ld a,h
+  inc (hl)
+  ld a,(hl)
   and $7F
-  or l
   ret nz
   jp setfpOP1_inf
 rr64:
@@ -307,7 +324,7 @@ xmul7:
   call +_
   ld hl,fpOP1
   pop de
-  call mov8
+  call mov10
   pop af
   pop bc
   pop de
@@ -318,19 +335,24 @@ _:
   ld de,fpOP1
   call mov8
   ld a,(hl) \ add a,4 \ ld (hl),a
+  ld e,a
+  inc hl
+  ld a,(hl)
   jr nc,+_
-  inc (hl)
+  inc a
   ld a,(hl)
   and $7F
   jp z,setfpOP1_inf
 _:
+  ld d,a
+  ld (fpOP1+8),de
   call srlfpOP1_mantissa
   call srlfpOP1_mantissa
   call srlfpOP1_mantissa
   pop de
   ;need (DE)-(HL) -> (hl)
   call rsbc64
-  ret nc
+  jp nc,normalizefpOP1
   jp fpOP1_subunder
 xmul17:
   push hl
@@ -372,7 +394,7 @@ xmul31:
   call +_
   ld hl,fpOP1
   pop de
-  call mov8
+  call mov10
   pop af
   pop bc
   pop de
@@ -382,13 +404,18 @@ _:
   push hl
   ld de,fpOP1
   call mov8
-  ld a,(hl) \ add a,5 \ ld (hl),a
+  ld a,(hl) \ add a,6 \ ld (hl),a
+  ld e,a
+  inc hl
+  ld a,(hl)
   jr nc,+_
-  inc (hl)
+  inc a
   ld a,(hl)
   and $7F
   jp z,setfpOP1_inf
 _:
+  ld d,a
+  ld (fpOP1+8),de
   call srlfpOP1_mantissa
   call srlfpOP1_mantissa
   call srlfpOP1_mantissa
@@ -397,7 +424,7 @@ _:
   pop de
   ;need (DE)-(HL) -> (hl)
   call rsbc64
-  ret nc
+  jr nc,normalizefpOP1
 fpOP1_subunder:
 ;need to increment exponent, negate mantissa, then normalize
   ld hl,fpOP1
@@ -406,6 +433,7 @@ _:
   ld hl,(fpOP1+8)
   dec hl
   ld (fpOP1+8),hl
+normalizefpOP1:
   ld a,(fpOP1+7)
   add a,a
   ret c
@@ -428,7 +456,7 @@ xmul13:
   call +_
   ld hl,fpOP1
   pop de
-  call mov8
+  call mov10
   pop af
   pop bc
   pop de
@@ -439,13 +467,18 @@ _:
   ld de,fpOP1
   call mov8
   pop de
-  ld a,(hl) \ add a,4 \ ld (hl),a
+  ld a,(hl) \ add a,5 \ ld (hl),a
+  ld c,a
+  inc hl
+  ld a,(hl)
   jr nc,+_
-  inc (hl)
+  inc a
   ld a,(hl)
   and $7F
   jp z,setfpOP1_inf
 _:
+  ld b,a
+  ld (fpOP1+8),bc
   ;subtract ((>>1) and (>>0))>>3
   call srlfpOP1_mantissa
   push de
@@ -458,7 +491,7 @@ _:
   pop de
   ;need to subtract (DE)-(HL) -> (HL)
   call rsbc64
-  ret nc
+  jp nc,normalizefpOP1
   jp fpOP1_subunder
 fpOP1_addover:
   push hl
@@ -502,7 +535,7 @@ xmul11:
   call +_
   ld hl,fpOP1
   pop de
-  call mov8
+  call mov10
   pop af
   pop bc
   pop de
@@ -512,14 +545,19 @@ _:
   push hl
   ld de,fpOP1
   call mov8
-  ld a,(hl) \ add a,4 \ ld (hl),a
   pop de
+  ld a,(hl) \ add a,5 \ ld (hl),a
+  ld c,a
+  inc hl
+  ld a,(hl)
   jr nc,+_
-  inc (hl)
+  inc a
   ld a,(hl)
   and $7F
   jp z,setfpOP1_inf
 _:
+  ld b,a
+  ld (fpOP1+8),bc
   call srlfpOP1_mantissa
   call srlfpOP1_mantissa
   push de
@@ -531,7 +569,7 @@ _:
   pop de
   ;need to subtract (DE)-(HL) -> (HL)
   call rsbc64
-  ret nc
+  jp nc,normalizefpOP1
   jp fpOP1_subunder
 rsbc64:
   ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de

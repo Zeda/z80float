@@ -23,32 +23,39 @@ _PutS         = 450Ah
   ret
 _:
 ;;Hey, add more tests here!
-
-  rsubx(const_pi,const_e,fpOP4)
-  mulx(fpOP4,pown10table+100,fpOP4)
-  call testputs \ .db "(e-pi)/10000=",0
-;  test(fpOP4,e_min_pi,"(e-pi)/10000")
-  strx(fpOP4,fpOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  mulx(const_pi,const_e,fpOP4)
-  mulx(fpOP4,pow10table+80,fpOP4)
-  call testputs \ .db "(e*pi)*10^16=",0
-  strx(fpOP4,fpOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  sqrtx(const_pi,fpOP1)
-  call testputs \ .db "sqrt(pi)=",0
+  ld hl,const_pi
+  ld de,const_e
+  ld bc,fpOP1
+  call xbg
+  call testputs \ .db "1/bg(pi,e)=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
   call puts
 
+  rsubx(const_pi,const_e,fpOP4)
+  call testputs \ .db "(e-pi)=",0
+  strx(fpOP4,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
 
+
+  ld hl,const_pi
+  ld de,const_e
+  ld bc,fpOP1
+  call xamean
+  ld h,b
+  ld l,c
+  call xmul
+;  mulx(const_pi,const_e,fpOP1)
+  call xsqrt
+;  sqrtx(fpOP1,fpOP1)
+  call testputs \ .db "sqrt(e*(e+pi)/2)=",0
+  strx(fpOP1,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
 
   ret
 e_min_pi:
