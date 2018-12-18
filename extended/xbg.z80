@@ -139,17 +139,22 @@ _:
   ld hl,var_a3
   ld b,h
   ld c,l
-  call xmul5
-  call xmul17
+;  call xmul5
+;  call xmul17
+  ld de,const_85
+  call xmul
 
   ld hl,var_a1
   ld de,var_a5
   ld b,h
   ld c,l
   call xadd
-  call xmul3
-  call xmul5
-  call xmul7
+;  call xmul3
+;  call xmul5
+;  call xmul7
+
+  ld de,const_105
+  call xmul
 
 
   ld hl,var_a2
@@ -157,8 +162,10 @@ _:
   ld b,h
   ld c,l
   call xadd
-  call xmul3
-  call xmul7
+;  call xmul3
+;  call xmul7
+  ld de,const_21
+  call xmul
 
   ld de,var_a3
   call xsub
@@ -220,6 +227,13 @@ const_341:
   .db $00,$00,$00,$00,$00,$00,$80,$AA \ .dw $4008
 const_13:
   .db $00,$00,$00,$00,$00,$00,$00,$D0 \ .dw $4003
+const_105:
+  .db $00,$00,$00,$00,$00,$00,$00,$D2 \ .dw $4006
+const_21:
+  .db $00,$00,$00,$00,$00,$00,$00,$A8 \ .dw $4004
+const_85:
+  .db $00,$00,$00,$00,$00,$00,$00,$AA \ .dw $4006
+
 bg_disp_g:
   push hl \ push de \ push bc
   strx(fpOP1,fpOP1)
