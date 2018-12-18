@@ -27,7 +27,7 @@ _:
   pop de
   pop hl
   ret
-xsub:
+xrsub:
 ;Input:
 ;  HL points to one number
 ;  DE points to another
@@ -59,7 +59,7 @@ _:
   pop hl
   call mov10
   jp subadd_stepin
-xrsub:
+xsub:
 ;Input:
 ;  HL points to one number
 ;  DE points to another
@@ -189,11 +189,11 @@ add_shifted:
   call sbc64
   jr nc,+_
   ;now we need to negate the mantissa, invert the sign
-  inc hl
-  inc hl
-  ld a,(hl)
+  inc de
+  inc de
+  ld a,(de)
   xor 80h
-  ld (hl),a
+  ld (de),a
   ld hl,fpOP2-1
   xor a
   ld c,a
