@@ -280,6 +280,7 @@ _:
   ret
 srl4fpOP2_mantissa:
   ld hl,fpOP2+7
+  ld b,a
   xor a
   rrd \ dec hl
   rrd \ dec hl
@@ -290,6 +291,7 @@ srl4fpOP2_mantissa:
   rrd \ dec hl
   rrd \ dec hl
   rrd
+  ld a,b
   ret
 srl2fpOP2_mantissa:
   call srlfpOP2_mantissa
