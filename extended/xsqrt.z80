@@ -21,10 +21,16 @@ xsqrt:
   pop de
   push de
   call mov8
+  ld hl,(fpOP1+8)
+  ex de,hl
+  ld (hl),e
+  inc hl
+  ld (hl),d
   pop de
-  ld hl,const_sqrt_p5
+  ld hl,const_sqrt_2
   ld b,d
   ld c,e
+  ex de,hl
   call c,xmul
   pop ix
   pop af
