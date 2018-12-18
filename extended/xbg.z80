@@ -30,13 +30,11 @@ xbg:
   push de
   push bc
   push af
-  push ix
   push bc
   call +_
   pop de
   ld hl,fpOP2
   call mov10
-  pop ix
   pop af
   pop bc
   pop de
