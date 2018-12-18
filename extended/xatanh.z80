@@ -1,6 +1,5 @@
 ;NOTE: Does not check special cases yet, or 1 and -1.
 ;
-;We are going to compute ln(x) using the B-G algo.
 ;x/BG(1,sqrt(1-x^2))
 #define var_x  fpOP1+152
 xatanh:

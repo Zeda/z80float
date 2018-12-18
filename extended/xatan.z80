@@ -1,7 +1,6 @@
 ;NOTE: Does not check special cases yet.
 ;Doesn't seem to be accurate for |x|<1/2, but seems to be accurate for all else.
 ;
-;We are going to compute ln(x) using the B-G algo.
 ;x/BG(1,sqrt(1+x^2))
 #define var_x  fpOP1+152
 xatan:
