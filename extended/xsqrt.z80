@@ -45,7 +45,7 @@ _:
   sra h
   rr l
   ex de,hl
-  call c,shiftright_mantissa_sqrt
+  call c,srlfpOP1_mantissa
   ld hl,16383
   add hl,de
   ld (fpOP1+8),hl
@@ -59,16 +59,6 @@ sqrtNAN:
   ld hl,const_NaN
   ld de,fpOP1
   jp mov10
-shiftright_mantissa_sqrt:
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  dec hl \ rr (hl)
-  ret
 .echo "xsqrt: ",$-xsqrt
 #include "../extended/sqrt/sqrt32.z80"
 .echo "  sqrt32: +",$-sqrt32
