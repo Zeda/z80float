@@ -77,25 +77,24 @@ sqrt32:
   ld a,c
   sbc hl,de
   sbc a,b
-;AHL is the new remainder
-;Need to divide by 2, then divide by the 16-bit (var_x+4)
   ld de,(var_c+2)
+;AHLDE is the new remainder
+;Need to divide by 2, then divide by the 16-bit (var_x+4)
   push af
-  jr nc,+_
-  xor a
-  ld b,a \ sub e \ ld e,a
-  ld a,b \ sbc a,d \ ld d,a
-  ld a,b \ sbc a,l \ ld l,a
-  ld a,b \ sbc a,h \ ld h,a
-_:
   rra
   rr h
   rr l
   rr d
   rr e
+  inc a
+  jr nz,+_
+  ld b,a \ sub e \ ld e,a
+  ld a,b \ sbc a,d \ ld d,a
+  ld a,b \ sbc a,l \ ld l,a
+  ld a,b \ sbc a,h \ ld h,a
+_:
   push de
   pop ix
-
   ld bc,(var_x+4)
   call div32_16   ;returns DE = result
   ld (var_a),hl
