@@ -85,7 +85,7 @@ div32_32:
   call div32_16
   ld (var_b+2),de   ;top 16-bit digit
 ;Need to adjust the remainder
-;(HL:(00-DE*(var_x+4))
+;(HL:00-DE*(var_x+4))
   push hl
   ld bc,(var_x+4)
   call mul16
@@ -110,7 +110,7 @@ div32_32:
   ld bc,(var_x+4)
   ex de,hl
   add hl,bc
-  ld bc,(var_x+4)
+  ld bc,(var_x+6)
   ex de,hl
   adc hl,bc
 _:
