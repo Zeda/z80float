@@ -1,2 +1,3 @@
 Thanks to Runer112 for help optimizing some of these routines!
-Thanks Runer112 for ppinting out I can negate the denominator in division beforehand !
+Thanks Runer112 for pointing out I can negate the denominator in division beforehand !
+Thanks SageMath ! This is the tool I have used to test many of the algorithms and to aid debugging.
