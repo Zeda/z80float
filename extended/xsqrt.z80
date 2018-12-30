@@ -44,16 +44,15 @@ _:
   ld e,(hl)
   or e
   jp z,sqrt_special
-  ld hl,-16383
-  add hl,de
-  sra h
-  rr l
-
-  ex de,hl
-  call c,srlfpOP1_mantissa
-  ld hl,16383
-  add hl,de
+  ld a,d
+  add a,$40
+  rra
+  ld h,a
+  ld a,e
+  rra
+  ld l,a
   ld (fpOP1+8),hl
+  call nc,srlfpOP1_mantissa
 #include "../extended/sqrt/sqrt64.z80"
 sqrt_special:
 ;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
