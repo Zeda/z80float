@@ -9,6 +9,7 @@
 
 ;This is an accelerated Borchardt-Gauss algorithm
 ;It is used in computing inverse trancendentals and the like.
+;This implmenetation actually computes 1/BG(a,g) since this is useful.
 ;
 ;Basic outline:
 ;  a0 is the initial a
@@ -16,15 +17,25 @@
 ;  compute a_(n+1) = (a_n+g_n)/2
 ;  compute a_(g+1) = (a_(n+1)+g_n)/2
 ;
-;Then return the sum of:
-; a6 * 4398046511104  = a6 * 2^42
-;-a5 * 1465657589760  = a5 * 2^30 * 3*5*7*13 =a5 * 2^30 * 3*7*65
-;+a4 * 97615085568    = a4 * 2^20 * 3*7*11*13*31 = a4 * 2^20 * 7*13*(2^10-1)
-;-a3 * 1543393280     = a3 * 2^12 * 5*11*13*17*31 = a3 * 2^12 * 13*17*31*65
-;+a2 * 5957952        = a2 * 2^6  * 3*7*11*13*31
-;-a1 * 5460           = a1 * 2^2  * 3*5*7*13
-;+a0
-;all divided by: 3028466566125
+;a1<<=2
+;a2<<=6
+;a3<<=12
+;a4<<=20
+;a5<<=30
+;a6<<=42
+;a3*=85
+;a1+=a5
+;a1*=105
+;a2+=a4
+;a2*=21
+;a2-=a3
+;a2*=341
+;a2-=a1
+;a2*=13
+;a2+=a0
+;a2+=a6
+;return 3028466566125/a2
+;
 xbg:
   push hl
   push de
@@ -33,7 +44,7 @@ xbg:
   push bc
   call +_
   pop de
-  ld hl,fpOP2
+  ld hl,var_a
   call mov10
   pop af
   pop bc
@@ -134,7 +145,8 @@ _:
   jp m,bg_Zero
 _:
   ld (var_a+8),hl
-
+;NOTE: I have verified that this is working up to here
+;Accuracy is lost in the bottom two bits by the time a6 is computed.
 ;Next, multiply a3 by 85
   ld hl,var_a3
   ld b,h
@@ -179,14 +191,15 @@ _:
 ;  call xmul13
   ld de,const_13
   call xmul
-  ld de,var_a
-  ld bc,fpOP2
+
+  ld de,var_a0
   call xadd
   ld h,b
   ld l,c
-  ld de,var_a0
+  ld de,var_a
+  ld b,d
+  ld c,e
   call xadd
-  ex de,hl
   ld hl,const_3028466566125
   jp xdiv
 casebg:
