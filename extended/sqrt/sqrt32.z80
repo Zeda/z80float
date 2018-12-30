@@ -80,22 +80,31 @@ sqrt32:
   sbc a,b
 ;AHL is the new remainder
 ;Need to divide by 2, then divide by the 16-bit (var_x+4)
+#ifdef subsqrt32
+  ld de,(var_c+2)
+#endif
 
   push af
   jr nc,+_
+#ifdef subsqrt32
   xor a
-  sub l
+  ld b,a \ sub e \ ld e,a
+  ld a,b \ sbc a,d \ ld d,a
+  ld a,b \ sbc a,l \ ld l,a
+  ld a,b \ sbc a,h \ ld h,a
+#else
+  ld a,l
+  cpl
   ld l,a
-  sbc a,a
-  sub h
+  ld a,h
+  cpl
   ld h,a
-  xor a
+#endif
 _:
   rra
   rr h
   rr l
 #ifdef subsqrt32
-  ld de,(var_c+2)
   rr d
   rr e
   push de
