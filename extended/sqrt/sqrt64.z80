@@ -11,7 +11,7 @@ sqrt64:
   ld hl,var_z0
   ld de,var_c
   call rsub40
-  ld a,(var_z0+4)
+  ;ld a,(var_z0+4)  ;returned from rsub40 already, unnecessary
   ld de,(var_z0)
   ld hl,(var_z0+2)
   rra
@@ -31,7 +31,7 @@ _:
 ;  sbc a,a
 ;  push af
 ;  ;if carry flag is set, then remainder is negative
-;  
+;
 ;  ld (var_x+6),hl
 ;  ld (var_x+4),de
 ;;need to square var_b, a 16-bit number
