@@ -8,7 +8,6 @@
 ;This expects the top two bits to be non-zero
 sqrt32:
 ;returns 0.HLDE as the square root
-;as subsqrt32:
 ;  min: 2017cc
 ;  max: 2538cc
 ;  avg: 2271.5cc
@@ -80,45 +79,27 @@ sqrt32:
   sbc a,b
 ;AHL is the new remainder
 ;Need to divide by 2, then divide by the 16-bit (var_x+4)
-#ifdef subsqrt32
   ld de,(var_c+2)
-#endif
-
   push af
   jr nc,+_
-#ifdef subsqrt32
   xor a
   ld b,a \ sub e \ ld e,a
   ld a,b \ sbc a,d \ ld d,a
   ld a,b \ sbc a,l \ ld l,a
   ld a,b \ sbc a,h \ ld h,a
-#else
-  ld a,l
-  cpl
-  ld l,a
-  ld a,h
-  cpl
-  ld h,a
-#endif
 _:
   rra
   rr h
   rr l
-#ifdef subsqrt32
   rr d
   rr e
   push de
   pop ix
-#endif
 
   ld bc,(var_x+4)
-#ifdef subsqrt32
   call div32_16   ;returns DE = result
   ld (var_a),hl
   ld (var_b+2),de
-#else
-  call divide
-#endif
   ld hl,(var_x+4)
   pop af
   ret nc

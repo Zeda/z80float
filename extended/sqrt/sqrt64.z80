@@ -1,7 +1,3 @@
-#define subsqrt32
-
-
-
 sqrt64:
 ;avg: 7544.059294cc
   call sqrt32
