@@ -1,3 +1,6 @@
+#Accuracy Issues
+* acosh
+
 # Range Reduction
 We need to apply range reduction to some existing routines:
 * xln
@@ -21,10 +24,6 @@ There is also the consideration of overflow. The output to the BG algorithm will
 
 ---
 Need to fill in the code for:
-* xasin
-* xasinh
-* xacos
-* xacosh
 * xexp
 
 Need to make:
