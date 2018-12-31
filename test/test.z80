@@ -23,11 +23,10 @@ _PutS         = 450Ah
   ret
 _:
 ;;Hey, add more tests here!
-  ld hl,const_pi
-  ld de,const_e
+  ld hl,const_1
   ld bc,fpOP1
-  call xbg
-  call testputs \ .db "1/bg(pi,e)=",0
+  call xatan
+  call testputs \ .db "atan(1)=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
@@ -40,28 +39,32 @@ _:
   ld l,c
   call puts
 
-
   ld hl,const_pi
-  ld de,const_e
   ld bc,fpOP1
-  call xamean
-  ld h,b
-  ld l,c
-  call xmul
-;  mulx(const_pi,const_e,fpOP1)
-  call xsqrt
-;  sqrtx(fpOP1,fpOP1)
-  call testputs \ .db "sqrt(e*(e+pi)/2)=",0
+  call xln
+  call testputs \ .db "ln(pi)=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
   call puts
 
+  ld hl,const_loge_2
+  ld bc,fpOP1
+  call xatanh
+  call testputs \ .db "atanh(ln(2))=",0
+  strx(fpOP1,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+
+
+
+
   ret
 e_min_pi:
   .db $18,$BD,$6B,$F5,$4B,$32,$BC,$D8,$FE,$BF
-
-
+const_6:
+  .db 0,0,0,0,0,0,0,$C0 \ .dw $4002
 
 subtest:
   ld bc,8000h
@@ -140,6 +143,13 @@ puts:
 #include "../extended/xmul.z80"
 #include "../extended/xadd.z80"
 #include "../extended/mul/sqr32.z80"
+#include "../extended/xln.z80"
+#include "../extended/xatan.z80"
+#include "../extended/xatanh.z80"
+#include "../extended/xasin.z80"
+#include "../extended/xasinh.z80"
+#include "../extended/xacos.z80"
+#include "../extended/xacosh.z80"
 xroutines:
 #include "../extended/routines.z80"
 .echo "routines: ",$-xroutines
