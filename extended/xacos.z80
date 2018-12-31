@@ -7,7 +7,6 @@ xacos:
   push af
   push bc
   call +_
-  ex de,hl
   pop de
   call mov10
   pop af
@@ -16,5 +15,24 @@ xacos:
   pop hl
   ret
 _:
-  ;<insert code here>
-  ret
+  push hl
+  ld d,h
+  ld e,l
+  ld bc,fpOP1
+  call xmul
+  ld hl,const_1
+  ld d,b
+  ld e,c
+  ld bc,var_x
+  call xsub
+  ex de,hl
+  ld h,b
+  ld l,c
+  call xsqrt
+  pop hl
+  ld bc,fpOP1
+  call xbg
+  ld h,b
+  ld l,c
+  ld de,var_x
+  jp xmul

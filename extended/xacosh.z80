@@ -7,7 +7,6 @@ xacosh:
   push af
   push bc
   call +_
-  ex de,hl
   pop de
   call mov10
   pop af
@@ -16,5 +15,23 @@ xacosh:
   pop hl
   ret
 _:
-  ;<insert code here>
-  ret
+  push hl
+  ld d,h
+  ld e,l
+  ld bc,fpOP1
+  call xmul
+  ld de,const_1
+  ld h,b
+  ld l,c
+  ld bc,var_x
+  call xsub
+  ld h,b
+  ld l,c
+  call xsqrt
+  pop hl
+  ld bc,fpOP1
+  call xbg
+  ld h,b
+  ld l,c
+  ld de,var_x
+  jp xmul

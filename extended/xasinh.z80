@@ -1,4 +1,4 @@
-;x/BG(sqrt(1+x^2),1)
+;x/BG(sqrt(1-x^2),1)
 #define var_x  fpOP1+152
 xasinh:
   push hl
@@ -7,7 +7,6 @@ xasinh:
   push af
   push bc
   call +_
-  ex de,hl
   pop de
   call mov10
   pop af
@@ -16,5 +15,16 @@ xasinh:
   pop hl
   ret
 _:
-  ;<insert code here>
-  ret
+  push hl
+  ld d,h
+  ld e,l
+  ld bc,fpOP1
+  call xmul
+  ld h,b
+  ld l,c
+  ld de,const_1
+  call xadd
+  call xsqrt
+  call xbg
+  pop de
+  jp xmul
