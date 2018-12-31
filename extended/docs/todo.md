@@ -1,3 +1,9 @@
+# Range Reduction
+We need to apply range reduction to some existing routines:
+* xln
+* xatan
+* xatanh
+
 # Need to optimize the BG algorithm.
 The BG algorithm, is the core to the inverse trig and inverse hyperbolic functions, as well as the natural logarithm. One easy way to make it faster is to write custom routines to perform the following:
 
