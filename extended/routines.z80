@@ -56,14 +56,15 @@ neg64:
   ret
 cmp64:
 ;avg: 25.12156863cc
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret nz \ dec hl \ dec de
-  ld a,(de) \ cp (hl) \ ret
+  ld b,d \ ld c,e
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cpd \ ret nz
+  ld a,(bc) \ cp (hl) \ ret
 srlfpOP1_mantissa:
   ld hl,fpOP1+7
 srl64:
