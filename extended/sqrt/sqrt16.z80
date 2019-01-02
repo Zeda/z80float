@@ -1,8 +1,8 @@
 sqrtHL:
 ;returns HL as the sqrt, DE as the remainder
-;min: 377cc
-;max: 591cc
-;avg: 484cc
+;min: 464cc
+;max: 544cc
+;avg: 504cc
 
   xor a
   ld de,$4000
@@ -88,7 +88,7 @@ _:
   sbc hl,de
   jr nc,+_
   add hl,de
-  .db $06   ;start of ld b,* which is 7cc to skip the next byte.
+  dec e ;negate the effects of the next 'inc e'
 _:
   inc e
   srl d
