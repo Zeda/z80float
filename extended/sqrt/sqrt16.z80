@@ -1,35 +1,31 @@
 sqrtHL:
 ;returns HL as the sqrt, DE as the remainder
-;min: 464cc
-;max: 544cc
-;avg: 504cc
+;min: 424cc
+;max: 461cc
+;avg: 442.5cc
 
-  xor a
   ld de,$4000
-
-  sbc hl,de
+  ld a,h
+  sub d
   jr nc,+_
-  add hl,de
+  add a,d
   ld d,e
-  or a
 _:
-;HL is either $0000 or $4000
+
   set 4,d
-  sbc hl,de
+  sub d
   jr nc,+_
-  add hl,de
+  add a,d
   .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
 _:
   set 5,d
   res 4,d
   srl d
 
-;HL is either $0000 or $1000 or $2000 or $3000
-
   set 2,d
-  sbc hl,de
+  sub d
   jr nc,+_
-  add hl,de
+  add a,d
   .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
 _:
   set 3,d
@@ -37,14 +33,15 @@ _:
   srl d
 
   inc d
-  sbc hl,de
+  sub d
   jr nc,+_
-  add hl,de
+  add a,h
   dec d
   .db $06   ;start of ld b,* which is 7cc to skip the next byte.
 _:
   inc d
   srl d
+  ld h,a
 
   set 6,e
   sbc hl,de
@@ -82,13 +79,13 @@ _:
   rr e
 
 
-
-
   inc e
   sbc hl,de
   jr nc,+_
   add hl,de
-  dec e ;negate the effects of the next 'inc e'
+  srl d
+  rr e
+  ret
 _:
   inc e
   srl d
