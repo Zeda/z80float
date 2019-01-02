@@ -88,7 +88,9 @@ _:
   sbc hl,de
   jr nc,+_
   add hl,de
-  dec e ;negate the effects of the next 'inc e'
+  srl d
+  rr e
+  ret
 _:
   inc e
   srl d
