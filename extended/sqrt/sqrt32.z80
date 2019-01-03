@@ -16,7 +16,7 @@ sqrt32:
   ld hl,(var_y+2)
   call sqrtHL   ;HL is remainder, A is the square root
   ld e,a
-  ld (var_x+5),a
+  ld (var_x+7),a
 
 ;Now we need to create b0
   srl h
@@ -51,9 +51,9 @@ sqrt32:
   rl d
 
   ld a,l
-  ld (var_x+4),a
+  ld (var_x+6),a
 
-;no we need to compute l*l
+;now we need to compute l*l
   ld c,l
   ld l,b
   add a,a
@@ -95,22 +95,73 @@ sqrt32:
 _:
   push de
   pop ix
-  ld bc,(var_x+4)
-  call div32_16   ;returns DE = result
-  ld (var_a),hl
-  ld (var_b+2),de
-  ld hl,(var_x+4)
+  ld bc,(var_x+6)
+  call div32_16   ;returns DE=quotient, HL is remainder
+  ld (var_x+4),de
   pop af
-  ret nc
-_:
+  jr nc,sqr32_pos
+;
+  ld b,h  ;remainder
+  ld c,l
+  push de
   xor a
   sub e
   ld e,a
-  sbc a,a
-  sub d
+  ld a,0
+  sbc a,d
   ld d,a
+  ld (var_x+4),de
+  jr nc,+_      ;need to analyze this. Might always execute.
+  ld hl,(var_x+6)
   dec hl
+  ld (var_x+6),hl
+_:
+  xor a
+  sub c
+  ld c,a
+  ld a,0
+  sbc a,b
+  ld b,a
+  sbc a,a
+  ld hl,(var_c+2)
+  rr l
+  rl c
+  rl b
+  rla
+  ;ABC is the remainder
+  pop de
+  push bc
+sqr32_end:
+  push af
+  ld b,d
+  ld c,e
+  call mul16
+  ld b,h
+  ld c,l
+  ;DEBC
+  ld hl,(var_c)
+  pop af
+  or a
+  sbc hl,bc
+  ld b,h
+  ld c,l
+  ;BC is the low 16 bits
+  pop hl
+  sbc hl,de
+  sbc a,0
   ret
+sqr32_pos;
+;Need to compute remainder
+;(BC*2+(var_c+2)&1)*65536+(var_c))-DE*DE
+  ld (var_x+4),de
+  ld a,(var_c+2)
+  rra
+  adc hl,hl
+  ld a,0
+  rla
+  push hl
+  jp sqr32_end
+
 #undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
 #undefine var_a fpOP2   ;   2 bytes
 #undefine var_c fpOP2+8 ;input
