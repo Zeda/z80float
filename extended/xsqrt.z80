@@ -9,7 +9,9 @@ xsqrt:
 ;HL points to x
 ;BC points to the output
 ;computes x^.5, if x>=0
-;avg: 9183.44329412cc
+;speed: 388+mov8+mov10+sqrt64+{0,7+srlfpOP1_mantissa}
+;avg: 6593.340cc
+
   push hl
   push de
   push bc

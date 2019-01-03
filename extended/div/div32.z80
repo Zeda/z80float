@@ -79,7 +79,8 @@ _:
   ret
 .echo "  div64_32: +",$-div64_32
 div32_32:
-;2601.134cc
+;228+{0,115}+2*div32_16+mul16
+;avg: 2581.161cc
 ;HLDE/(var_x+4)
   ld bc,(var_x+6)
   call div32_16

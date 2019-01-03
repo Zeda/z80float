@@ -1,7 +1,14 @@
 sqrt64:
 ;avg: 7544.059294cc
+;Speed: 106+{0,47}+{0,109+{0,18+{0,18+{0,18+{0,17}/256}/256}/256}}+sqrt32+div32_32
+;min: 106+min(sqrt32)+min(div32_32)
+;max: 333+max(sqrt32)+max(div32_32)
+;avg: 188.517647+ag(sqrt32)+avg(div32_32)
+;     5794.840cc
+
   call sqrt32
-  ;AHLBC is the remainder
+;AHLBC is the remainder
+
   rra
   rr h
   rr l
