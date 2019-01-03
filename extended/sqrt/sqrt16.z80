@@ -3,15 +3,13 @@ sqrtHL:
 ;min: 388cc
 ;max: 428cc
 ;avg: 405cc
-  ld d,$40
+  ld de,$5040
   ld a,h
-  sub d
+  sub e
   jr nc,+_
-  add a,d
-  ld d,0
+  add a,e
+  ld d,$10
 _:
-
-  set 4,d
   sub d
   jr nc,+_
   add a,d
@@ -43,7 +41,6 @@ _:
   ld h,a
 
 
-  ld e,$40
   ld a,e
   sbc hl,de
   jr nc,+_
