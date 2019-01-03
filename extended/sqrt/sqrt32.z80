@@ -14,8 +14,8 @@ sqrt32:
 
 ;Step one is to generate 8 accurate bits
   ld hl,(var_y+2)
-  call sqrtHL   ;HL is remainder, DE is value
-  ld a,e
+  call sqrtHL   ;HL is remainder, A is the square root
+  ld e,a
   ld (var_x+5),a
 
 ;Now we need to create b0

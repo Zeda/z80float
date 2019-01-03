@@ -1,15 +1,14 @@
 sqrtHL:
-;returns HL as the sqrt, DE as the remainder
-;min: 395cc
-;max: 432cc
-;avg: 413.5cc
-
-  ld de,$4000
+;returns A as the sqrt, HL as the remainder, D = 0
+;min: 388cc
+;max: 428cc
+;avg: 405cc
+  ld d,$40
   ld a,h
   sub d
   jr nc,+_
   add a,d
-  ld d,e
+  ld d,0
 _:
 
   set 4,d
@@ -36,7 +35,7 @@ _:
   sub d
   jr nc,+_
   add a,h
-  dec d
+  dec d   ;this resets the low bit of D, so `srl d` resets carry.
   .db $06   ;start of ld b,* which is 7cc to skip the next byte.
 _:
   inc d
@@ -81,10 +80,10 @@ _:
   jr nc,+_
   add hl,de
   srl d
-  rr e
+  rra
   ret
 _:
-  inc e
+  inc a
   srl d
-  rr e
+  rra
   ret
