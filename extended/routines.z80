@@ -66,8 +66,10 @@ cmp64:
   ld a,(bc) \ cpd \ ret nz
   ld a,(bc) \ cp (hl) \ ret
 srlfpOP1_mantissa:
+;198cc
   ld hl,fpOP1+7
 srl64:
+;188cc
   srl (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl
@@ -137,4 +139,30 @@ setfpOP1_inf:
   dec a
   ld (fpOP1+8),hl
   ld (fpOP1+7),a
+  ret
+diRestore:
+;Adds 151cc if interrupts are enabled, 161cc if disabled
+;Disables interrupts, but sets up the stack so that interrupt settings are restored.
+;Call this at the top of your routine that needs to disable interrupts :)
+  ex (sp),hl
+  push hl
+  push af
+  ld hl,restoreei
+  ld a,r
+  jp pe,+_
+  ld hl,restoredi
+_:
+  di
+  pop af
+  inc sp
+  inc sp
+  ex (sp),hl
+  dec sp
+  dec sp
+  ret
+restoredi:
+  di
+  ret
+restoreei:
+  ei
   ret
