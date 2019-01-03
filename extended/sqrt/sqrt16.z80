@@ -34,13 +34,14 @@ _:
   inc d
   sub d
   jr nc,+_
-  add a,h
+  add a,d
   dec d   ;this resets the low bit of D, so `srl d` resets carry.
   .db $06   ;start of ld b,* which is 7cc to skip the next byte.
 _:
   inc d
   srl d
   ld h,a
+
 
   ld e,$40
   ld a,e
