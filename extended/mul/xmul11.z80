@@ -1,0 +1,5 @@
+xmul11:
+  ld de,const_11
+  jp xmul
+const_11:
+  .db $00,$00,$00,$00,$00,$00,$00,$B0 \ .dw $4003

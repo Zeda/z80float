@@ -1,0 +1,5 @@
+xmul13:
+  ld de,const_13
+  jp xmul
+const_13:
+  .db $00,$00,$00,$00,$00,$00,$00,$D0 \ .dw $4003
