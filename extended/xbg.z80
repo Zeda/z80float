@@ -151,46 +151,35 @@ _:
   ld hl,var_a3
   ld b,h
   ld c,l
-;  call xmul5
-;  call xmul17
-  ld de,const_85
-  call xmul
+  call xmul5
+  call xmul17
 
   ld hl,var_a1
   ld de,var_a5
   ld b,h
   ld c,l
   call xadd
-;  call xmul3
-;  call xmul5
-;  call xmul7
-
-  ld de,const_105
-  call xmul
-
+  call xmul15
+  call xmul7
 
   ld hl,var_a2
   ld de,var_a4
   ld b,h
   ld c,l
   call xadd
-;  call xmul3
-;  call xmul7
-  ld de,const_21
-  call xmul
+  call xmul3
+  call xmul7
 
   ld de,var_a3
   call xsub
-;  call xmul11
-;  call xmul31
-  ld de,const_341
-  call xmul
+  call xmul11
+  call xmul31
+;  ld de,const_341
+;  call xmul
 
   ld de,var_a1
   call xsub
-;  call xmul13
-  ld de,const_13
-  call xmul
+  call xmul13
 
   ld de,var_a0
   call xadd
@@ -236,338 +225,8 @@ bg_NaN:
   ld a,$40
   ld (fpOP1+7),a
   ret
-const_341:
-  .db $00,$00,$00,$00,$00,$00,$80,$AA \ .dw $4008
-const_13:
-  .db $00,$00,$00,$00,$00,$00,$00,$D0 \ .dw $4003
-const_105:
-  .db $00,$00,$00,$00,$00,$00,$00,$D2 \ .dw $4006
-const_21:
-  .db $00,$00,$00,$00,$00,$00,$00,$A8 \ .dw $4004
-const_85:
-  .db $00,$00,$00,$00,$00,$00,$00,$AA \ .dw $4006
-
-
-xmul3:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov8
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  inc (hl)
-  jr nz,+_
-  inc (hl)
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  call srlfpOP1_mantissa
-  jp _addshiftstepin
-xmul5:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov8
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  ld a,(hl) \ add a,2 \ ld (hl),a
-  jr nc,+_
-  inc (hl)
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-_addshiftstepin:
-  pop de
-  push de
-  ex de,hl
-  call adc64
-  pop hl
-  ret nc
-; Need to shift down, but also increment exponent
-  ex de,hl
-  call rr64
-  ex de,hl
-  inc (hl)
-  ret nz
-  inc hl
-  inc (hl)
-  ld a,(hl)
-  and $7F
-  ret nz
-  jp setfpOP1_inf
-xmul7:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  ld a,(hl) \ add a,4 \ ld (hl),a
-  ld e,a
-  inc hl
-  ld a,(hl)
-  jr nc,+_
-  inc a
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  ld d,a
-  ld (fpOP1+8),de
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  pop de
-  ;need (DE)-(HL) -> (hl)
-  call rsbc64
-  jp nc,normalizefpOP1
-  jp fpOP1_subunder
-xmul17:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov8
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  ld a,(hl) \ add a,4 \ ld (hl),a
-  jr nc,+_
-  inc (hl)
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  jp _addshiftstepin
-xmul31:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  ld a,(hl) \ add a,6 \ ld (hl),a
-  ld e,a
-  inc hl
-  ld a,(hl)
-  jr nc,+_
-  inc a
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  ld d,a
-  ld (fpOP1+8),de
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  pop de
-  ;need (DE)-(HL) -> (hl)
-  call rsbc64
-  jr nc,normalizefpOP1
-fpOP1_subunder:
-;need to increment exponent, negate mantissa, then normalize
-  ld hl,fpOP1
-  call neg64
-_:
-  ld hl,(fpOP1+8)
-  dec hl
-  ld (fpOP1+8),hl
-normalizefpOP1:
-  ld a,(fpOP1+7)
-  add a,a
-  ret c
-  ld hl,fpOP1
-  sla (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl)
-  jp -_
-xmul13:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  pop de
-  ld a,(hl) \ add a,5 \ ld (hl),a
-  ld c,a
-  inc hl
-  ld a,(hl)
-  jr nc,+_
-  inc a
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  ld b,a
-  ld (fpOP1+8),bc
-  ;subtract ((>>1) and (>>0))>>3
-  call srlfpOP1_mantissa
-  push de
-  ex de,hl
-  call adc64
-  call c,fpOP1_addover
-  call srlfpOP1_mantissa    ;1.5
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa    ;.1875
-  pop de
-  ;need to subtract (DE)-(HL) -> (HL)
-  call rsbc64
-  jp nc,normalizefpOP1
-  jp fpOP1_subunder
-fpOP1_addover:
-  push hl
-  push af
-  ld hl,(fpOP1+8)
-  inc hl
-  ld (fpOP1+8),hl
-  ld a,h
-  xor $7F
-  or l
-  jr z,+_
-  scf
-  call nc,rr64
-  pop af
-  pop hl
-  ret
-_:
-  dec a
-  ld (fpOP1+7),a
-  pop af
-  pop hl
-  ret
-xmul11:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  ld hl,fpOP1
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-  push hl
-  ld de,fpOP1
-  call mov8
-  pop de
-  ld a,(hl) \ add a,5 \ ld (hl),a
-  ld c,a
-  inc hl
-  ld a,(hl)
-  jr nc,+_
-  inc a
-  ld a,(hl)
-  and $7F
-  jp z,setfpOP1_inf
-_:
-  ld b,a
-  ld (fpOP1+8),bc
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  push de
-  ex de,hl
-  call adc64
-  call c,fpOP1_addover      ;1.25
-  call srlfpOP1_mantissa    ;.625
-  call srlfpOP1_mantissa    ;.3125
-  pop de
-  ;need to subtract (DE)-(HL) -> (HL)
-  call rsbc64
-  jp nc,normalizefpOP1
-  jp fpOP1_subunder
-
+;const_341:
+;  .db $00,$00,$00,$00,$00,$00,$80,$AA \ .dw $4008
 #undefine var_a
 #undefine var_g
 #undefine var_a0
