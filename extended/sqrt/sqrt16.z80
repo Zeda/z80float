@@ -41,13 +41,11 @@ _:
   ld h,a
 
 
-  ld a,e
   sbc hl,de
   jr nc,+_
   add hl,de
 _:
-  ccf
-  rra
+  ld a,%10100000
   srl d
   rra
   ld e,a
