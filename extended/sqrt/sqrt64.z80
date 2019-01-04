@@ -4,7 +4,7 @@ sqrt64:
 ;min: 106+min(sqrt32)+min(div32_32)
 ;max: 333+max(sqrt32)+max(div32_32)
 ;avg: 188.517647+ag(sqrt32)+avg(div32_32)
-;     5794.840cc
+;     5777.840cc
 
   call sqrt32
 ;AHLBC is the remainder
