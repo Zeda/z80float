@@ -4,10 +4,18 @@
 mul16:
 ;BC*DE --> DEHL
 ; ~565.161cc for uniformly distributed BC and DE
-	ld	a,d
+	ld h,b
+	ld l,c
+	xor a		; we might not need it..? (perhaps a "rough" compare would decrease average cc ..?)
+	sbc hl,de	; BC < DE ?
+	ld h,b
+	ld l,c
+	jr nc,+_	; no, then no permutation
+	ex de,hl
+	ld b,h
+	ld c,l	
+_:	ld	a,d
 	ld	d,0
-	ld	h,b
-	ld	l,c
 	add	a,a
 	jr	c,Mul_BC_DE_DEHL_Bit14
 	add	a,a
