@@ -8,7 +8,7 @@ div64_32:
 ;HLDE is the remainder
 ;BCIX is the quotient
 ;440+2{0,96}+2*div32_16+2*mul16
-;~3396.768cc
+;~3396.822cc
   ld hl,(var_n+6)
   ld de,(var_n+4)
   ld bc,(var_x+6)

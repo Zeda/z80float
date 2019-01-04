@@ -3,7 +3,7 @@ mul32:
 ;max: 724cc  + 3*mul16
 ;min: 676cc  + 3*mul16
 ;avg: 694.25cc+3*mul16
-;2389.652cc
+;2389.733cc
 ;DEHL * BCIX
   push de
   push bc
@@ -12,7 +12,7 @@ mul32:
   call mul16  ;DEHL
   ld (z2_32),hl
   ld (z2_32+2),de
-  
+
   pop de
   pop bc
   push bc
@@ -20,7 +20,7 @@ mul32:
   call mul16  ;DEHL
   ld (z0_32),hl
   ld (z0_32+2),de
-  
+
   pop de    ;low word
   pop bc    ;low word
   pop hl

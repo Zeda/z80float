@@ -2,7 +2,9 @@
 #define var_x fpOP2
 #define var_n fpOP3
 xdiv:
-;avg: 11107.37035cc+29
+;597+{0,220+{0,6}}+{0,3}+div64+cmp64+mov8+2*mov10
+;1213.122+div64
+;avg: 11135.560cc
   push hl
   push de
   push bc
