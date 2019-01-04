@@ -1,8 +1,8 @@
 sqrtHL:
 ;returns A as the sqrt, HL as the remainder, D = 0
-;min: 371cc
-;max: 411cc
-;avg: 388cc
+;min: 376cc
+;max: 416cc
+;avg: 393cc
   ld de,$5040
   ld a,h
   sub e
@@ -42,10 +42,12 @@ _:
 
 
   sbc hl,de
+  ld a,e
   jr nc,+_
   add hl,de
 _:
-  ld a,%10100000
+  ccf
+  rra
   srl d
   rra
   ld e,a

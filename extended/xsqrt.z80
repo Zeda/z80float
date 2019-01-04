@@ -10,7 +10,7 @@ xsqrt:
 ;BC points to the output
 ;computes x^.5, if x>=0
 ;speed: 388+mov8+mov10+sqrt64+{0,7+srlfpOP1_mantissa}
-;avg: 6576.340cc
+;avg: 6581.340cc
 
   push hl
   push de

@@ -12,7 +12,7 @@ sqrt32:
 ;min: 1078+min(sqrtHL+div32_16+mul16)
 ;max: 1330+max(sqrtHL+div32_16+mul16)
 ;avg: 1189.75+avg(sqrtHL+div32_16+mul16)
-;     3008.161
+;     3013.161
 
 ;Step one is to generate 8 accurate bits
   ld hl,(var_y+2)
