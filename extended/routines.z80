@@ -65,6 +65,30 @@ cmp64:
   ld a,(bc) \ cpd \ ret nz
   ld a,(bc) \ cpd \ ret nz
   ld a,(bc) \ cp (hl) \ ret
+srlfpOP2_4:
+  ld hl,fpOP2+7
+srl64_4:
+  xor a
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd
+  ret
+srlfpOP2:
+  ld hl,fpOP2+7
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl)
+  ret
 srlfpOP1_mantissa:
 ;198cc
   ld hl,fpOP1+7
@@ -165,4 +189,23 @@ restoredi:
   ret
 restoreei:
   ei
+  ret
+normalizefpOP1:
+  ld a,(fpOP1+7)
+  add a,a
+  ret c
+_:
+  ld hl,fpOP1
+  sla (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl)
+  ld hl,(fpOP1+8)
+  dec hl
+  ld (fpOP1+8),hl
+  jp p,-_
   ret
