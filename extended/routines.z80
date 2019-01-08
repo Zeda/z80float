@@ -209,3 +209,21 @@ _:
   ld (fpOP1+8),hl
   jp p,-_
   ret
+addmantissa0102:
+  ld hl,fpOP2
+  ld de,fpOP1
+  call adc64
+  ret nc
+  ex de,hl
+  call rr64
+  ex de,hl
+  call srl64
+  ld hl,fpOP1+8
+  inc (hl)
+  ret nz
+  inc hl
+  ld a,(hl)
+  inc (hl)
+  xor (hl)
+  ret p
+  jp constmul_overflow

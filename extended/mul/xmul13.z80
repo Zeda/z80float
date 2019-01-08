@@ -1,5 +1,40 @@
 xmul13:
-  ld de,const_13
-  jp xmul
-const_13:
-  .db $00,$00,$00,$00,$00,$00,$00,$D0 \ .dw $4003
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop de
+  ld hl,fpOP1
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  ld de,fpOP1
+  call mov10
+  ld hl,(fpOP1+8)
+  ld a,h
+  or l
+  ret z
+  ld hl,fpOP1
+  call mov8
+  call srlfpOP2
+  call addmantissa0102
+  call srlfpOP2
+  call srlfpOP2
+  call addmantissa0102
+  ld hl,fpOP1+8
+  ld a,(hl)
+  add a,3
+  ld (hl),a
+  ret nc
+  inc hl
+  ld a,(hl)
+  inc (hl)
+  xor (hl)
+  jp m,constmul_overflow
+  ret
