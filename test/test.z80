@@ -23,10 +23,19 @@ _PutS         = 450Ah
   ret
 _:
 ;;Hey, add more tests here!
-  ld hl,const_1
+  ld hl,const_pi
+  ld bc,fpOP1
+  call xln
+  call testputs \ .db "ln(pi)=",0
+  strx(fpOP1,fpOP1)
+  ld h,b
+  ld l,c
+  call puts
+
+  ld hl,const_loge_2
   ld bc,fpOP1
   call xatan
-  call testputs \ .db "atan(1)=",0
+  call testputs \ .db "atan(ln(2))=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
@@ -39,19 +48,20 @@ _:
   ld l,c
   call puts
 
-  ld hl,const_pi
+  ld hl,const_loge_2
   ld bc,fpOP1
-  call xln
-  call testputs \ .db "ln(pi)=",0
+  call xatanh
+  call testputs \ .db "atanh(ln(2))=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
   call puts
 
-  ld hl,const_loge_2
+  ld hl,const_pi
+  ld de,const_e
   ld bc,fpOP1
-  call xatanh
-  call testputs \ .db "atanh(ln(2))=",0
+  call xmul
+  call testputs \ .db "pi*e=",0
   strx(fpOP1,fpOP1)
   ld h,b
   ld l,c
@@ -142,7 +152,15 @@ puts:
 #include "../extended/xdiv.z80"
 #include "../extended/xmul.z80"
 #include "../extended/xadd.z80"
-#include "../extended/mul/sqr32.z80"
+;#include "../extended/mul/sqr32.z80"
+#include "../extended/mul/xmul3.z80"
+#include "../extended/mul/xmul5.z80"
+#include "../extended/mul/xmul7.z80"
+#include "../extended/mul/xmul11.z80"
+#include "../extended/mul/xmul13.z80"
+#include "../extended/mul/xmul15.z80"
+#include "../extended/mul/xmul17.z80"
+#include "../extended/mul/xmul31.z80"
 #include "../extended/xln.z80"
 #include "../extended/xatan.z80"
 #include "../extended/xatanh.z80"
