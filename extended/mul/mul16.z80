@@ -3,7 +3,7 @@
 
 mul16:
 ;BC*DE --> DEHL
-; ~565.161cc for uniformly distributed BC and DE
+; ~544.887cc for uniformly distributed BC and DE
 	ld	a,d
 	ld	d,0
 	ld	h,b
@@ -25,7 +25,7 @@ mul16:
 	add	a,a
 	jr	c,Mul_BC_DE_DEHL_Bit7
 	ld	a,e
-  and %11111110
+ 	and	%11111110
 	add	a,a
 	jr	c,Mul_BC_DE_DEHL_Bit6
 	add	a,a
@@ -40,7 +40,7 @@ mul16:
 	jr	c,Mul_BC_DE_DEHL_Bit1
 	add	a,a
 	jr	c,Mul_BC_DE_DEHL_Bit0
-	rr e
+	rr	e
 	ret	c
 	ld	h,d
 	ld	l,e
