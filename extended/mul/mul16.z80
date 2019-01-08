@@ -1,9 +1,12 @@
 ;This was made by Runer112
-;It is a solid 24cc faster than my best
-
+;It is a solid 45cc faster than my best
+;Tested by jacobly
 mul16:
 ;BC*DE --> DEHL
-; ~565.161cc for uniformly distributed BC and DE
+; ~544.887cc as calculated in jacobly's test
+;min: 214cc  (DE = 1)
+;max: 667cc
+;avg: 544.4507883cc   however, deferring to jacobly's result as mine may have math issues ?
 	ld	a,d
 	ld	d,0
 	ld	h,b

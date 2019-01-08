@@ -1,9 +1,11 @@
 
 mul32:
 ;max: 724cc  + 3*mul16
+;     2725cc
 ;min: 676cc  + 3*mul16
+;     1318cc
 ;avg: 694.25cc+3*mul16
-;2389.733cc
+;     2328.911cc
 ;DEHL * BCIX
   push de
   push bc

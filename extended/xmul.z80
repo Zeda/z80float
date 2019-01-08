@@ -5,10 +5,14 @@ xmul:
 ;  HL points to one number
 ;  DE points to another
 ;Timing, excluding special cases (which take ~ 800cc):
-;max: 1036+max(mul64)+29
-;min: 882+min(mul64)+29
-;avg: 959+avg(mul64)+29
-;    ~9925.527+29
+;1057+{0,3}+{0,172}+mul64
+;max: 1232+max(mul64)
+;     11308cc
+;min: 1057+min(mul64)
+;     6751cc
+;avg: 1144.5+avg(mul64)
+;     9928.233cc
+
 
   push hl
   push de

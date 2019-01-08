@@ -6,9 +6,13 @@
 mul64:
 ;multiplies the 64-bit integers at fpOP1 and fpOP2
 ;min: 1740+3*min(mul32)
+;     5694cc
 ;max: 1901+3*max(mul32)
+;     10076cc
 ;avg: 1797+3*avg(mul32) + 9572881/2^24
-;   :~8966.527cc
+;   :~8783.733cc
+;DEHL * BCIX
+
   ld de,(fpOP1+6)
   ld hl,(fpOP1+4)
   ld bc,(fpOP2+6)
@@ -18,8 +22,8 @@ mul64:
   ld hl,z0_32
   ld de,z2_64
   call mov8
-  
-  
+
+
   ld de,(fpOP1+2)
   ld hl,(fpOP1)
   ld bc,(fpOP2+2)
