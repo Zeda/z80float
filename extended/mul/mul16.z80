@@ -40,7 +40,7 @@ mul16:
 	jr	c,Mul_BC_DE_DEHL_Bit1
 	add	a,a
 	jr	c,Mul_BC_DE_DEHL_Bit0
-	add	a,a
+	rr e
 	ret	c
 	ld	h,d
 	ld	l,e
