@@ -1,4 +1,5 @@
 xamean:
+;212+{0(special case),17}+mov10+xadd
   push hl
   push de
   push bc
@@ -13,11 +14,6 @@ xamean:
   jr z,+_
   dec hl
   ld (fpOP1+8),hl
-  ld a,h
-  and $7F
-  or l
-  jr nz,+_
-  ld (fpOP1+7),a
 _:
   ld hl,fpOP1
   pop de
