@@ -27,7 +27,7 @@ xrsub:
 ;Input:
 ;  HL points to one number
 ;  DE points to another
-
+;xadd+43
   push hl
   push de
   push bc
@@ -59,7 +59,7 @@ xsub:
 ;Input:
 ;  HL points to one number
 ;  DE points to another
-
+;xadd+37
   push hl
   push de
   push bc
@@ -91,7 +91,17 @@ xadd:
 ;Input:
 ;  HL points to one number
 ;  DE points to another
-
+;  BC points to output
+;945
+;+{0,57+swapfpOP2fpOP3}
+;+{0,123+{0,249}+{0,430}+{0,210}+21*n+{0,232-26n}}, n from 0 to 9
+;+{sub,add}
+;sub:
+;  84+{0,256}+sbc64  ;there is a 25% chance of it going here, I believe
+;  {0,333+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,29}}}}}}}}   ;this part happens at most once (50%) unless inputs have the same exponent, then it is about 8/3 (accurate to 17 digits)
+;add:
+;  69+adc64+{0,201+{0,39}
+;avg: 2094.3076938cc, I think. A lot of weird probability.
   push hl
   push de
   push bc
@@ -275,6 +285,7 @@ _:
   dec hl \ rr (hl)
   ret
 srl4fpOP2_mantissa:
+;242cc
   ld hl,fpOP2+7
   ld b,a
   xor a
@@ -290,8 +301,10 @@ srl4fpOP2_mantissa:
   ld a,b
   ret
 srl2fpOP2_mantissa:
+;423
   call srlfpOP2_mantissa
 srlfpOP2_mantissa:
+;203
   ld hl,fpOP2+7
   srl (hl) \ dec hl
   rr (hl) \ dec hl

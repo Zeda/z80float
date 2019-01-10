@@ -90,10 +90,10 @@ srlfpOP2:
   rr (hl)
   ret
 srlfpOP1_mantissa:
-;198cc
+;182cc
   ld hl,fpOP1+7
 srl64:
-;188cc
+;172cc
   srl (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl
@@ -104,6 +104,7 @@ srl64:
   rr (hl)
   ret
 rr64:
+;172cc
   rr (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl

@@ -2,6 +2,8 @@ xgeomean:
 ;Input:
 ;  HL points to one number
 ;  DE points to anothers
+;104+xmul+xsqrt
+;avg: 16573.025
   push hl
   push bc
   ld bc,fpOP1
