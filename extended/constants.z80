@@ -13,7 +13,7 @@ const_log2_10:
 const_e_ext:
   .db $3C,$3D,$27,$20,$56,$dc,$af
 const_e:
-  .db $91,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
+  .db $9A,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
 const_pi_ext:
   .db $1C,$DC,$80,$8B,$62,$C6,$C4
 const_pi:
