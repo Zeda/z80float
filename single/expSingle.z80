@@ -110,6 +110,7 @@ denorm:
     ex de,hl
     xor a
 comp_exp:
+;At this point, we are working on [0,ln(2)]
     add a,80h
     push af
 
@@ -206,7 +207,7 @@ shiftloop:
     ld d,a
     ld bc,(var_c) \ add hl,bc \ ld (var_c),hl
     ld hl,(var_c+2) \ adc hl,de \ ld (var_c+2),hl
-    
+
     ld de,var_x
     ld hl,(lutptr)
     ld a,(de) \ sub (hl) \ ld (de),a \ inc hl \ inc de
@@ -307,4 +308,3 @@ lnLUT:
 #undefine var_c
 #undefine out_exp
 #undefine lutptr
-
