@@ -3,6 +3,8 @@ fpOP2 = 800Ah
 fpOP3 = 8014h
 fpOP4 = 801Eh
 fpOP5 = 8028h
+seed0 = 80F8h
+seed1 = 80FCh
 
 #define addx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xadd
 #define subx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xsub
