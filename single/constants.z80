@@ -17,6 +17,10 @@ const_pi_inv: .db $83,$F9,$22,$7E
 const_e_inv:  .db $B2,$5A,$3C,$7E
 ;    .db $,$,$,$
 end_const:
+sin_a1: .db $A4,$AA,$2A,$7D   ;a1= 2^-3 * 11184804/2^23
+sin_a2: .db $AC,$83,$08,$79   ;a2= 2^-7 *  8946604/2^23
+sin_a3: .db $11,$97,$4C,$73   ;a3=2^-13 * 13408017/2^23
+
 iconstSingle:
     ex (sp),hl
     ld a,(hl)
@@ -40,5 +44,3 @@ constSingle:
 #endif
     scf
     ret
-
-

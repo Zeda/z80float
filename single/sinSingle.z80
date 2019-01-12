@@ -33,16 +33,16 @@ _:
   call mulSingle
   ;
   ld hl,var_y
-  ld de,a3
+  ld de,sin_a3
   ld bc,temp
   call mulSingle
-  ld hl,a2
+  ld hl,sin_a2
   ld d,b
   ld e,c
   call subSingle
   ld hl,var_y
   call mulSingle
-  ld hl,a1
+  ld hl,sin_a1
   call subSingle
   ld hl,var_y
   call mulSingle
@@ -51,11 +51,6 @@ _:
   ld hl,var_x
   pop bc
   jp mulSingle
-
-a1: .db $A4,$AA,$2A,$7D   ;a1= 2^-3 * 11184804/2^23
-a2: .db $AC,$83,$08,$79   ;a2= 2^-7 *  8946604/2^23
-a3: .db $11,$97,$4C,$73   ;a3=2^-13 * 13408017/2^23
-
 #undefine var_x
 #undefine var_y
 #undefine temp
