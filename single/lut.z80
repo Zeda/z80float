@@ -1,5 +1,12 @@
 ;;LUTs used
 lut:
+pow10LUT:
+.db $00,$00,$20,$83 ;10
+.db $00,$00,$48,$86 ;100
+.db $00,$40,$1c,$8d ;10000
+.db $20,$bc,$3e,$9a ;10^8
+.db $ca,$1b,$0e,$b5 ;10^16
+.db $ae,$c5,$1d,$ea ;10^32
 cexpLUT:
 ;;extra-precision singles.
 ;;Each sequence of 8 is an entire element (8 singles per element)
