@@ -11,9 +11,6 @@ rsubSingle:
     push bc
     push de
     ld de,addend2
-    bit ext,(iy+mathflags)
-    jr z,$+4
-    ldi
     ldi
     ldi
     ld a,(hl)
@@ -36,9 +33,6 @@ subSingle:
     push hl
     ex de,hl
     ld de,addend2
-    bit ext,(iy+mathflags)
-    jr z,$+4
-    ldi
     ldi
     ldi
     ld a,(hl)
@@ -60,8 +54,6 @@ addSingle:
     push de
     push bc
 addInject:
-    bit ext,(iy+mathflags)
-    jr z,$+4 \ inc de \ inc hl
     inc de
     inc de
     inc hl
@@ -78,18 +70,12 @@ addInject:
     jr nc,$+5
     ex de,hl
     neg
-    bit ext,(iy+mathflags)
-    jr z,$+6
-    cp 32 \ jr $+4
     cp 24
     jp nc,add_unneeded
     push hl
     ld hl,addend+6
     dec de
     ld bc,0408h
-    bit ext,(iy+mathflags)
-    jr nz,$+3 \ inc b
-    dec b
     dec hl
     ld (hl),0
     sub c
@@ -99,8 +85,6 @@ addInject:
     push hl
     ex de,hl
     ld a,(hl) \ or 80h \ ld (de),a \ dec de \ dec hl
-    bit ext,(iy+mathflags)
-    jr z,$+4 \ ldd
     ldd
     ldd
     ex de,hl
@@ -112,36 +96,25 @@ addInject:
     ld b,a
     jr z,noshift
     set 7,(hl)
+_:
     push hl
     srl (hl) \ dec hl
-    bit ext,(iy+mathflags)
-    jr z,$+5
-    rr (hl) \ dec hl
     rr (hl) \ dec hl
     rr (hl) \ dec hl
     rr (hl)
     pop hl
-    djnz $-22
+    djnz -_
 noshift:
     pop hl  ;bigger float
     dec hl
     ld b,(hl)
     dec hl
     dec hl
-    bit ext,(iy+mathflags)
-    jr z,$+3
-    dec hl
     ex de,hl
     pop af
     jp m,subtract
     ld hl,addend+2
-    bit ext,(iy+mathflags)
-    jr z,$+3 \ dec hl
-    
     ld a,(hl) \ rla \ inc hl
-;    bit ext,(iy+mathflags)
-    jr z,$+7
-    ld a,(de) \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
     ld a,(de) \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
     ld a,(de) \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
     ld a,(de) \ set 7,a \ adc a,(hl) \ ld (hl),a \ inc hl \ inc de
@@ -149,9 +122,6 @@ noshift:
     jp nc,add_done
     inc (hl)
     jp z,add_overflow
-    bit ext,(iy+mathflags)
-    jr z,$+5
-    dec hl \ rr (hl)
     dec hl \ rr (hl)
     dec hl \ rr (hl)
     dec hl \ rr (hl)
@@ -162,8 +132,6 @@ subtract:
     ld c,a \ sub (hl) \ ld (hl),a \ inc hl
     ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
     ld a,c
-    bit ext,(iy+mathflags)
-    jr z,$+4 \ ld a,(de) \ inc de
     sbc a,(hl) \ ld (hl),a \ inc hl
     ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
     ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
@@ -209,10 +177,6 @@ add_done:
 add_copy:
     pop de
     push de
-    bit ext,(iy+mathflags)
-    jr z,$+5
-    dec hl \ ldi
-
     ldi
     ldi
     ldi
