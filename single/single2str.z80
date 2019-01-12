@@ -1,3 +1,9 @@
+#ifndef inc_pushpop
+#include "pushpop.z80"
+#endif
+#define fpOP1 scrap+9
+#define fpOP2 scrap+13
+#define exp   scrap+17
 
 single2ti:
 ;;Turns a single precision float into a TI-float
@@ -89,331 +95,358 @@ toti_sub_end:
     ret
 .echo "single2ti:",$-single2ti
 single2str:
-    push af
-    push hl
-    push de
-    push bc
-    call toBase10
-    pop bc
-    ld d,b
-    ld e,c
-    ld a,(hl) \ ld (de),a \ inc hl \ inc de \ or a \ jr nz,$-5
-    pop de
-    pop hl
-    pop af
-    ret
-base10temp=scrap+25
-scrapstr=scrap+4
-toBase10:
-;;In: Convert the float pointed to by HL to a string
-;;Out: HL points to the result string
-    ld de,base10temp
-    ldi         ;\
-    ldi         ; |Copy the float so we can modify it
-    ld a,(hl)   ; |without directly modifying the source.
-    add a,a     ; |\
-    push af     ; | |Get sign and perform abs(x)
-    rrca        ; |/
-    ld (de),a   ; |
-    inc hl      ; |
-    inc de      ; |
-    ld a,(hl)   ; |
-    or a        ; |
-    jp z,base10_spec    ;Special cases, 0, INF, NAN
-    ld (de),a   ;/
-    ld bc,scrap     ;\
-    ld hl,base10temp; |get ipart(log10(x))
-    call log10Single; |
-    ld h,b \ ld l,c ; |
-    call single2char; |
-    ld e,a          ;/
-    ld b,87h
-    rlca
-    push af
-    rrca
-    jr nc,$+4
-    dec e
-    cpl
-;    or a \ jr nz,$+5 \ ld b,a \ jr $+7
-    inc a \ jr nz,$+6 \ ld b,-1 \ jr $+7
-    add a,a \ jr c,$+4 \ djnz $-3
-    ld c,a
-    pop af
-    ccf
-    rr c
-    ld hl,0
-    ld (scrap),hl
-    ld (scrap+2),bc
-    ld bc,scrap
-    ld h,b
-    ld l,c
-    call exp10Single
-    ld a,(scrap+2)
-    or 80h
-    ld (scrap+2),a
-    pop af
-    ld a,e
-    ld de,base10temp
-    call mulSingle
-    ld hl,scrap+4
-    ld d,$1A
-    jr c,$+4
-    ld d,'+'
-    ld (hl),d \ inc hl
-    ld (hl),'0' \ inc hl
-    ld b,6
-    inc a
-    bit 7,a
-    jp nz,base10neg_exp
-    cp 7
-    jp nc,engineering
-    ld c,a \ inc c
-    dec c \ jr nz,$+5 \ ld (hl),'.' \ inc hl
-    call mul10_sub \ add a,30h
-    ld (hl),a \ inc hl
-    djnz $-13
-    ld (hl),b
-format:
-    ld hl,(scrap)
-    add hl,hl
-    ld hl,(scrap+2)
-    rl l
-    ld a,h
-    adc a,80h
-    jr nc,roundstr_done
-    ld hl,scrapstr+8
-    ld bc,$3A30
-roundstr_loop:
-    ld a,(hl) \ cp '.' \ jr nz,$+4 \ dec hl \ ld a,(hl)
-    inc a \ ld (hl),a
-    cp b \ jr nz,roundstr_done
-    ld (hl),c \ dec hl
-    jr roundstr_loop
-roundstr_done:
-
-;now reformat
-;;if engineering format, make sure if first digit (padding) is not zero,
-;;shift up the decimal and increment the exponent
-    ld hl,scrapstr+9
-    ld a,(hl)
-    or a
-    jr z,eng_round_fixed
-    ld hl,scrapstr+1
-    ld a,(hl)
-    cp '0'
-    jr z,eng_round_fixed
-    inc hl
-    ld a,(hl)
-    ld (hl),'.'
-    inc hl
-    ld (hl),a
-    ld hl,scrapstr+10
-    ld a,(hl)
-    cp '+'
-    jr z,inc_eng_exp
-;dec_eng_exp
-    inc hl
-    inc hl
-    ld a,(hl)
-    or a
-    jr nz,$+3
-    dec hl \ ld a,(hl)
-    dec a
-    ld (hl),a
-    cp '0'-1
-    jr nz,eng_round_fixed
-    ld (hl),'9'
-    dec hl
-    dec (hl)
-    jr eng_round_fixed
-inc_eng_exp:
-    inc hl
-    inc hl
-    ld a,(hl)
-    or a
-    jr nz,$+3
-    dec hl \ ld a,(hl)
-    inc a
-    ld (hl),a
-    cp '9'+1
-    jr nz,eng_round_fixed
-    ld (hl),'0'
-    dec hl
-    inc (hl)
-eng_round_fixed:
-;;cannot have a '.' as the last digit
-;;no leading or trailing zeroes
-;;no leading '+'
-    ld de,scrap
-    ld hl,scrapstr
-    ld a,(hl)
-    cp '+' \ jr nz,$+6 \ inc hl \ ld a,(hl) \ jr $+5 \ ldi \ ld a,(hl)
-    cp '0' \ jr nz,$+3 \ inc hl
-    ldi
-    ld a,(hl) \ cp $1B \ jr z,$+5
-    or a \ jr nz,$-8
-striptrailloop:
-    dec de
-    ld a,(de)
-    cp '.'
-    jr z,striptrailloop
-    cp '0'
-    jr z,striptrailloop
-    
-    inc de
-    ld a,(hl)
-    ldi
-    or a
-    jr z,strfrmt_done
-    ld a,(hl)
-    cp '+'
-    jr nz,$+4
-    inc hl
-    ld a,(hl)
-    ldi
-    ld a,(hl)
-    ldi
-    or a
-    jr z,strfrmt_done
-    xor a
-    ld (de),a
-strfrmt_done:
-    ld hl,scrap
-    ret
-engineering:
-    push af
-    call mul10_sub \ add a,30h
-    ld (hl),a \ inc hl
-    ld (hl),'.' \ inc hl
-    dec b
-    call getnumstr
-;;Add engineering formatting
-    ld (hl),$1B
-    inc hl
-    pop af
-    cp 80h
-    ld d,'+'
-    jr c,$+7 \ ld d,$1A \ cpl \ add a,2
-    ld (hl),d \ inc hl
-    ld d,0
-    inc d \ sub 10 \ jr nc,$-3
-    dec d
-    jr z,$+9
-    ld e,a \ ld a,d \ add a,'0'
-    ld (hl),a \ inc hl \ ld a,e
-    add a,$3A
-    ld (hl),a
-    inc hl
-    ld (hl),0
-    jp format
-base10neg_exp:
-    neg
-    cp 3
-    jr c,$+6 \ neg \ jr engineering
-    ld (hl),'.'
-    ld c,b
-    ld b,a \ inc b \ ld a,'0'
-    dec c \ inc hl \ ld (hl),a \ djnz $-3
-    ld b,c \ inc b
-    call getnumstr
-    jp format
-getnumstr:
-    call mul10_sub \ add a,30h
-    ld (hl),a \ inc hl
-    djnz $-7
-    ld (hl),b
-    ret
-
-
-base10_spec:
-    pop bc
-    dec hl
-    ld a,(hl)
-    add a,a
-    jr z,base10_zero
-    jp m,base10_inf
-    ld hl,str_NAN
-    ret
-base10_zero:
-    ld hl,str_zero
-    ret nc
-    ld hl,str_negzero
-    ret
-base10_inf:
-    ld hl,str_inf
-    ret nc
-    ld hl,str_neginf
-    ret
-
-mul10_sub:
-;;multiply (scrap) by 10, leaving the integer part in A, decimal part in (scrap)
-    push bc
-    push hl
-    ld hl,(scrap)
-    ld bc,(scrap+2)
-    ld a,b
-    inc a
-    jr z,mul10_sub_done
-    ld d,h
-    ld e,l
-    ld a,c
-    ld b,0
-    or a
-    rra \ rr h \ rr l \ rr b
-    rra \ rr h \ rr l \ rr b
-    add hl,de \ adc a,c
-    jr nc,$+10
-    rra \ rr h \ rr l \ rr b \ scf
-    ld c,a
-;CHLB
-    ld a,(scrap+3)
-    adc a,3
-;A is the exponent
-    cp 80h
-    jr c,int_part_is_zero_str
-    ld d,b
-    sub 7Fh
-    ld b,a
-    xor a
-;CHLD
-    sla d \ adc hl,hl \ rl c \ rla \ djnz $-7
-    ld b,7Fh
-    ld e,a
-    ld a,c
-    or a \ jp m,$+18
-    or h
-    or l
-    or d
-    jr z,str_is_zeroed
-    ld a,c
-    dec b
-    sla d \ adc hl,hl \ adc a,a
-    jp p,$-6
-    ld c,a
-    ld a,e
-    ld (scrap),hl
-    ld (scrap+2),bc
-mul10_sub_done:
-    pop hl
-    pop bc
-    ret
-int_part_is_zero_str:
-    ld b,a
-    ld (scrap),hl
-    ld (scrap+2),bc
-    xor a
-    pop hl
-    pop bc
-    ret
-str_is_zeroed:
-    dec d
-    ld (scrap+2),de
-    pop hl
-    pop bc
-    ret
-str_negzero:.db $1A
+  call pushpop
+  push bc
+  call +_
+  pop de
+  ld hl,scrap+4
+  jp copyS
+_:
+  ld de,fpOP2
+  ldi
+  ldi
+  ldi
+  ldi
+  dec de
+  ld a,(de)
+  or a
+  jp z,single2str_special
+  sub 128
+  push af   ;carry means we need to multiply by 10^x, nc means divide
+  jr nc,$+4
+  neg       ;CPL would cause possible values smaller than .1, requiring an additional check.
+  ld l,a
+  ld h,0
+  ld c,l
+  ld b,h
+  add hl,hl
+  add hl,hl
+  add hl,hl
+  add hl,bc
+  add hl,hl
+  add hl,bc
+  add hl,hl
+  add hl,hl
+  add hl,bc
+  ld a,h
+  ld (exp),a ;this is the exponent
+  ld h,b
+  ld l,b
+  ld (fpOP1),hl
+  ld h,80h
+  ld (fpOP1+2),hl
+  ld de,fpOP1
+  ld b,d
+  ld c,e
+  rra \ ld hl,pow10LUT \ call c,mulSingle
+  rra \ ld hl,pow10LUT+4 \ call c,mulSingle
+  rra \ ld hl,pow10LUT+8 \ call c,mulSingle
+  rra \ ld hl,pow10LUT+12 \ call c,mulSingle
+  rra \ ld hl,pow10LUT+16 \ call c,mulSingle
+  rra \ ld hl,pow10LUT+20 \ call c,mulSingle
+  pop af
+  ld hl,fpOP2
+  ld b,h
+  ld c,l
+  call nc,divSingle
+  jr nc,+_
+  call mulSingle
+  ld a,(exp)
+  neg
+  ld (exp),a
+_:
+  ld a,(fpOP2+2)
+  sub 80h
+  ld bc,scrap+4
+  jr c,+_
+  ld (fpOP2+2),a
+  ld a,$1A   ;negative sign
+  ld (bc),a
+  inc bc
+_:
+  xor a
+  ld (bc),a
+  inc bc
+  xor a
+  ld (bc),a
+  inc bc
+  xor a
+  ld (bc),a
+  inc bc
+  call fpfix8_24
+  ld hl,exp
+  ld a,(scrap+3)
+  or a
+  jr z,+_
+  cp 10
+  jr c,+_
+  ld de,$0AFF   ;could do 0A2F, but need to add 30h anyways for other routine that is piggybacking
+  inc (hl)
+  inc e \ sub d \ jr nc,$-2
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld a,e
+_:
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld a,'.'
+  ld (bc),a
+  inc bc
+_:
+  call mul10_sub_
+  add a,30h
+  ld (bc),a
+  inc bc
+  ld hl,-scrap-17
+  add hl,bc
+  jr nc,-_
+  ld h,b
+  ld l,c
+_:
+;We want to make sure our string has at most 8 digits before rounding. The negative sign will get in the way.
+;We want to round the string, returning at most 7 digits
+  ld a,(scrap+4)
+  cp $1A  ;check if it is a negative.
+  jr z,$+3
+  dec hl
+  dec hl
+  ld a,(hl) \ cp 35h
+  push hl
+  dec hl
+  jr c,noroundstr
+  ld a,(hl)
+_:
+  inc a
+  ld (hl),a
+  cp '9'+1
+  jr nz,+_+2
+  ld (hl),'0'
+  dec hl
+  ld a,(hl)
+  or a
+  jr z,+_
+  cp '.'
+  jr nz,-_
+  dec hl
+  ld a,(hl)
+  or a
+  jr nz,-_
+_:
+  ld (hl),'1'
+noroundstr:
+;clean up the leading zeros
+  ld hl,scrap+4
+  ld a,(hl)
+  or a
+  ld c,30h
+  jr z,$+7
+  inc hl
+_:
+  ld a,(hl) \ or a \ jr nz,$+5 \ ld (hl),c \ jr -_-1
+  pop hl
+;now we need to move the decimal around
+;if exponent<-3, then usee exponential notation
+;if 0>exponent>=-3, then move the decimal left.
+;if 0=exponent, then no need to move the decimal
+;if 0<exponent<7, then move the decimal right
+;if exponent>=7, then use exponential notation
+  ld a,(exp)
+  cp $FD
+  jr nc,decimal_stay
+  cp 7
+  jr c,decimal_stay
+;so here we need to clean up 
+  or a
+  ld (hl),'e'
+  inc hl
+  jp p,+_
+  neg
+  ld (hl),$1A   ;negative sign
+  inc hl
+_:
+  
+  ld de,$FE0A
+  inc d \ sub e \ jr nc,$-2
+  add a,e
+  add a,30h
+  ld e,a
+  ld a,d
+  add a,31h
+  jr c,$+4
+  ld (hl),a
+  inc hl
+  ld (hl),e
+  inc hl
+removezeroes:
+  ld a,l
+  sub (scrap+4)&255
+  ld c,a
+  ld b,0
+  ld hl,scrap+4
+  ld d,h
+  ld e,l
+  ld a,(hl)
+  cp $1A
+  jr nz,+_+1
+  inc de
+  dec c
+  inc hl
+_:
+  ld a,(hl) \ cp 30h \ jr z,$-5 ;loops back a little before _:
+  ldir
+  ex de,hl
+_:
+  dec hl
+  ld a,(hl)
+  cp 30h
+  jr z,-_
+  cp '.'
+  jr nz,+_
+  ld a,l
+  cp (scrap+4)&255
+  jr z,$+7
+  dec hl
+  ld a,(hl)
+  cp $1A
+  jr nz,+_
+  ld (hl),'0'
+_:
+  inc hl
+  ld (hl),0
+  ret
+decimal_stay:
+  ld (hl),0
+  ld hl,scrap+4
+  ld a,'.'
+  cpir
+  dec hl
+  ld d,h
+  ld e,l
+  ld a,(exp)
+  ld b,0
+  jr nc,decimalmovleft
+  ld c,a
+  inc hl
+  or a
+  jr z,enddecimalmov
+  ldir
+  jr enddecimalmov
+decimalmovleft:
+  dec hl
+  neg
+  ld c,a
+  lddr
+enddecimalmov:
+  ld a,'.'
+  ld (de),a
+  xor a
+  cpir
+  dec hl
+  jr removezeroes
+mul10_sub_:
+;(scrap) is treated as an 8.24 fixed-point number
+;This multiplies the fractional part by 10.0, storing the result back in (scrap)
+;Returns a copy of the integer part in A
+  push bc
+  ld hl,(scrap)
+  ld b,h
+  ld c,l
+  ld de,(scrap+2)
+  xor a
+  add hl,hl
+  rl e
+  rla
+  add hl,hl
+  rl e
+  rla
+  ld d,a
+  add hl,bc
+  ld bc,(scrap+2)
+  ld b,0
+  ex de,hl
+  adc hl,bc
+  ex de,hl
+  add hl,hl
+  ld (scrap),hl
+  ex de,hl
+  adc hl,hl
+  ld (scrap+2),hl
+  ld a,h
+  pop bc
+  ret
+fpfix8_24:
+;convert the absolute value of the number at HL to 8.24 fixed point at scrap
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld a,(hl)
+  or 80h
+  inc hl
+  ld h,(hl)
+  ld l,a
+  ld a,h
+  sub 80h
+  ld h,a
+  jr c,+_
+;if we get here, it means we need to shift left a times
+  ex de,hl
+  inc d
+  xor a
+  add hl,hl \ rl e \ rla \ dec d \ jr nz,$-5
+  ld d,a
+  ld (scrap),hl \ ld (scrap+2),de
+  ret
+_:
+  inc h
+  jr z,+_
+  ld a,e
+  ld e,h
+  ld h,0
+  srl h \ rr l \ rr d \ rra \ inc e \ jr nz,$-8
+  ld e,a
+  jr nc,+_
+  inc e \ jr nz,+_
+  inc d \ jr nz,+_ \ inc hl
+_:
+  ld (scrap),de \ ld (scrap+2),hl
+  ret
+single2str_special:
+  pop hl
+  pop hl
+  dec de
+  ld a,(de)
+  add a,a
+  jr nc,$+5
+  ld (hl),1Ah
+  inc hl
+  ex de,hl
+  ld hl,str_zero
+  jr z,+_
+  add a,a
+  ld hl,str_INF
+  jr z,+_
+  add a,a
+  ld hl,str_NAN
+_:
+copyS:
+  ld a,e
+  cp l
+  jr nz,$+5
+  ld a,d
+  cp h
+  ret z
+  ld a,(hl)
+  or a
+  ldi
+  jr nz,$-4
+  ret
+#undefine exp
+#undefine fpOP1
+#undefine fpOP2
 str_zero:   .db "0",0
-str_NAN:    .db "NAN",0
-str_neginf  .db $1A
+str_NAN:    .db "NaN",0
 str_inf     .db "INF",0
 .echo "single2str:",$-single2str
