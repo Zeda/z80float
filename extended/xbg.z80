@@ -37,6 +37,11 @@
 ;return 3028466566125/a2
 ;
 xbg:
+;1510+9*mov10+6*xamean+5*xgeomean+4*xadd+2*xsub+xdiv+xmul3+xmul5+2*xmul7+xmul11+xmul13+xmul15+xmul17+xmul31
+;+{0,9}*(if pow>255-{2,6,12,20,30,42} choose 9*{1,2,3,4,5,6})
+;min: 13329+5*xgeomean+12*xadd+xmul3+xmul5+2*xmul7+xmul11+xmul13+xmul15+xmul17+xmul31
+;max: 18584+5*xgeomean+12*xadd+xmul3+xmul5+2*xmul7+xmul11+xmul13+xmul15+xmul17+xmul31
+;avg: 99383.979+12*xadd+xmul3+xmul5+2*xmul7+xmul11+xmul13+xmul15+xmul17+xmul31
   push hl
   push de
   push bc
