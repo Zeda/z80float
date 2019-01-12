@@ -1,0 +1,5 @@
+{
+  "cmd": "./compile",
+  "sh": "true",
+  "cwd": "{PROJECT_PATH}"
+}
