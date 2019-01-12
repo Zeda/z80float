@@ -1,0 +1,54 @@
+#define var_x 8800h
+#define var_y 8804h
+#define temp 8808h
+cosSingle:
+;cos(-pi/4<=x<pi/4)
+;y=x*x
+;1-y(.49999887-y(.041655882-y.0013591743))
+;1-y(a1-y(a2-y*a3))
+
+
+  push hl
+  push de
+  push bc
+  push af
+  call +_
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+;Need to verify that we are in fact in range
+  push bc
+  ld de,var_x
+  ldi
+  ldi
+  ldi
+  ldi
+  ld hl,var_x
+  ld d,h
+  ld e,l
+  ld bc,var_y
+  call mulSingle
+  ld h,b
+  ld l,c
+  ld de,cos_a3
+  ld bc,temp
+  call mulSingle
+  ld hl,cos_a2
+  ld d,b
+  ld e,c
+  call subSingle
+  ld hl,var_y
+  call mulSingle
+  ld hl,cos_a1
+  call subSingle
+  ld hl,var_y
+  call mulSingle
+  ld hl,const_1
+  pop bc
+  jp subSingle
+#undefine var_x
+#undefine var_y
+#undefine temp
