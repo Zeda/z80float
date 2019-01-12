@@ -61,13 +61,17 @@ mul10_overflow:
     pop af
     ret
 mulSingle:
-;;Inputs: HL points to float1, DE points to float2, BC points to where the result is copied
-;;Outputs: float1*float2 is stored to (BC)
+;Inputs: HL points to float1, DE points to float2, BC points to where the result is copied
+;Outputs: float1*float2 is stored to (BC)
+;573+mul24+{0,35}+{0,30}
+;min: 1398cc
+;max: 2564cc
+;avg: 2055.13839751681cc
     push af
     push hl
     push de
     push bc
-    
+
     call +_   ;CHLB
     ld a,c
     ex de,hl
@@ -102,7 +106,7 @@ _:
     inc hl
     ld b,(hl)
     inc hl
-    
+
 
     add a,(hl)      ;\
     pop hl          ; |
@@ -121,12 +125,12 @@ _:
     pop de
     ld a,e
     pop de
-    jp m,fixed
+    jp m,+_
     rl c
     rl b
     adc hl,hl
     dec d
-fixed:
+_:
     inc d
     jr z,overflow
     rl c
@@ -137,11 +141,12 @@ fixed:
     adc a,e
     ld b,a
     adc hl,de
-    jr nc,$+11
+    jr nc,+_
     inc c \ jr z,overflow
     rr h
     rr l
     rr b
+_:
     pop af
     cpl
     and $80
@@ -164,10 +169,14 @@ overflow:
 mul24:
 ;;BDE*CHL -> HLBCDE
 ;;155 bytes
-;;403cc+3mul
+;;402+3*C_Times_BDE
 ;;fastest:1201cc
 ;;slowest:1753cc
 ;;avg    :1464.9033203125cc (1464+925/1024)
+;min: 825cc
+;max: 1926cc
+;avg: 1449.63839751681cc
+
     push bc
     ld c,l
     push hl
@@ -176,7 +185,7 @@ mul24:
     ld l,a
     ld h,c
     ld (var48+2),hl
-    
+
     pop hl
     ld c,h
     call C_Times_BDE
@@ -191,7 +200,7 @@ mul24:
     ld h,0
     adc hl,bc
     ld (var48+3),hl
-    
+
     pop bc
     call C_Times_BDE
     ld de,(var48+2)
@@ -207,29 +216,50 @@ mul24:
     ld de,(var48)
     ret
 .echo "mul24:",$-mul24
-    
+
 
 C_times_BDE:
 ;;C*BDE => CAHL
-;;266cc ~ 452cc or 27cc if C=0
-;;266+22b-b&c+8d*e
-;;avg=266+22*4-7*.5*.5+8*.25
-;;   =355.25
-;;b is 0 to 8 depending on bits of C
-;;c is dependent on overflow of result      ;never 1 for the 7th bit of C
-;;d is bit 0 of C
-;;e is 0 or 1 depending on overflow
-;;88 bytes
-    xor a
-    ld h,a
-    ld l,a
-    rlc c \ ret z \ jr nc,$+8 \ ld a,b \ ld h,d \ ld l,e \ dec c
+;C = 0     157
+;C = 1     141
+;141+
+;C>=128    135+6{0,33+{0,1}}+{0,20+{0,8}}
+;C>=64     115+5{0,33+{0,1}}+{0,20+{0,8}}
+;C>=32     95+4{0,33+{0,1}}+{0,20+{0,8}}
+;C>=16     75+3{0,33+{0,1}}+{0,20+{0,8}}
+;C>=8      55+2{0,33+{0,1}}+{0,20+{0,8}}
+;C>=4      35+{0,33+{0,1}}+{0,20+{0,8}}
+;C>=2      15+{0,20+{0,8}}
+;min: 141cc
+;max: 508cc
+;avg: 349.21279907227cc
+
+  ld a,b
+  ld h,d
+  ld l,e
+  sla c \ jr c,mul8_24_1
+  sla c \ jr c,mul8_24_2
+  sla c \ jr c,mul8_24_3
+  sla c \ jr c,mul8_24_4
+  sla c \ jr c,mul8_24_5
+  sla c \ jr c,mul8_24_6
+  sla c \ jr c,mul8_24_7
+  sla c \ ret c
+  ld a,c
+  ld h,c
+  ld l,c
+  ret
+mul8_24_1:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_2:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_3:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_4:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_5:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_6:
     add hl,hl \ rla \ rl c \ jr nc,$+7 \ add hl,de \ adc a,b \ jr nc,$+3 \ inc c
+mul8_24_7:
     add hl,hl \ rla \ rl c \ ret nc \ add hl,de \ adc a,b \ ret nc \ inc c \ ret
-
-
