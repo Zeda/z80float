@@ -1,0 +1,32 @@
+#define bcall(x) rst 28h \ .dw x
+#include "../single/single.inc"
+_PutS         = 450Ah
+.db $BB,$6D
+.org $9D95
+  ld hl,const_ln_2
+  ld bc,8800h
+  call sinSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  bcall(_PutS)
+  ret
+
+
+#include "../single/sinSingle.z80"
+#include "../single/mulSingle.z80"
+#include "../single/addSingle.z80"
+#include "../single/constants.z80"
+
+
+math_single:
+;#include "../single/pushpop.z80"
+#include "../single/expSingle.z80"
+#include "../single/divSingle.z80"
+#include "../single/logSingle.z80"
+#include "../single/single2char.z80"
+#include "../single/single2str.z80"
+#include "../single/lut.inc"
