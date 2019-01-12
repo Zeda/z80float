@@ -2,7 +2,7 @@
 #define var_y 8804h
 #define temp 8808h
 sinSingle:
-;sine(0<=x<pi/4)
+;sine(-pi/4<=x<pi/4)
 ;y=x*x
 ;a1=2^-3 * 11184804/2^23
 ;a2=2^-7 * 8946604/2^23
@@ -20,6 +20,7 @@ sinSingle:
   pop hl
   ret
 _:
+;Need to verify that we are in fact in range
   push bc
   ld de,var_x
   ldi
@@ -31,8 +32,8 @@ _:
   ld e,l
   ld bc,var_y
   call mulSingle
-  ;
-  ld hl,var_y
+  ld h,b
+  ld l,c
   ld de,sin_a3
   ld bc,temp
   call mulSingle
