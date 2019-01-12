@@ -3,7 +3,7 @@
 #endif
 #define fpOP1 scrap+9
 #define fpOP2 scrap+13
-#define exp   scrap+17
+#define exp   scrap+18
 
 single2ti:
 ;;Turns a single precision float into a TI-float
@@ -24,7 +24,7 @@ single2ti:
     rra
     ld (hl),a
     inc hl
-    push hl     ;HL is where exponent will get written to
+    push hl     ;HL is where exponent will get written
 ;
     ld de,017Fh
     call toti_sub2
@@ -199,9 +199,9 @@ _:
   add a,30h
   ld (bc),a
   inc bc
-  ld hl,-scrap-17
-  add hl,bc
-  jr nc,-_
+  ld a,c
+  cp exp&255
+  jr nz,-_
   ld h,b
   ld l,c
 _:
@@ -257,7 +257,7 @@ _:
   jr nc,decimal_stay
   cp 7
   jr c,decimal_stay
-;so here we need to clean up 
+;so here we need to clean up
   or a
   ld (hl),'e'
   inc hl
@@ -266,7 +266,7 @@ _:
   ld (hl),$1A   ;negative sign
   inc hl
 _:
-  
+
   ld de,$FE0A
   inc d \ sub e \ jr nc,$-2
   add a,e

@@ -23,10 +23,10 @@ _PutS         = 450Ah
 
 
 math_single:
-;#include "../single/pushpop.z80"
+#include "../single/pushpop.z80"
 #include "../single/expSingle.z80"
 #include "../single/divSingle.z80"
 #include "../single/logSingle.z80"
 #include "../single/single2char.z80"
 #include "../single/single2str.z80"
-#include "../single/lut.inc"
+#include "../single/lut.z80"
