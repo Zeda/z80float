@@ -1,30 +1,31 @@
+trig_y = scrap+10
+trig_x = scrap+14
+trig_a = scrap+18
+trig_z = scrap+22
 tanSingle:
+;wtf, Zeda.
     push af
     push hl
     push de
     push bc
-    
-    ld de,scrap
-    xor a
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    ld (de),a \ inc de
-    dec a
-    ldi
-    ldi
-    ldi
-    ld a,(hl)
-    ld (de),hl
-    ld hl,scrap
-    ld b,h
-    ld c,l
-    call cexpSingle
-    ld de,scrap+4
+    ld bc,trig_y
+    call cosSingle
+    ld d,b
+    ld e,c
+    ld h,d
+    ld l,e
+    ld bc,trig_x
+    call mulSingle
+    ld hl,const_1
+    ld d,b
+    ld e,c
+    call subSingle
     ex de,hl
+    call sqrtSingle
+    ld de,trig_y
     pop bc
     call divSingle
     pop de
     pop hl
     pop af
     ret
-.echo "tanSingle:",$-tanSingle

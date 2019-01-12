@@ -1,0 +1,19 @@
+coshSingle:
+    push af
+    push hl
+    push de
+    push bc
+    ld bc,hyperout
+    call expSingle
+    ld h,b
+    ld l,c
+    ld bc,hyperout2
+    call invSingle
+    ld d,b
+    ld e,c
+    pop bc
+    call ameanSingle
+    pop de
+    pop hl
+    pop af
+    ret

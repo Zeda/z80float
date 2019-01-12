@@ -8,7 +8,8 @@ seed1_0 =80F8h
 seed1_1 =80FAh
 seed2_0 =80FCh
 seed2_1 =80FEh
-
+hyperout=scrap+9
+hyperout2=scrap+13
 
 .echo "===Math:",$-math_single
 
@@ -22,5 +23,3 @@ penRow      = 86D8h
 sGrFlags    = 14h
 textWrite   = 7
 flags       =89F0h
-mathflags   =21h
-ext         = 0
