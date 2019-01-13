@@ -1,31 +1,18 @@
-trig_y = scrap+10
-trig_x = scrap+14
-trig_a = scrap+18
-trig_z = scrap+22
+#define var_x 800Ah
+#define var_y 800Eh
+#define temp 8012h
+#define var_z 8016h
 tanSingle:
-;wtf, Zeda.
-    push af
-    push hl
-    push de
-    push bc
-    ld bc,trig_y
+  call pushpop
+  push bc
+    ;HL points to input
+    ld bc,var_z
+    ld d,b
+    ld e,c
     call cosSingle
-    ld d,b
-    ld e,c
-    ld h,d
-    ld l,e
-    ld bc,trig_x
-    call mulSingle
-    ld hl,const_1
-    ld d,b
-    ld e,c
-    call subSingle
-    ex de,hl
-    call sqrtSingle
-    ld de,trig_y
+    ld bc,var_x
+    call sinSingle
+    ld h,b
+    ld l,c
     pop bc
-    call divSingle
-    pop de
-    pop hl
-    pop af
-    ret
+    jp divSingle
