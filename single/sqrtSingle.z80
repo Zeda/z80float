@@ -1,211 +1,230 @@
 sqrtSingle:
-    push af
-    push hl
-    push de
-    push bc
-    ld c,0
-    ld b,(hl) \ inc hl
-    ld e,(hl) \ inc hl
-    ld a,(hl) \ inc hl
-    add a,a
-    jr c,sqrt_nan
-    scf
-    rra
-    ld d,a
-    ld a,(hl)
-    or a
-    jr z,sqrt_spec
-    rra
-;80 -> 80
-;81 -> 80
-    jr c,$+10
-    srl d \ rr e \ rr b \ rr c
-    add a,a
-    add a,80h
-    rra
-    push af     ;exponent
-    ld h,b
-    ld l,c
-    push ix
-    call sqrt
-    pop ix
-;result in DEBC
-    rl c
-    pop af
-    jr nc,$+12 \ inc b \ jr nz,$+9 \ inc e \ jr nz,$+6 \ inc d \ jr nz,$+3 \ inc a
-    pop hl
-    push hl
-    ld (hl),b \ inc hl
-    ld (hl),e \ inc hl
-    res 7,d
-    ld (hl),d \ inc hl
-    ld (hl),a
-    pop bc
-    pop de
-    pop hl
-    pop af
-    ret
-sqrt_spec:
-    ld a,e
-    add a,a
-    pop hl
-    ld b,h
-    ld c,l
-    ld de,0
-    jr z,sqrt_ret
-    jp m,sqrt_inf
-sqrt_NAN:
-    ld d,$20
-    jr sqrt_ret
-sqrt_inf:
-    ld d,$40
-sqrt_ret:
-    ld (hl),e \ inc hl
-    ld (hl),e \ inc hl
-    ld (hl),d \ inc hl
-    ld (hl),e
-    pop de
-    pop hl
-    pop af
-    ret
-sqrt:
-;32 bits returned, sqrt(x), x is a 0.32 fixed-point value
-;;input x=DEHL
-    exx
-    ld hl,0 ; |r1=0
-    ld d,h  ;\
-    ld e,l  ; |r2=0
-    ld b,h  ; |
-    ld c,l  ;/
-    call sqrtsub1
-    call sqrtsub2
-    push hl
-    pop ix
-    ld l,d
-    ld h,d
-    ld a,8
-;    ld ix,0
-;    ld a,16
-loop1:
-    push af
-    ld a,ixl \ add ix,ix \ adc hl,hl;\
-    add ix,ix \ adc hl,hl \ exx     ; |Basically does
-    add hl,hl \  rla  ; | sla r0 \ rl r1
-    add hl,hl \  rla  ; | sla r0 \ rl r1
-    ld ixl,a \ exx                  ;/
-    sla c \ rl b; |sla r2
-    rl e \ rl d ;/
-    inc c
-    push ix     ;\
-    ex (sp),hl  ; |
-    sbc hl,bc   ; |r1=r1-r2
-    ex (sp),hl  ; |
-    pop ix      ; |
-    sbc hl,de   ;/
-    jr c,$+5
-    inc c
-    jr $+7
-    add ix,bc   ; |r1=r1+r2
-    adc hl,de   ;/
-    dec c
-    pop af      ; |r3--
-    dec a       ;/
-    jr nz,loop1
-    ld a,14     ;r3=14
-loop2:
-    add ix,ix \ adc hl,hl   ;sla r1
-    add ix,ix \ adc hl,hl   ;sla r1
-    sla c \ rl b;\
-    rl e \ rl d ; |sla r2 \ inc r2
-    inc c       ;/
-    push ix     ;\
-    ex (sp),hl  ; |
-    sbc hl,bc   ; |r1=r1-r2
-    ex (sp),hl  ; |
-    pop ix      ; |
-    sbc hl,de   ;/
-    jr c,endofloop2
-    inc c       ;inc r2
-    jr skipfix2
-endofloop2:
-    add ix,bc   ; |r1=r1+r2
-    adc hl,de   ;/
-    dec c       ;inc r2
-skipfix2:
-    dec a       ;/
-    jr nz,loop2
-    add ix,ix \ adc hl,hl \ rla
-    add ix,ix \ adc hl,hl \ rla
-;ixhl - DEBC-DEBC-1
-    sla c \ rl b
-    rl e \ rl d
-    inc c
-    push ix     ;\
-    ex (sp),hl  ; |
-    sbc hl,bc   ; |r1=r1-r2
-    ex (sp),hl  ; |
-    pop ix
-    sbc hl,de   ;/
-    sbc a,0
-    jr c,endofloop3
-    inc c       ;inc r2
-    jr skipfix3
-endofloop3:
-    add ix,bc   ; |r1=r1+r2
-    adc hl,de   ;/
-    dec c
-skipfix3:
-    add ix,ix \ adc hl,hl \ rla
-;ixhl - DEBC
-    push ix     ;\
-    ex (sp),hl  ; |
-    sbc hl,bc   ; |r1=r1-r2
-    ex (sp),hl  ; |
-    pop ix
-    sbc hl,de   ;/
-    sbc a,0
-    ret c
-    inc c
-    ret
-sqrtsub2:
-    call +_
+;733+2{0,15}+{0,1}+7{0,6}+{0,3}+pushpop+sqrtHL+2*HL_Div_E_special
+;min: 1751
+;max: 1979
+;avg: 1853.5
+  call pushpop
+  push bc
+  ld c,(hl)
+  inc hl
+  ld e,(hl)
+  inc hl
+  ld a,(hl)
+  add a,a
+  jp c,sqrtSingle_NaN
+  scf
+  rra
+  ld d,a
+  inc hl
+  ld a,(hl)
+  or a
+  jp z,sqrtSingle_special
+  add a,80h
+  rra
+  push af   ;new exponent
+  jr c,+_
+  srl d
+  rr e
+  rr c
 _:
-    call +_
-_:
-    ld a,l
-    add hl,hl
-    add hl,hl
-    exx
-    sla e \ rla ; | sla r0 \ rl r1
-    rl e \ rla  ; | sla r0 \ rl r1
-    exx
-    ld l,a
-    sla c \ rl b
-    inc c
-    sbc hl,bc
-    inc c
-    ret nc
-    dec c
-    add hl,bc
-    dec c
-    ret
-sqrtsub1:
-    call +_
-_:
-    call +_
-_:
-    ld a,l \ exx;\
-    sla d \ rla ; | sla r0 \ rl r1
-    rl d \ rla  ; | sla r0 \ rl r1
-    exx
-    ld l,a
-    sla c
-    scf
-    sbc a,c
-    ret c
-    ld l,a
-    inc c
-    inc c
-    ret
+  ex de,hl
+  ;HLC
+  push bc
+  call sqrtHL
+  pop bc
+  ld (scrap+2),a
+  rr h
+  ld h,l
+  rr h
+  ld l,c
+  rr l
+  ld e,a
+  ;HL/E
+  call HL_Div_E_special
+  ld e,a
+  ld a,c
+  rra
+  rl e
+  ld d,0
+  ld b,d
+  rl d
 
-.echo "sqrtSingle:",$-sqrtSingle
+  ld a,l
+  ld (scrap+1),a
+
+
+
+;now we need to compute l*l
+  ld c,l
+  ld l,b
+  add a,a
+  ld h,a
+  jr nc,$+3 \ ld l,c
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+  add hl,hl \ jr nc,$+3 \ add hl,bc
+;leaves c flag reset
+
+;now need to perform DE*256-HL --> AHL
+  xor a
+  sub l
+  ld l,a
+  ld a,e
+  sbc a,h
+  ld h,a
+  ld a,d
+  sbc a,0
+;AHL is the new remainder
+;Need to divide by 2, then divide by the 16-bit (var_x+4)
+  push af
+  rra
+  rr h
+  rr l
+  inc a
+  jr nz,+_
+  sub l \ ld l,a
+  sbc a,a \ sub h \ ld h,a
+_:
+  ld bc,(scrap+1)
+;HL/BC to 8 bits, allowed to destroy remainder
+;We are just going to approximate it
+  ld e,b
+  call HL_Div_E_special
+  pop af
+  ld a,l
+  jr nc,+_
+  neg
+_:
+  pop de
+  ;DBCA
+  pop hl
+  ld (hl),a
+  inc hl
+  ld (hl),c
+  inc hl
+  res 7,b
+  ld (hl),b
+  inc hl
+  ld (hl),d
+  ret
+sqrtSingle_NaN:
+  ld hl,const_NaN
+  pop de
+  jp mov4
+sqrtSingle_special:
+  dec hl
+  dec hl
+  pop de
+  jp mov4
+HL_Div_E_special:
+;262+7{0,3+{0,3}}+{8,{0,12}}
+;min: 262cc
+;max: 316cc
+;avg: 284.75cc
+  ld a,h
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
+  sla l \ rla \ jr c,$+4 \ cp e \ ret c \ sub e \ inc l
+  ret
+sqrtHL:
+;returns A as the sqrt, HL as the remainder, D = 0
+;min: 376cc
+;max: 416cc
+;avg: 393cc
+  ld de,$5040
+  ld a,h
+  sub e
+  jr nc,+_
+  add a,e
+  ld d,$10
+_:
+  sub d
+  jr nc,+_
+  add a,d
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  set 5,d
+  res 4,d
+  srl d
+
+  set 2,d
+  sub d
+  jr nc,+_
+  add a,d
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  set 3,d
+  res 2,d
+  srl d
+
+  inc d
+  sub d
+  jr nc,+_
+  add a,d
+  dec d   ;this resets the low bit of D, so `srl d` resets carry.
+  .db $06   ;start of ld b,* which is 7cc to skip the next byte.
+_:
+  inc d
+  srl d
+  ld h,a
+
+
+  sbc hl,de
+  ld a,e
+  jr nc,+_
+  add hl,de
+_:
+  ccf
+  rra
+  srl d
+  rra
+  ld e,a
+
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  or %00100000
+  xor %00011000
+  srl d
+  rra
+  ld e,a
+
+
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  or %00001000
+  xor %00000110
+  srl d
+  rra
+  ld e,a
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  srl d
+  rra
+  ret
+_:
+  inc a
+  srl d
+  rra
+  ret
+mov4:
+  ldi
+  ldi
+  ldi
+  ldi
+  ret
