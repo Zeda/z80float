@@ -38,6 +38,8 @@ _:
     ld c,(hl)
     inc hl
     ld a,(hl)
+    or a
+    jr z,mulSingle_case0
     ex de,hl
     ex (sp),hl
     ld e,(hl)
@@ -46,8 +48,9 @@ _:
     inc hl
     ld b,(hl)
     inc hl
-
-
+    inc (hl)
+    dec (hl)
+    jr z,mulSingle_case1
     add a,(hl)      ;\
     pop hl          ; |
     rra             ; |Lots of help from Runer112 and
@@ -94,7 +97,7 @@ _:
     ld h,a
     ret
 bad:
-    jr c,overflow
+    jr nc,overflow
 underflow:
     ld hl,0
     rl b
@@ -105,6 +108,65 @@ underflow:
 overflow:
     ld hl,$8000
     jr underflow+3
+mulSingle_case1:
+;x*0   -> 0
+;x*inf -> inf
+;x*NaN -> NaN
+  pop hl
+  ld h,b
+  ld l,d
+  ld b,e
+  ld c,0
+  ret
+mulSingle_case0:
+;special*x = special
+;NaN*x = NaN
+;0*0 = 0
+;0*NaN = NaN
+;0*Inf = NaN
+;Inf*Inf  = Inf
+;Inf*-Inf =-Inf
+  ;0CDE
+  pop hl
+  inc hl
+  inc hl
+  inc hl
+  ld a,(hl)
+  or a
+  jr z,+_
+  ld h,c
+  ld c,0
+  ret
+_:
+  dec hl
+  ld b,(hl)
+;basically, if b|c has bit 5 set, return NaN
+  ld a,b
+  or c
+  ld h,$20
+  and h
+  jr z,+_
+  ld c,0
+  ret
+_:
+  ld a,c
+  xor b
+  rl b
+  rlca
+  rr b
+  res 4,b
+
+  rl c
+  rrca
+  rr c
+
+  ld a,c
+  and $E0
+  add a,b
+  rra
+  ld h,a
+  ld c,0
+  ret
 .echo "mulSingle:",$-mulSingle
 mul24:
 ;;BDE*CHL -> HLBCDE
