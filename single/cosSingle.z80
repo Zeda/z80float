@@ -1,6 +1,6 @@
-#define var_x 8800h
-#define var_y 8804h
-#define temp 8808h
+#define var_x 800Ah
+#define var_y 800Eh
+#define temp 8012h
 cosSingle:
 ;cos(-pi/4<=x<pi/4)
 ;y=x*x
