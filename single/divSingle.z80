@@ -16,7 +16,7 @@ divSingle:
     push de
 inv_inject:
     push bc
-    push af    
+    push af
     inc hl \ inc de
     inc hl \ inc de
     ld a,(de)   ;\
@@ -54,9 +54,14 @@ inv_inject:
 
     set 7,c
     ld a,b
-    or 80h    
+    or 80h
     sbc hl,de \ sbc a,c
+    jr nz,+_
+    or h
+    or l
     jr z,setmantissa0
+    xor a
+_:
     jr nc,startdiv
     ld b,a
     ld a,(quot+3)
