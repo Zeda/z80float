@@ -1,3 +1,4 @@
+;Uses 3 bytes at scrap
 sqrtSingle:
 ;733+2{0,15}+{0,1}+7{0,6}+{0,3}+pushpop+sqrtHL+2*HL_Div_E_special
 ;min: 1751
