@@ -1,9 +1,8 @@
-;Uses 29 bytes
+;Uses 27 bytes
 #define var_a scrap+11
 #define var_g var_a+4
 #define var_b var_g+4
-#define var_c var_b+4
-#define var_x var_c+4
+#define var_x var_b+4
 ;This algorithm is insired by the one outlined here:
 ;http://www.ams.org/journals/mcom/1972-26-118/S0025-5718-1972-0307438-2/S0025-5718-1972-0307438-2.pdf
 ;It offers quadratic convergence, instead of linear convergence for only a little more work each iteration.
@@ -44,7 +43,7 @@ _:
     ld de,var_g
     ld b,h
     ld c,l
-    call bgiSingle
+    call bg2iSingle
     ld de,var_x
     call mulSingle
     pop af
@@ -90,5 +89,4 @@ _:
 #undefine var_a
 #undefine var_g
 #undefine var_b
-#undefine var_c
 #undefine var_x
