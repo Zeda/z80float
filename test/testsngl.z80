@@ -1,9 +1,86 @@
 #define bcall(x) rst 28h \ .dw x
 #include "../single/single.inc"
+fontFlags     = 32h
+fracDrawLFont = 2
+_GrBufClr     = 4BD0h
 _PutS         = 450Ah
+_NewLine      = 452Eh
 .db $BB,$6D
 .org $9D95
+  bcall(_GrBufClr)
+  res fracDrawLFont,(iy + fontFlags)
+  set textWrite, (IY + sGrFlags)
+  ld hl,0
+  ld (penCol),hl
+;
+;
+  call testputs \ .db "tan(ln(2))=",0
   ld hl,const_ln_2
+  ld bc,8800h
+  call tanSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "sin(ln(2))=",0
+  ld hl,const_ln_2
+  ld bc,8800h
+  call sinSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "cos(ln(2))=",0
+  ld hl,const_ln_2
+  ld bc,8800h
+  call cosSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "tanh(1/pi)=",0
+  ld hl,const_pi_inv
+  ld bc,8800h
+  call tanhSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "sinh(1/pi)=",0
+  ld hl,const_pi_inv
+  ld bc,8800h
+  call sinhSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "cosh(1/pi)=",0
+  ld hl,const_pi_inv
   ld bc,8800h
   call coshSingle
   ld h,b
@@ -12,7 +89,66 @@ _PutS         = 450Ah
   call single2str
   ld h,b
   ld l,c
-  bcall(_PutS)
+  call puts
+  call newline
+
+  call testputs \ .db "e^10=",0
+  ld hl,const_10
+  ld bc,8800h
+  call expSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "log_pi(10)=",0
+  ld hl,const_10
+  ld de,const_pi
+  ld bc,8800h
+  call logSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "atan(ln(2))=",0
+  ld hl,const_ln_2
+  ld bc,8800h
+  call atanSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "asinh(1/ln(2))=",0
+  ld hl,const_lg_e
+  ld bc,8800h
+  call asinhSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+
+
+
+  bcall(_GrBufCpy)
   ret
 test_cmp:
   ld hl,const_pi_
@@ -24,7 +160,28 @@ test_cmp:
   jr nc,+_
   ld hl,s_lt
 _:
-  bcall(_PutS)
+  jr puts
+testputs:
+  ex (sp),hl
+  call puts
+  ex (sp),hl
+  ret
+puts:
+  push de
+  push bc
+  push af
+  bcall(_VPutS)
+  pop af
+  pop bc
+  pop de
+  ret
+newline:
+  ld hl,(penCol)
+  ld l,0
+  ld a,6
+  add a,h
+  ld h,a
+  ld (penCol),hl
   ret
 
 ;const_pi:     .db $DB,$0F,$49,$81
@@ -38,33 +195,47 @@ __:
 #include "../single/tanSingle.z80"
 #include "../single/mulSingle.z80"
 #include "../single/mul10Single.z80"
+#include "../single/mulSingle_p375.z80"
+#include "../single/mulSingle_p34375.z80"
+#include "../single/mulSingle_p041015625.z80"
 #include "../single/addSingle.z80"
 #include "../single/rsubSingle.z80"
 #include "../single/subSingle.z80"
 #include "../single/constants.z80"
 #include "../single/pushpop.z80"
 #include "../single/expSingle.z80"
+#include "../single/powSingle.z80"
+#include "../single/pow2Single.z80"
+#include "../single/pow10Single.z80"
 #include "../single/divSingle.z80"
 #include "../single/divSingle_special.z80"
 #include "../single/logSingle.z80"
-#include "../single/single2char.z80"
+#include "../single/lnSingle.z80"
+#include "../single/lgSingle.z80"
+#include "../single/log10Single.z80"
+;#include "../single/single2char.z80"
 #include "../single/single2str.z80"
 #include "../single/single2TI.z80"
 #include "../single/str2single.z80"
 #include "../single/lut.z80"
-
 #include "../single/absSingle.z80"
+#include "../single/acosSingle.z80"
+#include "../single/asinSingle.z80"
+#include "../single/atanSingle.z80"
+#include "../single/acoshSingle.z80"
+#include "../single/asinhSingle.z80"
+#include "../single/atanhSingle.z80"
 #include "../single/ameanSingle.z80"
 #include "../single/geomeanSingle.z80"
 #include "../single/sqrtSingle.z80"
 #include "../single/cmpSingle.z80"
 #include "../single/bgSingle.z80"
+#include "../single/bg2iSingle.z80"   ;slightly faster version for ln(x), can omit and use bgiSingle instead :)
 #include "../single/randSingle.z80"
 #include "../single/coshSingle.z80"
 #include "../single/sinhSingle.z80"
 #include "../single/tanhSingle.z80"
 #include "../single/negSingle.z80"
-;#include "../single/Single.z80"
-;#include "../single/Single.z80"
-;#include "../single/Single.z80"
+#include "../single/ti2single.z80"
+#include "../single/single2char.z80"
 .echo $-__," bytes"

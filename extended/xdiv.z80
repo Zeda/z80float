@@ -129,5 +129,3 @@ div_NaN:
   ld (fpOP1+7),a
   ret
 .echo "xdiv: ",$-xdiv
-#include "../extended/div/div64.z80"
-#include "../extended/div/div32.z80"

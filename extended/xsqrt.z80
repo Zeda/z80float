@@ -55,7 +55,7 @@ _:
   ld l,a
   ld (fpOP1+8),hl
   call nc,srlfpOP1_mantissa
-#include "../extended/sqrt/sqrt64.z80"
+  jp sqrt64   ;#include "../extended/sqrt/sqrt64.z80"
 sqrt_special:
 ;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
   ld de,fpOP1
@@ -66,11 +66,6 @@ sqrtNAN:
   ld de,fpOP1
   jp mov10
 .echo "xsqrt: ",$-xsqrt
-#include "../extended/sqrt/sqrt32.z80"
-.echo "  sqrt32: +",$-sqrt32
-#include "../extended/sqrt/sqrt16.z80"
-.echo "  sqrt16: +",$-sqrtHL
-
 #undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
 #undefine var_a fpOP2   ;   2 bytes
 #undefine var_c fpOP2+8 ;input
