@@ -116,6 +116,7 @@ puts:
 #include "../extended/mul/xmul15.z80"
 #include "../extended/mul/xmul17.z80"
 #include "../extended/mul/xmul31.z80"
+#include "../extended/mul/fpOP1mul10.z80"
 #include "../extended/xln.z80"
 #include "../extended/xatan.z80"
 #include "../extended/xatanh.z80"
