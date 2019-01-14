@@ -1,0 +1,21 @@
+#define var_x   scrap     ;4 bytes
+#define var_c   scrap+4   ;4 bytes
+powSingle:
+;;Computes y^x
+;;HL points to y
+;;DE points to x
+;;BC points to output
+    push hl
+    push de
+    push bc
+    push af
+    push bc
+    ld bc,var_c
+    call lgSingle
+    ld h,b
+    ld l,c
+    ex de,hl
+    jp pow_inject
+.echo "powSingle:",$-powSingle
+#undefine var_x
+#undefine var_c

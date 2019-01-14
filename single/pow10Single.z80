@@ -1,0 +1,8 @@
+pow10Single:
+    push hl
+    push de
+    push bc
+    push af
+    ld de,const_lg10
+    push bc
+    jp pow_inject

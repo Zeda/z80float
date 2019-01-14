@@ -74,7 +74,7 @@ no_eng_adjust:
     xor a
     ld (de),a
     push bc
-    
+
     ld hl,scrap
     call str2int    ;preserves no registers, returns in DEHL
     ld b,31+128
@@ -91,7 +91,7 @@ no_eng_adjust:
     ld (strint+2),hl
     ld a,b
     ld (strint+4),a
-    
+
     ld hl,0
     ld (scrap),hl
     ld a,d
@@ -110,9 +110,9 @@ no_eng_adjust:
     ld (scrap+2),hl
     ld hl,scrap
     pop bc
-    call exp10Single
+    call pow10Single
     ld de,strint+1
-    call mulSingle    
+    call mulSingle
     pop de
     pop hl
     pop af
@@ -180,4 +180,3 @@ mul10intloop:
     jp nz,mul10intloop
     inc d
     jp mul10intloop
-
