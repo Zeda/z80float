@@ -15,11 +15,10 @@ bgiSingle:
 ;The entire single-precision algorithm:
 ;   b=a*.03125
 ;   a=amean(a,g)
-;   c=a*.625
 ;   g=geomean(a,g)
+;   a*=.375
 ;   a+=g
 ;   a+=b
-;   a-=c
 ;   return 1.40625/a
     push hl
     push de
@@ -66,14 +65,12 @@ _:
   ld b,d
   ld c,e
   call geomeanSingle
-;c=a*.625
-  ld de,var_c
-  call mov4
-  ex de,hl    ;DE now points to var_g
-  ld hl,var_c
+
+;   a*=.375
+  ld hl,var_a
   ld b,h
   ld c,l
-  call mulSingle_neg_p625
+  call mulSingle_p375
 
 ;a+=g
   ld hl,var_a
@@ -83,9 +80,6 @@ _:
 ;a+=b
   ld de,var_b
   call addSIngle
-;a-=c
-  ld de,var_c
-  call addSingle
   ex de,hl
   ld hl,const_1p40625
   jp divSingle
