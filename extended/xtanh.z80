@@ -1,3 +1,37 @@
-;y=x*x
-;a=.5x* (1+5y/156(1+3y/550(1+y/1512))) / (1+3y/26(1+5y/396(1+y/450)))
-;a is roughly tanh(x/2)
+;https://www.math.utah.edu/~beebe/software/ieee/tanh.pdf
+;p0 = -1613.4119023996228053
+;p1 = -99.225929672236083313
+;p2 = -.96437492777225469787
+;q0 = 4840.2357071988688686
+;q1 = 2233.7720718962312926
+;q2 = 112.74474380534949335
+;g=x*x
+;r = g * ((p2 * g + p1) * g + p0)/(((g + q2)*g + q1) * g + q0)
+;return x+x*r
+;
+;tanh(a+b) = (tanh(a)+tanh(b))/(1+tanh(a)tanh(b))
+;We could precompute a table for `a` from 1 to 23
+
+#define var_x  fpOP1+152
+xtanh:
+  push hl
+  push de
+  push bc
+  push af
+  push bc
+  call +_
+  pop de
+  call mov10
+  pop af
+  pop bc
+  pop de
+  pop hl
+  ret
+_:
+  ret
+tanh_p0: .db $8E,$C3,$F0,$F0,$4D,$2E,$AD,$C9 \ .dw $C00A
+tanh_p1: .db $63,$63,$E6,$D2,$0D,$AD,$73,$C6 \ .dw $C006
+tanh_p2: .db $03,$FA,$9D,$EE,$3B,$A3,$70,$7B \ .dw $C000
+tanh_q0: .db $A6,$96,$B4,$74,$BA,$E2,$41,$97 \ .dw $400C
+tanh_q1: .db $F1,$95,$87,$0F,$68,$5A,$9C,$8B \ .dw $400B
+tanh_q2: .db $EE,$D3,$BF,$5F,$0F,$4F,$7D,$E1 \ .dw $4006

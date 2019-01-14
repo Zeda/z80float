@@ -20,7 +20,7 @@ _:
   ld e,l
   ld bc,fpOP1
   call xmul
-  ld de,const_1
+  ld de,xconst_1
   ld h,b
   ld l,c
   ld bc,var_x

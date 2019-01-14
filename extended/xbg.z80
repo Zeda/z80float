@@ -179,8 +179,6 @@ _:
   call xsub
   call xmul11
   call xmul31
-;  ld de,const_341
-;  call xmul
 
   ld de,var_a1
   call xsub
@@ -194,7 +192,7 @@ _:
   ld b,d
   ld c,e
   call xadd
-  ld hl,const_3028466566125
+  ld hl,xconst_3028466566125
   jp xdiv
 casebg:
 ;1/bg(0,x)    -> is actually permissable
@@ -230,8 +228,6 @@ bg_NaN:
   ld a,$40
   ld (fpOP1+7),a
   ret
-;const_341:
-;  .db $00,$00,$00,$00,$00,$00,$80,$AA \ .dw $4008
 #undefine var_a
 #undefine var_g
 #undefine var_a0

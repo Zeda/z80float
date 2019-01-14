@@ -62,7 +62,7 @@ sqrt_special:
   ld hl,var_x
   jp mov10
 sqrtNAN:
-  ld hl,const_NaN
+  ld hl,xconst_NaN
   ld de,fpOP1
   jp mov10
 .echo "xsqrt: ",$-xsqrt

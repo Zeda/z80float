@@ -22,7 +22,7 @@ _:
   call xmul
   ld h,b
   ld l,c
-  ld de,const_1
+  ld de,xconst_1
   call xadd
   call xsqrt
   call xbg

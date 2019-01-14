@@ -27,7 +27,7 @@ _:
   ld hl,var_x
   ld bc,fpOP5
   call xsqrt
-  ld de,const_1
+  ld de,xconst_1
   ld bc,fpOP4
   call xamean
   ld b,h
