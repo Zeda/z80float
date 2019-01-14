@@ -16,7 +16,7 @@ single2char:
     ld a,(hl)
     sub 7Fh
     ex de,hl
-    jr nc,$+6 \ xor a \ ld d,a \ jr return_char
+    jr nc,$+4 \ xor a \ ld d,a
     jr z,return_char
     cp 8
     ld b,a
