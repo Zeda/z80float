@@ -4,7 +4,7 @@
 #define z2_32 z0_32+4
 
 mul64:
-;multiplies the 64-bit integers at fpOP1 and fpOP2
+;multiplies the 64-bit integers at xOP1 and xOP2
 ;min: 1740+3*min(mul32)
 ;     5694cc
 ;max: 1901+3*max(mul32)
@@ -13,10 +13,10 @@ mul64:
 ;   :~8783.733cc
 ;DEHL * BCIX
 
-  ld de,(fpOP1+6)
-  ld hl,(fpOP1+4)
-  ld bc,(fpOP2+6)
-  ld ix,(fpOP2+4)
+  ld de,(xOP1+6)
+  ld hl,(xOP1+4)
+  ld bc,(xOP2+6)
+  ld ix,(xOP2+4)
   call mul32
   ;copy the 8 bytes at z0_32 to z2_64
   ld hl,z0_32
@@ -24,10 +24,10 @@ mul64:
   call mov8
 
 
-  ld de,(fpOP1+2)
-  ld hl,(fpOP1)
-  ld bc,(fpOP2+2)
-  ld ix,(fpOP2)
+  ld de,(xOP1+2)
+  ld hl,(xOP1)
+  ld bc,(xOP2+2)
+  ld ix,(xOP2)
   call mul32
   ;copy the 8 bytes at z0_32 to z0_64
   ld hl,z0_32
@@ -36,12 +36,12 @@ mul64:
 
 ;now I need to subtract the 32-bit digits from each other
   xor a
-  ld hl,(fpOP1)
-  ld bc,(fpOP1+4)
+  ld hl,(xOP1)
+  ld bc,(xOP1+4)
   sbc hl,bc
   ex de,hl
-  ld hl,(fpOP1+2)
-  ld bc,(fpOP1+6)
+  ld hl,(xOP1+2)
+  ld bc,(xOP1+6)
   sbc hl,bc
   jr nc,+_
   ld b,a \ sub e \ ld e,a
@@ -54,12 +54,12 @@ _:
   push hl   ;top byte
   push de
 
-  ld hl,(fpOP2)
-  ld bc,(fpOP2+4)
+  ld hl,(xOP2)
+  ld bc,(xOP2+4)
   sbc hl,bc
   ex de,hl
-  ld hl,(fpOP2+2)
-  ld bc,(fpOP2+6)
+  ld hl,(xOP2+2)
+  ld bc,(xOP2+6)
   sbc hl,bc
   jr nc,+_
   ld c,a
@@ -86,54 +86,54 @@ _:
   ld hl,(z0_64)
   ld de,(z2_64)
   add hl,de
-  ld (fpOP1),hl
+  ld (xOP1),hl
   ld hl,(z0_64+2)
   ld de,(z2_64+2)
   adc hl,de
-  ld (fpOP1+2),hl
+  ld (xOP1+2),hl
   ld hl,(z0_64+4)
   ld de,(z2_64+4)
   adc hl,de
-  ld (fpOP1+4),hl
+  ld (xOP1+4),hl
   ld hl,(z0_64+6)
   ld de,(z2_64+6)
   adc hl,de
-  ld (fpOP1+6),hl
+  ld (xOP1+6),hl
   rla
 ;now need to subtract
-  ld hl,(fpOP1)
+  ld hl,(xOP1)
   ld de,(z0_32)
   sbc hl,de
-  ld (fpOP1),hl
-  ld hl,(fpOP1+2)
+  ld (xOP1),hl
+  ld hl,(xOP1+2)
   ld de,(z0_32+2)
   sbc hl,de
-  ld (fpOP1+2),hl
-  ld hl,(fpOP1+4)
+  ld (xOP1+2),hl
+  ld hl,(xOP1+4)
   ld de,(z0_32+4)
   sbc hl,de
-  ld (fpOP1+4),hl
-  ld hl,(fpOP1+6)
+  ld (xOP1+4),hl
+  ld hl,(xOP1+6)
   ld de,(z0_32+6)
   sbc hl,de
-  ld (fpOP1+6),hl
+  ld (xOP1+6),hl
   sbc a,0
 mul64_final:
 ;now need to add it back in
   ld hl,(z0_64+4)
-  ld de,(fpOP1)
+  ld de,(xOP1)
   add hl,de
   ld (z0_64+4),hl
   ld hl,(z0_64+6)
-  ld de,(fpOP1+2)
+  ld de,(xOP1+2)
   adc hl,de
   ld (z0_64+6),hl
   ld hl,(z0_64+8)
-  ld de,(fpOP1+4)
+  ld de,(xOP1+4)
   adc hl,de
   ld (z0_64+8),hl
   ld hl,(z0_64+10)
-  ld de,(fpOP1+6)
+  ld de,(xOP1+6)
   adc hl,de
   ld (z0_64+10),hl
   ld hl,z0_64+12
@@ -150,37 +150,37 @@ mul64_add:
   ld hl,(z0_64)
   ld de,(z2_64)
   add hl,de
-  ld (fpOP1),hl
+  ld (xOP1),hl
   ld hl,(z0_64+2)
   ld de,(z2_64+2)
   adc hl,de
-  ld (fpOP1+2),hl
+  ld (xOP1+2),hl
   ld hl,(z0_64+4)
   ld de,(z2_64+4)
   adc hl,de
-  ld (fpOP1+4),hl
+  ld (xOP1+4),hl
   ld hl,(z0_64+6)
   ld de,(z2_64+6)
   adc hl,de
-  ld (fpOP1+6),hl
+  ld (xOP1+6),hl
   rla
 ;now need to subtract
-  ld hl,(fpOP1)
+  ld hl,(xOP1)
   ld de,(z0_32)
   add hl,de
-  ld (fpOP1),hl
-  ld hl,(fpOP1+2)
+  ld (xOP1),hl
+  ld hl,(xOP1+2)
   ld de,(z0_32+2)
   adc hl,de
-  ld (fpOP1+2),hl
-  ld hl,(fpOP1+4)
+  ld (xOP1+2),hl
+  ld hl,(xOP1+4)
   ld de,(z0_32+4)
   adc hl,de
-  ld (fpOP1+4),hl
-  ld hl,(fpOP1+6)
+  ld (xOP1+4),hl
+  ld hl,(xOP1+6)
   ld de,(z0_32+6)
   adc hl,de
-  ld (fpOP1+6),hl
+  ld (xOP1+6),hl
   adc a,0
   jp mul64_final
 .echo "  mul64: +",$-mul64

@@ -1,5 +1,5 @@
 ;x/BG(sqrt(1-x^2),1)
-#define var_x  fpOP1+152
+#define var_x  xOP1+152
 xasin:
   push hl
   push de
@@ -18,7 +18,7 @@ _:
   push hl
   ld d,h
   ld e,l
-  ld bc,fpOP1
+  ld bc,xOP1
   call xmul
   ld h,b
   ld l,c

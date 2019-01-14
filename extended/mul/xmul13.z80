@@ -6,7 +6,7 @@ xmul13:
   push bc
   call +_
   pop de
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov10
   pop af
   pop bc
@@ -14,20 +14,20 @@ xmul13:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ld a,h
   or l
   ret z
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov8
-  call srlfpOP2
+  call srlxOP2
   call addmantissa0102
-  call srlfpOP2
-  call srlfpOP2
+  call srlxOP2
+  call srlxOP2
   call addmantissa0102
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   ld a,(hl)
   add a,3
   ld (hl),a

@@ -5,9 +5,9 @@ xmul7:
   push af
   push bc
   call +_
-  call normalizefpOP1
+  call normalizexOP1
   pop de
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov10
   pop af
   pop bc
@@ -15,20 +15,20 @@ xmul7:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ld a,h
   or l
   ret z
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov8
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  call srlfpOP1_mantissa
-  ld de,fpOP2
+  call srlxOP1_mantissa
+  call srlxOP1_mantissa
+  call srlxOP1_mantissa
+  ld de,xOP2
   call rsbc64
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   ld a,(hl)
   add a,3
   ld (hl),a

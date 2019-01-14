@@ -5,9 +5,9 @@ xmul31:
   push af
   push bc
   call +_
-  call normalizefpOP1
+  call normalizexOP1
   pop de
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov10
   pop af
   pop bc
@@ -15,19 +15,19 @@ xmul31:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ld a,h
   or l
   ret z
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov8
-  call srlfpOP2_4
-  call srlfpOP2
-  ld de,fpOP1
+  call srlxOP2_4
+  call srlxOP2
+  ld de,xOP1
   call sbc64
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   ld a,(hl)
   add a,5
   ld (hl),a

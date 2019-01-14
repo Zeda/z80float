@@ -1,5 +1,5 @@
-#define pow10exp  fpOP3+42
-#define strout fpOP3+45
+#define pow10exp  xOP3+42
+#define strout xOP3+45
 xtostr:
   push hl
   push de
@@ -18,9 +18,9 @@ xtostr:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld de,(fpOP1+8)   ;this is the exponent and sign
+  ld de,(xOP1+8)   ;this is the exponent and sign
   ld hl,strout
   bit 7,d
   jr z,+_
@@ -31,7 +31,7 @@ _:
   ld a,d
   or e
   jp z,strcase
-  ld (fpOP1+8),de   ;just making it positive
+  ld (xOP1+8),de   ;just making it positive
   ;Now we need to perform (DE-0x4000)*19728 (approximation of exponent*log10(2))
   ld bc,19728
   push hl       ;points to where the string is being written
@@ -50,7 +50,7 @@ _:
   ld h,a
   ld de,pow10table   ;get the table of 10^-(2^k)
 _:
-  ld bc,fpOP1
+  ld bc,xOP1
   add hl,hl
   add hl,hl
   add hl,hl
@@ -69,10 +69,10 @@ _:
   call xtostr_mul
 ;now the number is pretty close to a nice value
 _:
-  ld a,(fpOP1+8)
+  ld a,(xOP1+8)
   add a,a
   jr nc,+_
-  call fpOP1mul10
+  call xOP1mul10
   ld hl,(pow10exp)
   dec hl
   ld (pow10exp),hl
@@ -85,9 +85,9 @@ _:
   ;number of bits to shift
   ld b,a
   xor a
-  ld (fpOP1+8),a
+  ld (xOP1+8),a
 _:
-  ld hl,fpOP1
+  ld hl,xOP1
   sla (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
@@ -283,7 +283,7 @@ posdec:
   ret
 strcase:
   ld de,str_Zero
-  ld a,(fpOP1+7)
+  ld a,(xOP1+7)
   and $C0
   jr z,+_
   ld de,str_Inf
@@ -308,10 +308,10 @@ _:
   ld l,c
   jp xmul
 xtostrmul10:
-;multiply the 0.64 fixed point number at fpOP1 by 10
+;multiply the 0.64 fixed point number at xOP1 by 10
 ;overflow in A register
-  ld hl,fpOP1
-  ld de,fpOP2
+  ld hl,xOP1
+  ld de,xOP2
   call mov9
   xor a
   inc hl \ sla (hl)
@@ -323,7 +323,7 @@ xtostrmul10:
   inc hl \ rl (hl)
   inc hl \ rl (hl)
   rla
-  ld hl,fpOP2
+  ld hl,xOP2
   sla (hl)
   inc hl \ rl (hl)
   inc hl \ rl (hl)
@@ -334,13 +334,13 @@ xtostrmul10:
   inc hl \ rl (hl)
   rla
   push af
-  ld de,fpOP1
-  ld hl,fpOP2
+  ld de,xOP1
+  ld hl,xOP2
   call add64
   pop hl
   ld a,h
   adc a,0
-  ld hl,fpOP1
+  ld hl,xOP1
   sla (hl)
   inc hl \ rl (hl)
   inc hl \ rl (hl)

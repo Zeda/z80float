@@ -1,15 +1,15 @@
-#define var_c fpOP1   ;input
+#define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32
-#define var_x fpOP2   ;output
-#define var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
-#define var_a fpOP2   ;   2 bytes
-#define var_z0 fpOP2+8;used in sqr32
+#define var_x xOP2   ;output
+#define var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
+#define var_a xOP2   ;   2 bytes
+#define var_z0 xOP2+8;used in sqr32
 
 xsqrt:
 ;HL points to x
 ;BC points to the output
 ;computes x^.5, if x>=0
-;speed: 388+mov8+mov10+sqrt64+{0,7+srlfpOP1_mantissa}
+;speed: 388+mov8+mov10+sqrt64+{0,7+srlxOP1_mantissa}
 ;avg: 6540.792cc
 
   push hl
@@ -22,7 +22,7 @@ xsqrt:
   ld hl,var_x
   pop de
   call mov8
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ex de,hl
   ld (hl),e
   inc hl
@@ -34,7 +34,7 @@ xsqrt:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
   ex de,hl
   dec hl
@@ -53,21 +53,21 @@ _:
   ld a,e
   rra
   ld l,a
-  ld (fpOP1+8),hl
-  call nc,srlfpOP1_mantissa
+  ld (xOP1+8),hl
+  call nc,srlxOP1_mantissa
   jp sqrt64   ;#include "../extended/sqrt/sqrt64.z80"
 sqrt_special:
 ;special case: 0 -> 0, NaN -> NaN, +inf -> +inf, so output=input
-  ld de,fpOP1
+  ld de,xOP1
   ld hl,var_x
   jp mov10
 sqrtNAN:
   ld hl,xconst_NaN
-  ld de,fpOP1
+  ld de,xOP1
   jp mov10
 .echo "xsqrt: ",$-xsqrt
-#undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
-#undefine var_a fpOP2   ;   2 bytes
-#undefine var_c fpOP2+8 ;input
+#undefine var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
+#undefine var_a xOP2   ;   2 bytes
+#undefine var_c xOP2+8 ;input
 #undefine var_y var_c+4 ;  used for sqrt32
-#undefine var_z0 fpOP2+16
+#undefine var_z0 xOP2+16

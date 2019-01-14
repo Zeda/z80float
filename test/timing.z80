@@ -37,11 +37,11 @@ timer=$+1
   cp 0
   jr z,+_
   ;<<insert code here>>
-  ld bc,fpOP2
+  ld bc,xOP2
   ld d,b
   ld e,c
   call xrand
-  ld bc,fpOP1
+  ld bc,xOP1
   ld h,b
   ld l,c
   call xrand

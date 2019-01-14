@@ -1,6 +1,6 @@
-#define var_q fpOP1
-#define var_x fpOP2
-#define var_n fpOP3
+#define var_q xOP1
+#define var_x xOP2
+#define var_n xOP3
 xdiv:
 ;597+{0,220+{0,6}}+{0,3}+div64+cmp64+mov8+2*mov10
 ;1075+{0,220+{0,6}}+{0,3}+div64+cmp64
@@ -35,12 +35,12 @@ xdiv:
 _:
   push hl
   ex de,hl
-  ld de,fpOP2
+  ld de,xOP2
   call mov10
   pop hl
   call mov10
-	ld hl,(fpOP3+8)
-	ld de,(fpOP2+8)
+	ld hl,(xOP3+8)
+	ld de,(xOP2+8)
 	ld a,h
 	xor d
   ld b,a
@@ -87,7 +87,7 @@ _:
   ret
 div_zero:
   xor a
-  ld (fpOP1+7),a
+  ld (xOP1+7),a
   ld h,a
   ld l,a
   ret
@@ -96,18 +96,18 @@ div_inf:
   ld h,a
   ld l,a
   dec a
-  ld (fpOP1+7),a
+  ld (xOP1+7),a
   ret
 casediv:
 ;0/x
 ;inf/x
 ;NaN/x
-  ld hl,(fpOP2+8)
+  ld hl,(xOP2+8)
   ld a,h
   or l
   jr z,+_
-  ld hl,fpOP3
-  ld de,fpOP1
+  ld hl,xOP3
+  ld de,xOP1
   call mov8
   ld hl,0
   ret
@@ -118,7 +118,7 @@ casediv2:
 ;x/0   -> NaN
 ;x/inf -> 0
 ;x/NaN -> NaN
-  ld a,(fpOP2+7)
+  ld a,(xOP2+7)
   rla
   jr c,div_inf
   rla
@@ -126,6 +126,6 @@ casediv2:
 div_NaN:
   ld hl,0
   ld a,$40
-  ld (fpOP1+7),a
+  ld (xOP1+7),a
   ret
 .echo "xdiv: ",$-xdiv

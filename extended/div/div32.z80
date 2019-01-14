@@ -1,6 +1,6 @@
-#define var_x fpOP2   ;output
-#define var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
-#define var_n fpOP3
+#define var_x xOP2   ;output
+#define var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
+#define var_n xOP3
 
 
 div64_32:
@@ -249,6 +249,5 @@ div16_14_2:
 div16_15_2:
   add a,a \ ld e,a \ sbc hl,bc \ ret
 .echo "  div16: +",$-divide16
-.echo "  Total: ",$-xdiv
 #undefine var_x
 #undefine var_b

@@ -1,4 +1,4 @@
-#define var_z fpOP3+16
+#define var_z xOP3+16
 
 xmul:
 ;Input:
@@ -39,12 +39,12 @@ xmul:
   ret
 _:
   push de
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
   pop hl
   call mov10
-	ld hl,(fpOP1+8)
-	ld de,(fpOP2+8)
+	ld hl,(xOP1+8)
+	ld de,(xOP2+8)
 	ld a,h
 	xor d
   ld b,a
@@ -83,14 +83,14 @@ _:
   ret
 
 casemul:
-;fpOP1 is inf/nan/0
-  ld hl,fpOP2+9
+;xOP1 is inf/nan/0
+  ld hl,xOP2+9
   ld a,(hl)
   dec hl
   or (hl)
   dec hl
   ld a,(hl)
-  ld hl,fpOP2
+  ld hl,xOP2
   jr nz,casemul2_copy
   ;now we have two special cases to multipy together
 ;inf*inf-> inf
@@ -109,7 +109,7 @@ casemul:
   rr d
   and $C0
   ld c,a
-  ld a,(fpOP1+7)
+  ld a,(xOP1+7)
   and $C0
   cp c
   jr z,+_
@@ -118,8 +118,8 @@ _:
   ld (var_z+15),a
   ret
 casemul2:
-;finite times inf/nan/0, so fpOP1 -> out
-  ld hl,fpOP1
+;finite times inf/nan/0, so xOP1 -> out
+  ld hl,xOP1
 casemul2_copy:
   ld de,var_z+8
   call mov8
@@ -141,5 +141,3 @@ mul_inf:
   ld (var_z+15),a
   ret
 .echo "xmul: ",$-xmul
-.echo "  mul16: +",$-mul16
-.echo "  Total: ",$-xmul

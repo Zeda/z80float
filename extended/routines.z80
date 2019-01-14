@@ -65,8 +65,8 @@ cmp64:
   ld a,(bc) \ cpd \ ret nz
   ld a,(bc) \ cpd \ ret nz
   ld a,(bc) \ cp (hl) \ ret
-srlfpOP2_4:
-  ld hl,fpOP2+7
+srlxOP2_4:
+  ld hl,xOP2+7
 srl64_4:
   xor a
   rrd \ dec hl
@@ -78,8 +78,8 @@ srl64_4:
   rrd \ dec hl
   rrd
   ret
-srlfpOP2:
-  ld hl,fpOP2+7
+srlxOP2:
+  ld hl,xOP2+7
   srl (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl
@@ -89,9 +89,9 @@ srlfpOP2:
   rr (hl) \ dec hl
   rr (hl)
   ret
-srlfpOP1_mantissa:
+srlxOP1_mantissa:
 ;182cc
-  ld hl,fpOP1+7
+  ld hl,xOP1+7
 srl64:
 ;172cc
   srl (hl) \ dec hl
@@ -132,38 +132,38 @@ mov4:
   ldi
   ldi
   ret
-swapfpOP2fpOP3:
+swapxOP2xOP3:
 ;370cc
-  ld hl,(fpOP2+8)
-  ld de,(fpOP3+8)
-  ld (fpOP3+8),hl
-  ld (fpOP2+8),de
-swapfpOP2fpOP3_mantissa:
+  ld hl,(xOP2+8)
+  ld de,(xOP3+8)
+  ld (xOP3+8),hl
+  ld (xOP2+8),de
+swapxOP2xOP3_mantissa:
 ;298cc
-  ld hl,(fpOP2)
-  ld de,(fpOP3)
-  ld (fpOP3),hl
-  ld (fpOP2),de
-  ld hl,(fpOP2+2)
-  ld de,(fpOP3+2)
-  ld (fpOP3+2),hl
-  ld (fpOP2+2),de
-  ld hl,(fpOP2+4)
-  ld de,(fpOP3+4)
-  ld (fpOP3+4),hl
-  ld (fpOP2+4),de
-  ld hl,(fpOP2+6)
-  ld de,(fpOP3+6)
-  ld (fpOP3+6),hl
-  ld (fpOP2+6),de
+  ld hl,(xOP2)
+  ld de,(xOP3)
+  ld (xOP3),hl
+  ld (xOP2),de
+  ld hl,(xOP2+2)
+  ld de,(xOP3+2)
+  ld (xOP3+2),hl
+  ld (xOP2+2),de
+  ld hl,(xOP2+4)
+  ld de,(xOP3+4)
+  ld (xOP3+4),hl
+  ld (xOP2+4),de
+  ld hl,(xOP2+6)
+  ld de,(xOP3+6)
+  ld (xOP3+6),hl
+  ld (xOP2+6),de
   ret
-setfpOP1_inf:
+setxOP1_inf:
   xor a
   ld h,a
   ld l,a
   dec a
-  ld (fpOP1+8),hl
-  ld (fpOP1+7),a
+  ld (xOP1+8),hl
+  ld (xOP1+7),a
   ret
 diRestore:
 ;Adds 151cc if interrupts are enabled, 161cc if disabled
@@ -191,12 +191,12 @@ restoredi:
 restoreei:
   ei
   ret
-normalizefpOP1:
-  ld a,(fpOP1+7)
+normalizexOP1:
+  ld a,(xOP1+7)
   add a,a
   ret c
 _:
-  ld hl,fpOP1
+  ld hl,xOP1
   sla (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
@@ -205,21 +205,21 @@ _:
   rl (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl)
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   dec hl
-  ld (fpOP1+8),hl
+  ld (xOP1+8),hl
   jp p,-_
   ret
 addmantissa0102:
-  ld hl,fpOP2
-  ld de,fpOP1
+  ld hl,xOP2
+  ld de,xOP1
   call adc64
   ret nc
   ex de,hl
   call rr64
   ex de,hl
   call srl64
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   inc (hl)
   ret nz
   inc hl

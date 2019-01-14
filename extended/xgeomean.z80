@@ -6,7 +6,7 @@ xgeomean:
 ;avg: 16573.025
   push hl
   push bc
-  ld bc,fpOP1
+  ld bc,xOP1
   call xmul
   ld h,b
   ld l,c

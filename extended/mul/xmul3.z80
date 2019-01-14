@@ -11,7 +11,7 @@ xmul3:
   push bc
   call +_
   pop de
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov10
   pop af
   pop bc
@@ -19,13 +19,13 @@ xmul3:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ld a,h
   or l
   ret z
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov8
   dec hl \ srl (hl)
   dec hl \ rr (hl)
@@ -35,13 +35,13 @@ _:
   dec hl \ rr (hl)
   dec hl \ rr (hl)
   dec hl \ rr (hl)
-  ld de,fpOP2
+  ld de,xOP2
   ex de,hl
   call adc64
   ex de,hl
   push af
   call c,rr64
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   pop af
   ld a,(hl)
   adc a,1
@@ -55,6 +55,6 @@ _:
 constmul_overflow:
   xor $80
   ld (hl),a
-  ld hl,fpOP1+7
+  ld hl,xOP1+7
   ld (hl),-1
   ret

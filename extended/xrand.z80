@@ -8,25 +8,25 @@ xrand:
   push bc
 
   call rand
-  ld (fpOP1),hl
+  ld (xOP1),hl
   call rand
-  ld (fpOP1+2),hl
+  ld (xOP1+2),hl
   call rand
-  ld (fpOP1+4),hl
+  ld (xOP1+4),hl
   call rand
-  ld (fpOP1+6),hl
+  ld (xOP1+6),hl
   ld hl,$3FFF
-  ld (fpOP1+8),hl
-  call normalizefpOP1
+  ld (xOP1+8),hl
+  call normalizexOP1
 ;If we had to normalize, we should load in more random bits!
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   ld a,h    ;First, make sure it isn't zero.
   or l
   jr z,randdone
   ld a,l
   inc a
   jr z,randdone
-  ld hl,fpOP1
+  ld hl,xOP1
 _:
   push hl
   push af
@@ -44,7 +44,7 @@ _:
   jr nc,-_
 randdone:
   pop de
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov10
   pop af
   pop bc

@@ -1,4 +1,4 @@
-#define var_a fpOP3+42
+#define var_a xOP3+42
 #define var_g var_a+10
 #define var_a0 var_a+20
 #define var_a1 var_a+30
@@ -219,14 +219,14 @@ bg_Zero:
   xor a
   ld h,a
   ld l,a
-  ld (fpOP1+8),hl
-  ld (fpOP1+7),a
+  ld (xOP1+8),hl
+  ld (xOP1+7),a
   ret
 bg_NaN:
   ld hl,0
-  ld (fpOP1+8),hl
+  ld (xOP1+8),hl
   ld a,$40
-  ld (fpOP1+7),a
+  ld (xOP1+7),a
   ret
 #undefine var_a
 #undefine var_g

@@ -1,44 +1,44 @@
 ;;Hey, add more tests here!
   ld hl,const_pi
-  ld bc,fpOP1
+  ld bc,xOP1
   call xrand
   call testputs \ .db "rand=",0
-  strx(fpOP1,fpOP1)
+  strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
 
   ld hl,const_loge_2
-  ld bc,fpOP1
+  ld bc,xOP1
   call xatan
   call testputs \ .db "atan(ln(2))=",0
-  strx(fpOP1,fpOP1)
+  strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
 
-  rsubx(const_pi,const_e,fpOP4)
+  rsubx(const_pi,const_e,xOP4)
   call testputs \ .db "(e-pi)=",0
-  strx(fpOP4,fpOP1)
+  strx(xOP4,xOP1)
   ld h,b
   ld l,c
   call puts
 
   ld hl,const_loge_2
-  ld bc,fpOP1
+  ld bc,xOP1
   call xatanh
   call testputs \ .db "atanh(ln(2))=",0
-  strx(fpOP1,fpOP1)
+  strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
 
   ld hl,const_pi
   ld de,const_e
-  ld bc,fpOP1
+  ld bc,xOP1
   call xmul
   call testputs \ .db "pi*e=",0
-  strx(fpOP1,fpOP1)
+  strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts

@@ -1,9 +1,9 @@
-#define var_c fpOP1   ;input
+#define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32
-#define var_x fpOP2   ;output
-#define var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
-#define var_a fpOP2   ;   2 bytes
-#define var_z0 fpOP2+8;used in sqr32
+#define var_x xOP2   ;output
+#define var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
+#define var_a xOP2   ;   2 bytes
+#define var_z0 xOP2+8;used in sqr32
 sqr32:
 ;avg: 2057.39cc
 ;HLDE --> var_z0
@@ -42,8 +42,8 @@ sqr32:
   inc (hl)
   ret
 .echo "sqr32: ",$-sqr32
-#undefine var_b fpOP2   ; 4 bytes, result gets copied to bottom anyways
-#undefine var_a fpOP2   ;   2 bytes
-#undefine var_c fpOP2+8 ;input
+#undefine var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
+#undefine var_a xOP2   ;   2 bytes
+#undefine var_c xOP2+8 ;input
 #undefine var_y var_c+4 ;  used for sqrt32
-#undefine var_z0 fpOP2+16
+#undefine var_z0 xOP2+16

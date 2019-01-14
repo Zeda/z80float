@@ -16,7 +16,7 @@ xexp2:
   pop hl
   push de
   ex de,hl
-  ld hl,fpOP1
+  ld hl,xOP1
   call mov8
   ex de,hl
   pop de
@@ -30,9 +30,9 @@ xexp2:
   pop hl
   ret
 _:
-  ld de,fpOP1
+  ld de,xOP1
   call mov10
-  ld hl,(fpOP1+8)
+  ld hl,(xOP1+8)
   res 7,h
   ld a,h
   or l

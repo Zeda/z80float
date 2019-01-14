@@ -1,9 +1,9 @@
-fpOP1mul10:
+xOP1mul10:
 ;Note! Does not check for special numbers! Does not check overflow!
-  ld hl,fpOP1
-  ld de,fpOP2
+  ld hl,xOP1
+  ld de,xOP2
   call mov8
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   ld a,3
   add a,(hl)
   ld (hl),a
@@ -11,7 +11,7 @@ fpOP1mul10:
   inc hl
   inc (hl)
 _:
-  ld hl,fpOP2+7
+  ld hl,xOP2+7
   srl (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl
@@ -20,7 +20,7 @@ _:
   rr (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl)
-  ld hl,fpOP2+7
+  ld hl,xOP2+7
   srl (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl) \ dec hl
@@ -29,10 +29,10 @@ _:
   rr (hl) \ dec hl
   rr (hl) \ dec hl
   rr (hl)
-  ld de,fpOP1
+  ld de,xOP1
   call adc64
   ret nc
-  ld hl,fpOP1+8
+  ld hl,xOP1+8
   inc (hl)
   jr nz,+_
   inc hl

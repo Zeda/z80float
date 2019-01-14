@@ -1,5 +1,5 @@
 ;sqrt(1-x^2)/BG(x,1)
-#define var_x  fpOP1+152
+#define var_x  xOP1+152
 xacos:
   push hl
   push de
@@ -18,7 +18,7 @@ _:
   push hl
   ld d,h
   ld e,l
-  ld bc,fpOP1
+  ld bc,xOP1
   call xmul
   ld hl,xconst_1
   ld d,b
@@ -30,7 +30,7 @@ _:
   ld l,c
   call xsqrt
   pop hl
-  ld bc,fpOP1
+  ld bc,xOP1
   call xbg
   ld h,b
   ld l,c

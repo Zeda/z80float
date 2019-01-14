@@ -12,7 +12,7 @@
 ;tanh(a+b) = (tanh(a)+tanh(b))/(1+tanh(a)tanh(b))
 ;We could precompute a table for `a` from 1 to 23
 
-#define var_x  fpOP1+152
+#define var_x  xOP1+152
 xtanh:
   push hl
   push de

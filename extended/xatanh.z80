@@ -1,7 +1,7 @@
 ;NOTE: Does not check special cases yet, or 1 and -1.
 ;
 ;x/BG(1,sqrt(1-x^2))
-#define var_x  fpOP1+152
+#define var_x  xOP1+152
 xatanh:
   push hl
   push de
@@ -24,7 +24,7 @@ _:
   ld hl,var_x
   ld d,h
   ld e,l
-  ld bc,fpOP2
+  ld bc,xOP2
   call xmul
   ld h,b
   ld l,c
