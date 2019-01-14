@@ -1,5 +1,8 @@
-#Accuracy Issues
-* acosh
+# Accuracy Issues
+* xacosh
+
+# Bugs
+* atanh(x>1) should return `NaN`. `acosh` returns `NaN` as it should. The difference is that the offending value is in the second arg, not the first.
 
 # Range Reduction
 We need to apply range reduction to some existing routines:
@@ -8,7 +11,7 @@ We need to apply range reduction to some existing routines:
 * xatanh
 * sinSingle
 * cosSingle
-
+* asinhSingle needs to be reduced to |x|>=1
 
 # Need to optimize the BG algorithm.
 The BG algorithm, is the core to the inverse trig and inverse hyperbolic functions, as well as the natural logarithm. One easy way to make it faster is to write custom routines to perform the following:
@@ -37,9 +40,5 @@ Need to make:
 * xsech
 * xcsch
 * xcoth
-* atanSingle
-* acosSingle
 * asinSingle
-* atanhSingle
-* acothSingle
 * asinhSingle
