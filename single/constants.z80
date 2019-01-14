@@ -15,6 +15,7 @@ const_10:     .db $00,$00,$20,$83
 const_10_inv: .db $CD,$CC,$4C,$7C    ;roughly 0.1
 const_pi_inv: .db $83,$F9,$22,$7E
 const_e_inv:  .db $B2,$5A,$3C,$7E
+const_log10_e:.db $D9,$5B,$5E,$7E
 ;    .db $,$,$,$
 end_const:
 sin_a1: .db $A4,$AA,$2A,$7D ;a1= 2^-3 * 11184804/2^23
@@ -29,6 +30,7 @@ exp_a3: .db $7B,$42,$63,$7B  ;.0554833215071
 exp_a4: .db $FD,$94,$1E,$79  ;.00967907584392
 exp_a5: .db $5E,$01,$23,$76  ;.001243632065103
 exp_a6: .db $5F,$B7,$63,$73  ;.0002171671843714
+const_1p40625: .db $00,$00,$34,$80  ;1.40625
 
 iconstSingle:
     ex (sp),hl

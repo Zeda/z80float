@@ -1,0 +1,94 @@
+;Uses 29 bytes
+#define var_a scrap+11
+#define var_g var_a+4
+#define var_b var_g+4
+#define var_c var_b+4
+#define var_x var_c+4
+;This algorithm is insired by the one outlined here:
+;http://www.ams.org/journals/mcom/1972-26-118/S0025-5718-1972-0307438-2/S0025-5718-1972-0307438-2.pdf
+;It offers quadratic convergence, instead of linear convergence for only a little more work each iteration.
+;So only TWO iterations are needed for single precision instead of ten.
+lnSingle:
+;need to add ln(2)*x_exp to end result
+    push hl
+    push de
+    push bc
+    push af
+    call +_
+    pop af
+    pop bc
+    pop de
+    pop hl
+    ret
+_:
+    push bc
+    ld de,var_X
+    ldi
+    ldi
+    ldi
+    ld a,(hl)
+    push af
+    ld a,80h
+    ld (de),a
+    ld bc,var_g
+    ld hl,var_x
+    call sqrtSingle
+    ld de,const_1
+    ld bc,var_a
+    call ameanSingle
+    ld b,h
+    ld c,l
+    call subSingle
+
+    ld hl,var_a
+    ld de,var_g
+    ld b,h
+    ld c,l
+    call bgiSingle
+    ld de,var_x
+    call mulSingle
+    pop af
+    ;need to multiply ln2*(A-80h) and addd it to the final result
+    sub 80h
+    jr nc,$+4
+    neg
+    push af
+    ld c,a
+    ld b,$B1 \ ld de,$7218    ;ln(2)
+    call C_times_BDE
+    ;CAHL is the mantissa, need to adjust
+    ld b,$7F
+    inc c
+    dec c
+    jr z,$+14
+    inc b \ srl c \ rra \ rr h \ rr l
+    inc c \ dec c
+    jr nz,$-10
+  ;;C*BDE => CAHL
+    ;BAHL
+    ld c,a
+    pop af
+    jr c,+_
+    res 7,c
+_:
+    ld (var_g),hl
+    ld (var_g+2),bc
+    ld de,var_a
+    ld hl,var_g
+    ld b,d
+    ld c,e
+    call addSingle
+    ex de,hl
+_:
+    pop de
+    ldi
+    ldi
+    ldi
+    ldi
+    ret
+.echo "B-G lnSingle:",$-lnSingle_BG
+#undefine var_a
+#undefine var_g
+#undefine var_b
+#undefine var_c
+#undefine var_x

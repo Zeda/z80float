@@ -1,93 +1,27 @@
-;Uses 33 bytes
-#define var_A scrap+9
-#define var_B scrap+13
-#define var_D scrap+17
-#define var_E scrap+21
-#define var_G scrap+25
-#define var_X scrap+29
+;Uses 29 bytes
+#define var_a scrap+11
+#define var_g var_a+4
+#define var_b var_g+4
+#define var_c var_b+4
+#define var_x var_c+4
 ;This algorithm is insired by the one outlined here:
 ;http://www.ams.org/journals/mcom/1972-26-118/S0025-5718-1972-0307438-2/S0025-5718-1972-0307438-2.pdf
 ;It offers quadratic convergence, instead of linear convergence for only a little more work each iteration.
 ;So only TWO iterations are needed for single precision instead of ten.
-
-lnSingle_bg:
-;need to add ln(2)*x_exp to end result
-    push hl
-    push de
-    push bc
-    push af
-    call +_
-    pop af
-    pop bc
-    pop de
-    pop hl
-    ret
-_:
-    push bc
-    ld de,var_X
-    ldi
-    ldi
-    ldi
-    ld a,(hl)
-    push af
-    ld a,80h
-    ld (de),a
-    ld bc,var_G
-    ld hl,var_X
-    call sqrtSingle
-    ld de,const_1
-    ld bc,var_A
-    call ameanSingle
-    ld bc,var_X
-    call subSingle
-    
-    ld hl,var_A
-    ld de,var_G
-    ld b,d
-    ld c,e
-    call bgSingle
-    ld hl,var_X
-    ld b,h
-    ld c,l
-    call divSingle
-    pop af
-    ;need to multiply ln2*(A-80h) and addd it to the final result
-    pop de
-    ldi
-    ldi
-    ldi
-    ldi
-    ret
-.echo "B-G lnSingle:",$-lnSingle_BG
-bgSingle:
+bgiSingle:
 ;HL points to 'A'
 ;DE points to 'G'
 ;BC points to output.
+;Computes the reciprocal of the Borchard-Gauss mean algorithm.
 ;The entire single-precision algorithm:
-;    b=a
-;    a=amean(a,g)
-;    d=a
-;    e=a+(a-b)/3
-;    g=geomean(a,g)
-;    a=amean(a,g)
-;    a=a+(a-d)/3
-;    e=a+(a-e)/15
-
-;    b=a
-;    a=amean(a,g)
-;    d=a
-;    e=a-b
-;    e=e/3
-;    e=a+e
-;    g=geomean(a,g)
-;    a=amean(a,g)
-;    d=a-d
-;    d=d/3
-;    a=d+a
-;    e=a-e
-;    e=e/15
-;    e=a+e
-
+;   b=a*.03125
+;   a=amean(a,g)
+;   c=a*.625
+;   g=geomean(a,g)
+;   a+=g
+;   a+=b
+;   a-=c
+;   return 1.40625/a
     push hl
     push de
     push bc
@@ -95,7 +29,7 @@ bgSingle:
     push bc
     call +_
     pop de
-    ld hl,var_E
+    ld hl,var_a
     ldi
     ldi
     ldi
@@ -106,78 +40,61 @@ bgSingle:
     pop hl
     ret
 _:
-;set up vars
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld (var_A),bc
-    ld (var_B),bc
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    ld (var_A+2),bc
-    ld (var_B+2),bc
-    ex de,hl
-    ld de,var_G
-    ldi
-    ldi
-    ldi
-    ldi
-;do algo
-    ld hl,var_A
-    ld de,var_G
-    ld b,h
-    ld c,l
-    call ameanSingle
-    ld de,var_D
-    ldi
-    ldi
-    ldi
-    ldi
-    ld hl,var_A
-    ld de,var_B
-    ld bc,var_E
-    call subSingle
-    ld h,b
-    ld l,c
-    call div3Single
-    ld de,var_A
-    call addSingle
-    ld hl,var_G
-    ld b,h
-    ld c,l
-    call geomeanSingle
-    ld b,d
-    ld c,e
-    call ameanSingle
-    ld hl,var_D
-    ld b,h
-    ld c,l
-    call rsubSingle
-    call div3Single
-    ld b,d
-    ld c,e
-    call addSingle
-;DE points to A
-    ld hl,var_E
-    ld b,h
-    ld c,l
-    call rsubSingle
-    call div15Single
-    jp addSingle
-.echo "B-G Algorithm:",$-bgSingle
+  push de
+  ld de,var_a
+  call mov4
+  pop hl
+  call mov4
+;b=a*.03125
+  ld hl,var_a
+  call mov4
+  ld a,(var_b+3)
+  sub 5
+  ld (var_b+3),a
+  jr z,$+4
+  jr nc,+_
+  ;need to set var_b to zero
+  ld hl,0
+  ld (var_b+2),hl
+_:
+;a=amean(a,g)
+  ld hl,var_a
+  ld de,var_g
+  ld b,h
+  ld c,l
+  call ameanSingle
+;g=geomean(a,g)
+  ld b,d
+  ld c,e
+  call geomeanSingle
+;c=a*.625
+  ld de,var_c
+  call mov4
+  ex de,hl    ;DE now points to var_g
+  ld hl,var_c
+  ld b,h
+  ld c,l
+  call mulSingle_neg_p625
 
-;roughly one add's worth of overhead
-;1 div
-;1 mul   
-;2 sqrt
-;10 add
-;3 special divides, roughly half the speed of a mul
+;a+=g
+  ld hl,var_a
+  ld b,h
+  ld c,l
+  call addSingle
+;a+=b
+  ld de,var_b
+  call addSIngle
+;a-=c
+  ld de,var_c
+  call addSingle
+  ex de,hl
+  ld hl,const_1p40625
+  jp divSingle
+;return 1.40625/a
+.echo "B-G Algorithm:",$-bgiSingle
 
-#undefine var_A
-#undefine var_B
-#undefine var_D
-#undefine var_E
-#undefine var_G
-#undefine var_X
+#undefine var_a
+#undefine var_g
+#undefine var_b
+#undefine var_c
+#undefine var_x

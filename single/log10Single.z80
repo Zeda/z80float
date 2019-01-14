@@ -1,0 +1,8 @@
+log10Single:
+;lg(x) = ln(x)/ln(2)
+  call pushpop
+  call lnSingle
+  ld h,b
+  ld l,c
+  ld de,const_log10_e
+  jp mulSingle
