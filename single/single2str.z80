@@ -91,9 +91,8 @@ _:
   cp 10
   jr c,+_
   ld de,$0AFF   ;could do 0A2F, but need to add 30h anyways for other routine that is piggybacking
-  inc (hl)
   inc e \ sub d \ jr nc,$-2
-  add a,30h
+  add a,3Ah
   ld (bc),a
   inc bc
   ld a,e
