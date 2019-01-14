@@ -125,6 +125,7 @@ puts:
 #include "../extended/xacos.z80"
 #include "../extended/xacosh.z80"
 #include "../extended/xrand.z80"
+#include "../extended/rand.z80"
 xroutines:
 #include "../extended/routines.z80"
 .echo "routines: ",$-xroutines

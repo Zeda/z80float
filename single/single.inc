@@ -4,10 +4,8 @@
 #endif
 curKey  =80F6h
 keyCount=80F7h
-seed1_0 =80F8h
-seed1_1 =80FAh
-seed2_0 =80FCh
-seed2_1 =80FEh
+#define seed0 80F8h
+#define seed1 80FCh
 hyperout=scrap+9
 hyperout2=scrap+13
 

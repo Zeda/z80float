@@ -232,6 +232,7 @@ __:
 #include "../single/bgSingle.z80"
 #include "../single/bg2iSingle.z80"   ;slightly faster version for ln(x), can omit and use bgiSingle instead :)
 #include "../single/randSingle.z80"
+#include "../single/rand.z80"
 #include "../single/coshSingle.z80"
 #include "../single/sinhSingle.z80"
 #include "../single/tanhSingle.z80"
