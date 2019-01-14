@@ -1,0 +1,33 @@
+#define var_a scrap+11
+#define var_g var_a+4
+#define var_b var_g+4
+#define var_c var_b+4
+#define var_x var_c+4
+acosSingle:
+;sqrt(1-x*x)*bgi(x,1)
+  call pushpop
+  push bc
+  ld de,var_a
+  call mov4
+  ld de,var_a
+  ld h,d
+  ld l,e
+  ld bc,var_x
+  call mulSingle
+  ld de,const_1
+  ld h,b
+  ld l,c
+  call rsubSingle
+  call sqrtSingle
+  ld hl,var_a
+  ld b,h
+  ld c,l
+  call bgiSingle
+  ld de,var_x
+  pop bc
+  jp mulSingle
+#undefine var_a
+#undefine var_g
+#undefine var_b
+#undefine var_c
+#undefine var_x
