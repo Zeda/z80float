@@ -9,10 +9,11 @@ sinhSingle:
     ld l,c
     ld bc,hyperout2
     call invSingle
+    ld a,(hyperout2+2)
+    xor 80h
+    ld (hyperout2+2),a
     ld d,b
     ld e,c
-    ex de,hl
-    call negSingle
     pop bc
     call ameanSingle
     pop de
