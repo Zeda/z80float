@@ -77,9 +77,16 @@ _:
   ld a,c
   ld (scrap+3),a
 ;Now scrap+3 is a 4-byte mantissa that needs to be normalized
-;It is non-zero
+;
+  ld hl,(scrap+3)
+  ld a,h
+  or l
+  ld hl,(scrap+5)
+  or l
+  or h
+  jp z,strToSingle_zero-1
   ld c,$7F
-  ld a,(scrap+6)
+  ld a,h
   or a
   jp m,strToSingle_normed
   ;Will need to iterate at most three times
