@@ -1,0 +1,10 @@
+xneg:
+  call pushpop
+  ld d,b
+  ld e,c
+  call mov9
+  ld a,(hl)
+  xor 80h
+  ld (de),a
+  ret
+.echo "xneg:",$-xabs
