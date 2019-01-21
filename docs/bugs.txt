@@ -9,4 +9,4 @@ I did:
   x+=x  ;Displays correctly
   x+=x  ;Displays as 41.208 instead of 14.208 !
 
-sqrtSingle isn't decrementing the top 16 bits when it is supposed to.
+xinv is failing on 1/pi at the tenth digit
