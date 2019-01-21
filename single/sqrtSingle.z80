@@ -2,8 +2,8 @@
 sqrtSingle:
 ;733+2{0,15}+{0,1}+7{0,6}+{0,3}+pushpop+sqrtHL+2*HL_Div_E_special
 ;min: 1751
-;max: 1979
-;avg: 1853.5
+;max: 1985
+;avg: 1856.5
   call pushpop
   push bc
   ld c,(hl)
@@ -96,13 +96,14 @@ _:
   ld e,b
   call HL_Div_E_special
   pop af
+  pop de
   ld a,l
+  pop hl
   jr nc,+_
   neg
+  dec bc
 _:
-  pop de
   ;DBCA
-  pop hl
   ld (hl),a
   inc hl
   ld (hl),c
