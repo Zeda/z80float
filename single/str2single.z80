@@ -1,182 +1,286 @@
-strint=scrap+25
 
 str2single:
-;;Need to process special values like ZERO, NAN, INF
-    push af
-    push hl
-    push de
-    push bc
-    ld a,(hl)
-    sub $1A
-    sub 1
-    push af
-    jr nc,$+3
-    inc hl
-    ld bc,0
-    ld a,(hl)
-    cp '.'
-    jr nz,lbl0
-strisdec:
-    inc hl
-    ld a,(hl)
-    dec b
-    cp '0'
-    jr z,strisdec
-    inc c
-    inc b
-    jr lbl1
-lbl0:
-    ld a,(hl)
-    cp '0'
-    inc hl
-    jr z,$-4
-    cp '.'
-    jr z,strisdec+1
-    dec hl
-lbl1:
-    ld de,scrap
-    ld a,7
-loop0:
-    push af
-    ld a,(hl)
-    ld (de),a
-    cp '.'
-    jr nz,$+5
-    inc c
-    inc hl
-    ld a,(hl)
-    ld (de),a
-    sub 3Ah
-    add a,10
-    jr nc,intcopied
-    inc hl
-    inc de
-    ld a,b
-    sub c
-    ld b,a
-    pop af
-    dec a
-    jr nz,loop0
-    push af
-    dec hl
-    inc hl
-    ld a,(hl)
-    sub 3Ah
-    add a,10
-    jr c,$-6
-intcopied:
-    pop af
-    ld a,(hl)
-    cp $1B
-    jr nz,no_eng_adjust
-    ;;This means it was the engineering E, need to get the signed int, add to C
-no_eng_adjust:
-    xor a
-    ld (de),a
-    push bc
-
-    ld hl,scrap
-    call str2int    ;preserves no registers, returns in DEHL
-    ld b,31+128
-    ld a,d \ or a \ jp m,$+18
-    or e \ or h \ or l \ jp z,str_is_zero \ ld a,d
-    dec b \ add hl,hl \ rl e \ adc a,a \ jp p,$-5
-    ld (strint),hl
-    pop hl
-    ex de,hl
-    rla
-    ld h,a
-    pop af
-    rr h
-    ld (strint+2),hl
-    ld a,b
-    ld (strint+4),a
-
-    ld hl,0
-    ld (scrap),hl
-    ld a,d
-    add a,a
-    ld b,7
-    push af
-    jr nc,$+4
-    neg
-    add a,a \ jr c,$+4 \ djnz $-3
-    dec b
-    ld l,a
-    pop af
-    rr l
-    ld h,b
-    set 7,h
-    ld (scrap+2),hl
-    ld hl,scrap
-    pop bc
-    call pow10Single
-    ld de,strint+1
-    call mulSingle
-    pop de
-    pop hl
-    pop af
-    ret
-str_is_inf:
-    pop bc
-    pop af
-    pop hl
-    ld b,h
-    ld c,l
-    ld (hl),0 \ inc hl
-    ld (hl),0 \ inc hl
-    ld a,80h
-    rra
-    ld (hl),a \ inc hl
-    ld (hl),0
-    pop de
-    pop bc
-    pop af
-    ret
-str_is_zero:
-    pop bc
-    pop af
-    pop hl
-    ld b,h
-    ld c,l
-    ld a,0
-    ld (hl),a \ inc hl
-    ld (hl),a \ inc hl
-    rra
-    ld (hl),a \ inc hl
-    ld (hl),-1
-    pop de
-    pop bc
-    pop af
-    ret
-
-str2int:
-;;Converts the string pointed to by HL into a 32-bit int in DEHL
-    ld b,h
-    ld c,l
-    ld hl,0
-    ld d,h
-    ld e,h
-mul10intloop:
-    ld a,(bc)
-    sub 3Ah
-    add a,10
-    ret nc
-    push bc
-    push de
-    push hl
-    add hl,hl \ rl e \ rl d
-    add hl,hl \ rl e \ rl d
-    pop bc \ add hl,bc \ ex de,hl
-    pop bc \ adc hl,bc \ ex de,hl
-    add hl,hl \ rl e \ rl d
-    pop bc
-    inc bc
-    add a,l \ ld l,a
-    jr nc,mul10intloop
-    inc h
-    jp nz,mul10intloop
-    inc e
-    jp nz,mul10intloop
-    inc d
-    jp mul10intloop
+;;#Routines/Single Precision
+;;Inputs:
+;;  HL points to the string
+;;  BC points to where the float is output
+;;Destroys:
+;;  9 bytes at scrap ?
+  call pushpop
+  push bc
+;Check if there is a negative sign.
+;   Save for later
+;   Advance ptr
+  ld a,(hl)
+  sub $1A
+  sub 1
+  push af
+  jr nc,$+3
+  inc hl
+;Skip all leading zeroes
+  ld a,(hl)
+  cp '0'
+  jr z,$-4      ;jumps back to the `inc hl`
+;Set exponent to 0
+  ld b,0
+;Check if the next char is '.'
+  cp '.'
+  jr nz,+_
+  ld b,-7     ;the ascii_to_uint8 will increment this 8 times
+;Get rid of zeroes
+  dec b
+  inc hl
+  ld a,(hl)
+  cp '0'
+  jr z,$-5      ;jumps back to the `dec b`
+_:
+;Now we read in the next 8 digits
+  ld de,scrap+3
+  xor a
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+;Now `scrap` holds the 4-digit base-100 number.
+;b is the exponent
+;if carry flag is set, just need to get rid of remaining digits
+;Otherwise, need to get rid of remaining digits, while incrementing the exponent
+  sbc a,a
+  inc a
+  ld c,a
+_:
+  ld a,(hl)
+  cp 30h
+  jr nz,+_
+  inc hl
+  ld a,b
+  add a,c
+  jp z,strToSingle_inf
+  ld b,a
+  jr -_
+;Now check for engineering `E` to modify the exponent
+_:
+  cp $1B
+  call z,str_eng_exp
+;Gotta multiply the number at (scrap) by 2^24
+  ld d,100
+  call scrap_times_256
+  ld a,c
+  ld (scrap+6),a
+  call scrap_times_256
+  ld a,c
+  ld (scrap+5),a
+  call scrap_times_256
+  ld a,c
+  ld (scrap+4),a
+  call scrap_times_256
+  ld a,c
+  ld (scrap+3),a
+;Now scrap+3 is a 4-byte mantissa that needs to be normalized
+;It is non-zero
+  ld c,$7F
+  ld a,(scrap+6)
+  or a
+  jp m,strToSingle_normed
+  ;Will need to iterate at most three times
+_:
+  dec c
+  ld hl,scrap+3
+  sla (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  adc a,a
+  jp p,-_
+strToSingle_normed:
+;Move the number to scrap
+  ld hl,(scrap+4)
+  ld (scrap),hl
+  ld l,a
+  ld h,c
+  sla l
+  pop af
+  rr l
+  ld (scrap+2),hl
+;now (scrap) is our number, need to multiply by power of 10!
+;Power of 10 is stored in B, need to put in A first
+  xor a
+  sub b
+  ld de,pown10LUT
+  jp p,+_
+  ld a,b
+  ld de,pow10LUT
+  cp 39
+  jp nc,strToSingle_inf+1
+_:
+  cp 39
+  jp nc,strToSingle_zero
+  ld hl,scrap
+  ld b,h
+  ld c,l
+  call +_
+  call +_
+  call +_
+  call +_
+  call +_
+  call +_
+  pop de
+  jp mov4
+_:
+  rra
+  call c,mulSingle
+  inc de
+  inc de
+  inc de
+  inc de
+  ret
+str_eng_exp:
+  ld de,0
+  inc hl
+  ld a,(hl)
+  cp $1A    ;negative exponent?
+  push af
+  jr nz,$+3
+  inc hl
+_:
+  ld a,(hl)
+  sub 3Ah
+  add a,10
+  jr nc,+_
+  inc hl
+  push hl
+  ld h,d
+  ld l,e
+  add hl,hl
+  add hl,hl
+  add hl,de
+  add hl,hl
+  add a,l
+  ld l,a
+  ex de,hl
+  pop hl
+  jp c,eng_overflow
+  inc d
+  dec d
+  jp z,-_
+  jp nz,eng_overflow
+_:
+  ld a,e
+  cp 39
+  jr nc,eng_overflow
+  pop af
+  ld a,b
+  jr nz,+_
+  sub e
+  ld b,a
+  ret
+_:
+  add a,e
+  ld b,a
+  ret
+scrap_times_256:
+  ld e,8
+_:
+  or a
+  ld hl,scrap
+  call +_
+  call +_
+  rl c
+  dec e
+  jr nz,-_
+  ret
+_:
+  call scrap_times_sub
+scrap_times_sub:
+  ld a,(hl)
+  rla
+  cp d
+  jr c,$+3
+  sub d
+  ld (hl),a
+  inc hl
+  ccf
+  ret
+ascii_to_uint8:
+;c flag means don't increment the exponent
+  ld c,0
+  ld a,(hl)
+  jr c,ascii_to_uint8_noexp
+  cp '.'
+  jr nz,+_
+  inc hl
+  ld (hl),a
+  jr ascii_to_uint8_noexp
+_:
+  inc b
+  sub 3Ah
+  add a,10
+  jr nc,+_
+  ld c,a
+  add a,a
+  add a,a
+  add a,c
+  add a,a
+  ld c,a
+  inc hl
+_:
+  ld a,(hl)
+  cp '.'
+  jr nz,+_
+  inc hl
+  jr ascii_to_uint8_noexp_2nd
+_:
+  inc b
+  sub 3Ah
+  add a,10
+  jr nc,+_
+  add a,c
+  inc hl
+  .db $FE   ;start of `cp **`, saves 1cc
+_:
+  ld a,c
+  ld (de),a
+  dec de
+  or a
+  ret
+ascii_to_uint8_noexp:
+  sub 3Ah
+  add a,10
+  jr nc,ascii_to_uint8_noexp_end
+  ld c,a
+  add a,a
+  add a,a
+  add a,c
+  add a,a
+  ld c,a
+  inc hl
+ascii_to_uint8_noexp_2nd:
+  ld a,(hl)
+  sub 3Ah
+  add a,10
+  jr nc,ascii_to_uint8_noexp_end
+  add a,c
+  inc hl
+  .db $FE   ;start of `cp **`, saves 1cc
+ascii_to_uint8_noexp_end:
+  ld a,c
+  ld (de),a
+  dec de
+  scf
+  ret
+eng_overflow:
+  pop af
+  jr nz,strToSingle_inf
+  pop af
+strToSingle_zero:
+  ld hl,const_0
+  pop de
+  jp mov4
+strToSingle_inf:
+;return inf
+  pop af
+  ld hl,const_inf
+  jr nc,$+5
+  ld hl,const_NegInf
+  pop de
+  jp mov4
+.echo "str2Single: ",$-str2single
