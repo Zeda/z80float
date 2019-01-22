@@ -20,8 +20,8 @@ _PutS         = 450Ah
   ld (penCol),hl
   call randinit
 _:
-#include "timing.z80"
-;#include "tests.z80"
+;#include "timing.z80"
+#include "tests.z80"
 
 subtest:
   ld bc,8000h
@@ -92,6 +92,7 @@ puts:
   pop de
   ret
 
+#include "../single/pushpop.z80"
 #include "../extended/xtostr.z80"
 #include "../extended/xbg.z80"
 #include "../extended/xgeomean.z80"
@@ -102,8 +103,12 @@ puts:
 #include "../extended/div/div32.z80"
 #include "../extended/div/div64.z80"
 #include "../extended/xdiv.z80"
+#include "../extended/xinv.z80"
 #include "../extended/xmul.z80"
 #include "../extended/xadd.z80"
+#include "../extended/xcmp.z80"
+#include "../extended/xabs.z80"
+#include "../extended/xneg.z80"
 ;#include "../extended/mul/sqr32.z80"
 #include "../extended/mul/mul16.z80"
 #include "../extended/mul/mul32.z80"
@@ -126,6 +131,9 @@ puts:
 #include "../extended/xacosh.z80"
 #include "../extended/xrand.z80"
 #include "../extended/rand.z80"
+#include "../extended/xexp.z80"
+#include "../extended/xpow2.z80"
+#include "../extended/xpow10.z80"
 xroutines:
 #include "../extended/routines.z80"
 .echo "routines: ",$-xroutines

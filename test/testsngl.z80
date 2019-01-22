@@ -14,10 +14,10 @@ _NewLine      = 452Eh
   ld (penCol),hl
 ;
 ;
-  call testputs \ .db "tan(ln(2))=",0
-  ld hl,const_ln_2
+  call testputs \ .db "sqrt(pi)=",0
+  ld hl,const_pi
   ld bc,8800h
-  call tanSingle
+  call sqrtSingle
   ld h,b
   ld l,c
   ld bc,8000h
