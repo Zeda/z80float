@@ -1,0 +1,11 @@
+#define xexp_x xOP3+42
+xpow10:
+  call pushpop
+  push bc
+  ld de,xconst_lg_10
+  ld bc,xexp_x
+  call xmul
+  ld hl,xexp_x
+  pop bc
+  jp xpow2
+#undefine xexp_x
