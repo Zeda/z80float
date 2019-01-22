@@ -30,6 +30,8 @@ xconst_sqrt_p5_ext:
   .db $E2,$25,$78,$DC,$3E,$B6,$62
 xconst_sqrt_2:
   .db $0F,$6D,$DE,$F9,$33,$F3,$04,$B5 \ .dw $4000
+xconst_log10_e:
+  .db $95,$71,$28,$37,$A9,$D8,$5B,$DE,$FE,$3F
 ;==========================================================
 ;The following are common constants given to 64-bit precision.
 ;==========================================================
