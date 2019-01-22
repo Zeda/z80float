@@ -1,0 +1,15 @@
+#define var_y  xOP1+162
+xlog:
+  call pushpop
+  call xln
+  push bc
+  ld bc,var_y
+  ex de,hl
+  call xln
+  ld d,b
+  ld e,c
+  pop hl
+  ld b,h
+  ld c,l
+  jp xdiv
+#undefine var_y

@@ -1,0 +1,9 @@
+xmul10:
+  call pushpop
+  push bc
+  ld de,xOP1
+  call mov10
+  call xOP1mul10
+  ld hl,xOP1
+  pop de
+  jp mov10

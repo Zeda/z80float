@@ -1,0 +1,8 @@
+xlg:
+;lg(x) = ln(x)/ln(2)
+  call pushpop
+  call xln
+  ld h,b
+  ld l,c
+  ld de,xconst_lg_e
+  jp xmul
