@@ -10,3 +10,5 @@ I did:
   x+=x  ;Displays as 41.208 instead of 14.208 !
 
 xinv is failing on 1/pi at the tenth digit
+xlog10 is failing on, for example, log(pi)
+xlog is failing terribly
