@@ -12,3 +12,5 @@ I did:
 xinv is failing on 1/pi at the tenth digit
 xlog10 is failing on, for example, log(pi)
 xlog is failing terribly
+xtostr isn't printing cosh(pi) or sinh(pi) correctly (though they are computed correctly). First digit should be 1, not 2.
+xtanh is not computing properly. It looks like an issue with the final subtraction
