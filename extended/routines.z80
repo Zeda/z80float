@@ -55,16 +55,14 @@ neg64:
   ld a,c \ sbc a,(hl) \ ld (hl),a
   ret
 cmp64:
-;avg: 25.12156863cc
-  ld b,d \ ld c,e
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cpd \ ret nz
-  ld a,(bc) \ cp (hl) \ ret
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret
 srlxOP2_4:
   ld hl,xOP2+7
 srl64_4:
