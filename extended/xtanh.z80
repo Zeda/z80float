@@ -12,26 +12,39 @@
 ;tanh(a+b) = (tanh(a)+tanh(b))/(1+tanh(a)tanh(b))
 ;We could precompute a table for `a` from 1 to 23
 
-#define var_x  xOP1+152
 xtanh:
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
+;Just going to go with the standard method
+;tanh(x) = sinh(x)/cosh(x)
+;  = (e^x-e^-x)/(e^x+e^-x)
+;  = 1-2/(e^2x+1)
+
+  call pushpop
+  ld d,h
+  ld e,l
+  call xadd
+  ld h,b
+  ld l,c
+  call xexp
+  ld de,xconst_1
+  call xadd
+  call xinv
+  ld de,8
+  ex de,hl    ;points to output
+  add hl,de
+  dec (hl)
+  jr nz,+_
+  inc hl
+  ld a,(hl)
+  add a,a
+  ld c,a
+  dec a
+  dec a
+  rra
+  ld (hl),a
+  jr nz,+_
+  dec hl
+  dec hl
+  ld (hl),0
 _:
-  ret
-tanh_p0: .db $8E,$C3,$F0,$F0,$4D,$2E,$AD,$C9 \ .dw $C00A
-tanh_p1: .db $63,$63,$E6,$D2,$0D,$AD,$73,$C6 \ .dw $C006
-tanh_p2: .db $03,$FA,$9D,$EE,$3B,$A3,$70,$7B \ .dw $C000
-tanh_q0: .db $A6,$96,$B4,$74,$BA,$E2,$41,$97 \ .dw $400C
-tanh_q1: .db $F1,$95,$87,$0F,$68,$5A,$9C,$8B \ .dw $400B
-tanh_q2: .db $EE,$D3,$BF,$5F,$0F,$4F,$7D,$E1 \ .dw $4006
+  ld hl,xconst_1
+  jp xsub
