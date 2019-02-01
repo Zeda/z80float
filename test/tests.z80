@@ -1,9 +1,12 @@
 ;Hey, add more tests here!
   ld hl,xconst_pi
   ld bc,xOP1
-  call xpow10
+  call xtanh
   call testputs \ .db "2^pi=",0
-  strx(xOP1,xOP1)
+  ld hl,xOP1
+  ld bc,xOP1
+  call xtostr
+;  strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts

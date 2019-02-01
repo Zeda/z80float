@@ -3,7 +3,7 @@
 #endif
 #define fpOP1 scrap+9
 #define fpOP2 scrap+13
-#define exp   scrap+18
+#define exp   scrap+17
 single2str:
   call pushpop
   push bc
@@ -90,12 +90,14 @@ _:
   jr z,+_
   cp 10
   jr c,+_
-  ld de,$0AFF   ;could do 0A2F, but need to add 30h anyways for other routine that is piggybacking
+  ld de,$0A2F
   inc e \ sub d \ jr nc,$-2
-  add a,3Ah
+  add a,d
+  ld d,a
+  ld a,e
   ld (bc),a
   inc bc
-  ld a,e
+  ld a,d
 _:
   add a,30h
   ld (bc),a
