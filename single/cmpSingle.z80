@@ -36,12 +36,14 @@ _:
   push af
   ld bc,scrap
   call subSingle
-  ld a,(scrap+3)
-  pop bc
+  ld a,(scrap+3)    ;new power
+  pop bc            ;B is old power/
   sub b
+  jr nc,cmp_is_sign
   dec a
   add a,22
   jr nc,cmp_close
+cmp_is_sign:
   ld a,(scrap+2)
   or 1    ;not equal, so reset z flag
   rla     ;if negative, float1<float2, setting c flag as wanted, else nc.
