@@ -1,5 +1,5 @@
 #define pow10exp  xOP3+42
-#define strout xOP3+45
+#define strout pow10exp+3
 xtostr:
   push hl
   push de
@@ -105,7 +105,7 @@ noadjustxtostr:
   jr c,+_
   ld de,(pow10exp)
   dec de
-  ld (hl),30h
+  ld (hl),'0'
   inc de \ inc (hl) \ sub 10 \ jr nc,$-4
   ld (pow10exp),de
   add a,10
@@ -115,14 +115,36 @@ _:
   ld (hl),a
   inc hl
   ld a,l
-  cp (strout+20)&255
+  cp (strout+18)&255
   jr z,+_
   push hl
   call xtostrmul10
   pop hl
   jr -_
 _:
-;now I need to format the string data
+;Now let's round!
+  dec hl
+  ld a,(hl)
+  cp '5'
+  jr c,+_
+  dec hl
+  inc (hl)
+  ld a,(hl)
+  cp $3A
+  jr nz,+_
+  ld (hl),'0'
+  jr $-9
+_:
+;Strip trailing zeros
+  cp '0'
+  jr nz,+_
+  dec hl
+  ld a,(hl)
+  jr $-6
+_:
+  inc hl
+
+;now I need to format the string data based on exponent.
   push hl
 
   ld hl,(pow10exp)
@@ -155,18 +177,6 @@ _:
   inc h
   ex (sp),hl
 ;Now we are going to round
-  dec hl
-  ld a,(hl)
-  cp '5'
-  jr c,strround_done
-_:
-  ld (hl),'0'
-  dec hl
-  inc (hl)
-  ld a,(hl)
-  cp $3A
-  jr z,-_
-strround_done:
   pop hl
   ld (hl),'e'
   inc hl
