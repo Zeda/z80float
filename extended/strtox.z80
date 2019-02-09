@@ -64,7 +64,7 @@ _:
   call skipdigits
 ;Now check for engineering `E` to modify the exponent
   cp $1B
-  call z,str_eng_exp
+  call z,str_xeng_exp
 ;Gotta multiply the number at (xOP1) by 2^64
   ld (ptr_sto),hl
   ld d,100
@@ -161,7 +161,7 @@ _:
   ret nc
   dec d
   ret
-str_eng_exp:
+str_xeng_exp:
   ld de,0
   inc hl
   ld a,(hl)
@@ -190,7 +190,7 @@ _:
 _:
   ld a,d
   cp 20
-  jp nc,eng_overflow
+  jp nc,xeng_overflow
   pop af
   ld a,c
   jr nz,+_
@@ -305,7 +305,7 @@ ascii_xto_uint8_noexp_end:
   dec de
   scf
   ret
-eng_overflow:
+xeng_overflow:
   pop af
   jr nz,strtox_inf
   pop af
