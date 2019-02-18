@@ -1,3 +1,5 @@
+sla64_xOP1:
+  ld hl,xOP1
 sla64:
   sla (hl) \ inc hl
   rl (hl) \ inc hl
