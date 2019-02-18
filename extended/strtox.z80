@@ -1,5 +1,6 @@
-#define ptr_sto xOP1+25
-
+#ifndef strtox_ptr
+#define strtox_ptr xOP1+25
+#endif
 strtox:
 ;;#Routines/Extended Precision
 ;;Inputs:
@@ -11,6 +12,7 @@ strtox:
 ;;  25 bytes at xOP1 ?
   call pushpop
   push bc
+
 ;Check if there is a negative sign.
 ;   Save for later
 ;   Advance ptr
@@ -66,7 +68,7 @@ _:
   cp $1B
   call z,str_xeng_exp
 ;Gotta multiply the number at (xOP1) by 2^64
-  ld (ptr_sto),hl
+  ld (strtox_ptr),hl
   ld d,100
   call xOP1_xtimes_256
   ld (xOP1+17),a
@@ -249,10 +251,10 @@ ascii_xto_uint8:
   ld (hl),a
   jr ascii_xto_uint8_noexp
 _:
-  inc b
   sub 3Ah
   add a,10
-  jr nc,+_
+  jr nc,ascii_xto_uint8_noexp_end
+  inc b
   ld c,a
   add a,a
   add a,a
@@ -267,19 +269,17 @@ _:
   inc hl
   jr ascii_xto_uint8_noexp_2nd
 _:
-  inc b
   sub 3Ah
   add a,10
-  jr nc,+_
+  jr nc,ascii_xto_uint8_noexp_end
+  inc b
   add a,c
   inc hl
-  .db $FE   ;start of `cp **`, saves 1cc
-_:
-  ld a,c
   ld (de),a
   dec de
   or a
   ret
+
 ascii_xto_uint8_noexp:
   sub 3Ah
   add a,10
