@@ -8,10 +8,10 @@ xtostr:
   push bc
   call +_
   pop de
-  ld a,(hl)
+  xor a
+  cp (hl)
   ldi
-  or a
-  jr nz,$-4
+  jr nz,$-3
   pop af
   pop bc
   pop de
@@ -25,14 +25,19 @@ _:
   bit 7,d
   jr z,+_
   res 7,d
+  ld (xOP1+8),de   ;just making it positive
   ld (hl),$1A    ;negative sign
   inc hl
 _:
   ld a,d
   or e
   jp z,strcase
-  ld (xOP1+8),de   ;just making it positive
-  ;Now we need to perform (DE-0x4000)*19728 (approximation of exponent*log10(2))
+
+;We should write '0' next. When rounding 9.999999... for example, not padding with a 0 will return '.' instead of '1.'
+  ld (hl),'0'
+  inc hl
+
+;Now we need to perform (DE-0x4000)*19728 (approximation of exponent*log10(2))
   ld bc,19728
   push hl       ;points to where the string is being written
   call mul16    ;when analyzing timing, note that the first iteration is guaranteed to skip
@@ -87,15 +92,8 @@ _:
   xor a
   ld (xOP1+8),a
 _:
-  ld hl,xOP1
-  sla (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
+  call sla64_xOP1
+  inc hl
   rl (hl)
   djnz -_
 noadjustxtostr:
@@ -144,10 +142,38 @@ _:
 _:
   inc hl
 
-;now I need to format the string data based on exponent.
-  push hl
+;Strip the leading zero if it exists (rounding may have bumped this to `1`)
+  ex de,hl
+  ld hl,strout
+  ld a,(hl)
+  cp $1A
+  jr nz,+_
+  inc hl
+  ld a,(hl)
+_:
+  cp '0'
+  jr nz,+_
+  dec de
+  ex de,hl
+  ;Now lets move HL-DE bytes at DE+1 to DE
+  sbc hl,de
+  ld b,h
+  ld c,l
+  ld h,d
+  ld l,e
+  inc hl
+  ldir
+  cp a
+_:
+  push de
 
+;If z flag is reset, this means that the exponent should be bumped up 1
   ld hl,(pow10exp)
+  jr z,+_
+  inc hl
+  ld (pow10exp),hl
+_:
+
   ;if -4<=HL<=10, then need to insert the decimal place somewhere.
   ld bc,4
   add hl,bc
@@ -163,10 +189,10 @@ _:
   ld hl,strout
   ld de,strout-1
   ld a,(hl)
-  ldi
   cp $1A    ;negative sign
-  jr nz,$+4
+  jr nz,+_
   ldi
+_:
   ld a,'.'
   ld (de),a
 ;now we need count 15 digits, truncating the last ~4 decimal digits
@@ -280,15 +306,24 @@ posdec:
   ld a,(hl)
   ld bc,(pow10exp)
   cp $1A    ;negative sign
-  jr nz,$+3
+  jr nz,+_
   inc bc
+_:
   inc bc
   ldir
   pop hl
-  ex de,hl
-  ld (hl),'.'
-  xor a
+;HL points to the end of the string
+;DE points to where the decimal is printed
+;If HL-DE-1 = 0, then don't write a decimal !
+  scf
+  sbc hl,de
+  add hl,de
+  jr z,+_
+  ld a,'.'
   ld (de),a
+  inc hl
+_:
+  ld (hl),0
   ld hl,strout-1
   ret
 strcase:
@@ -324,24 +359,11 @@ xtostrmul10:
   ld de,xOP2
   call mov9
   xor a
-  inc hl \ sla (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
+  inc hl
+  call sla64
   rla
   ld hl,xOP2
-  sla (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
+  call sla64
   rla
   push af
   ld de,xOP1
@@ -350,14 +372,6 @@ xtostrmul10:
   pop hl
   ld a,h
   adc a,0
-  ld hl,xOP1
-  sla (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
-  inc hl \ rl (hl)
+  call sla64_xOP1
   rla
   ret
