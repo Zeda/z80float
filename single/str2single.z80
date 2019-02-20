@@ -222,10 +222,10 @@ ascii_to_uint8:
   ld (hl),a
   jr ascii_to_uint8_noexp
 _:
-  inc b
   sub 3Ah
   add a,10
-  jr nc,+_
+  jr nc,ascii_to_uint8_noexp_end
+  inc b
   ld c,a
   add a,a
   add a,a
@@ -240,15 +240,12 @@ _:
   inc hl
   jr ascii_to_uint8_noexp_2nd
 _:
-  inc b
   sub 3Ah
   add a,10
-  jr nc,+_
+  jr nc,ascii_to_uint8_noexp_end
+  inc b
   add a,c
   inc hl
-  .db $FE   ;start of `cp **`, saves 1cc
-_:
-  ld a,c
   ld (de),a
   dec de
   or a
