@@ -6,7 +6,7 @@ ascii_to_uint8:
   cp '.'
   jr nz,+_
   inc hl
-  ld (hl),a
+  ld a,(hl)
   jr ascii_to_uint8_noexp
 _:
   sub 3Ah
