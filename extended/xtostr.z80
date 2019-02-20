@@ -103,7 +103,7 @@ noadjustxtostr:
   jr c,+_
   ld de,(pow10exp)
   dec de
-  ld (hl),'0'
+  ld (hl),'0'-1
   inc de \ inc (hl) \ sub 10 \ jr nc,$-4
   ld (pow10exp),de
   add a,10
