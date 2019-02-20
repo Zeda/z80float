@@ -1,363 +1,366 @@
-#ifndef inc_pushpop
-#include "pushpop.z80"
-#endif
-#define fpOP1 scrap+9
-#define fpOP2 scrap+13
-#define exp   scrap+17
+#define pow10exp_single  scrap+9
+#define strout_single pow10exp_single+2
+
 single2str:
-  call pushpop
+  push hl
+  push de
+  push bc
+  push af
   push bc
   call +_
   pop de
-  ld hl,scrap+4
-  jp copyS
-_:
-  ld de,fpOP2
+  xor a
+  cp (hl)
   ldi
-  ldi
-  ldi
-  ldi
-  dec de
-  ld a,(de)
-  or a
-  jp z,single2str_special
-  sub 128
-  push af   ;carry means we need to multiply by 10^x, nc means divide
-  jr nc,$+4
-  neg       ;CPL would cause possible values smaller than .1, requiring an additional check.
-  ld l,a
-  ld h,0
-  ld c,l
-  ld b,h
-  add hl,hl
-  add hl,hl
-  add hl,hl
-  add hl,bc
-  add hl,hl
-  add hl,bc
-  add hl,hl
-  add hl,hl
-  add hl,bc
-  ld a,h
-  ld (exp),a ;this is the exponent
-  ld h,b
-  ld l,b
-  ld (fpOP1),hl
-  ld h,80h
-  ld (fpOP1+2),hl
-  ld de,fpOP1
-  ld b,d
-  ld c,e
-  rra \ ld hl,pow10LUT \ call c,mulSingle
-  rra \ ld hl,pow10LUT+4 \ call c,mulSingle
-  rra \ ld hl,pow10LUT+8 \ call c,mulSingle
-  rra \ ld hl,pow10LUT+12 \ call c,mulSingle
-  rra \ ld hl,pow10LUT+16 \ call c,mulSingle
-  rra \ ld hl,pow10LUT+20 \ call c,mulSingle
+  jr nz,$-3
   pop af
-  ld hl,fpOP2
-  ld b,h
-  ld c,l
-  call nc,divSingle
-  jr nc,+_
-  call mulSingle
-  ld a,(exp)
-  neg
-  ld (exp),a
-_:
-  ld a,(fpOP2+2)
-  sub 80h
-  ld bc,scrap+4
-  jr c,+_
-  ld (fpOP2+2),a
-  ld a,$1A   ;negative sign
-  ld (bc),a
-  inc bc
-_:
-  xor a
-  ld (bc),a
-  inc bc
-  xor a
-  ld (bc),a
-  inc bc
-  xor a
-  ld (bc),a
-  inc bc
-  call fpfix8_24
-  ld hl,exp
-  ld a,(scrap+3)
-  or a
-  jr z,+_
-  cp 10
-  jr c,+_
-  ld de,$0A2F
-  inc e \ sub d \ jr nc,$-2
-  add a,d
-  ld d,a
-  ld a,e
-  ld (bc),a
-  inc bc
-  ld a,d
-_:
-  add a,30h
-  ld (bc),a
-  inc bc
-  ld a,'.'
-  ld (bc),a
-  inc bc
-_:
-  call mul10_sub_
-  add a,30h
-  ld (bc),a
-  inc bc
-  ld a,c
-  cp exp&255
-  jr nz,-_
-  ld h,b
-  ld l,c
-_:
-;We want to make sure our string has at most 8 digits before rounding. The negative sign will get in the way.
-;We want to round the string, returning at most 7 digits
-  ld a,(scrap+4)
-  cp $1A  ;check if it is a negative.
-  jr z,$+3
-  dec hl
-  dec hl
-  ld a,(hl) \ cp 35h
-  push hl
-  dec hl
-  jr c,noroundstr
-  ld a,(hl)
-_:
-  inc a
-  ld (hl),a
-  cp '9'+1
-  jr nz,+_+2
-  ld (hl),'0'
-  dec hl
-  ld a,(hl)
-  or a
-  jr z,+_
-  cp '.'
-  jr nz,-_
-  dec hl
-  ld a,(hl)
-  or a
-  jr nz,-_
-_:
-  ld (hl),'1'
-noroundstr:
-;clean up the leading zeros
-  ld hl,scrap+4
-  ld a,(hl)
-  or a
-  ld c,30h
-  jr z,$+7
-  inc hl
-_:
-  ld a,(hl) \ or a \ jr nz,$+5 \ ld (hl),c \ jr -_-1
+  pop bc
+  pop de
   pop hl
-;now we need to move the decimal around
-;if exponent<-3, then usee exponential notation
-;if 0>exponent>=-3, then move the decimal left.
-;if 0=exponent, then no need to move the decimal
-;if 0<exponent<7, then move the decimal right
-;if exponent>=7, then use exponential notation
-  ld a,(exp)
-  cp $FD
-  jr nc,decimal_stay
-  cp 7
-  jr c,decimal_stay
-;so here we need to clean up
-  or a
-  ld (hl),'e'
-  inc hl
-  jp p,+_
-  neg
-  ld (hl),$1A   ;negative sign
-  inc hl
+  ret
+_:
+; Move the float to scrap
+  ld de,scrap
+  call mov4
+
+; Make the float negative, write a '-' if already negative
+  ld de,strout_single
+  ld hl,scrap+2
+  ld a,(hl)
+  rlca
+  scf
+  rra
+  ld (hl),a
+  jr nc,+_
+  ld a,$1A
+  ld (de),a
+  inc de
 _:
 
-  ld de,$FE0A
-  inc d \ sub e \ jr nc,$-2
-  add a,e
-  add a,30h
-  ld e,a
-  ld a,d
-  add a,31h
-  jr c,$+4
+; Check if the exponent field is 0 (a special value)
+  inc hl
+  ld a,(hl)
+  or a
+  jp z,strcase_single
+
+
+; We should write '0' next. When rounding 9.999999... for example, not padding with a 0 will return '.' instead of '1.'
+  ex de,hl
+  ld (hl),'0'
+  inc hl
+
+; Save the pointer
+  push hl
+
+; Now we need to perform signed (A-128)*77 (approximation of exponent*log10(2))
+  ld de,77
+  ld h,a
+  ld l,d
+  call mul8_preset
+  ld de,-77*128
+  add hl,de
+  ld a,h
+  ld (pow10exp_single),a    ;The base-10 exponent
+  ld de,pown10LUT
+  jr c,+_
+  neg
+  ld de,pow10LUT   ;get the table of 10^-(2^k)
+_:
+  ld bc,scrap
+  call singletostr_mul
+  call singletostr_mul
+  call singletostr_mul
+  call singletostr_mul
+  call singletostr_mul
+  call singletostr_mul
+;now the number is pretty close to a nice value
+
+; If it is less than 1, multiply by 10
+  ld a,(scrap+3)
+  sub 128
+  jr nc,+_
+  ld de,const_10
+  ;ld hl,scrap    ;Since singletostr_mul returns BC = scrap, can do this cheaper
+  ;ld b,h
+  ;ld c,l
+  ld h,b
+  ld l,c
+  call mulSingle
+  ld hl,pow10exp_single
+  dec (hl)
+  ld a,(scrap+3)
+  sub 128
+_:
+
+; Convert to a fixed-point number !
+  inc a
+  ld b,a
+  xor a
+_:
+  ld hl,scrap
+  sla (hl)
+  inc hl \ rl (hl)
+  inc hl \ rl (hl)
+  rla
+  djnz -_
+
+;We need to get 7 digits
+  ld b,6
+  pop hl    ;Points to the string
+
+;The first digit can be as large as 20, so it'll actually be two digits
+  cp 10
+  jr c,+_
+  dec b
+;Increment the exponent :)
+  ld de,(pow10exp_single-1)
+  inc d
+  ld (pow10exp_single-1),de
+;
+  ld (hl),'0'-1
+  inc (hl) \ sub 10 \ jr nc,$-3
+  add a,10
+  inc hl
+_:
+; Get the remaining digits.
+_:
+  add a,'0'
   ld (hl),a
   inc hl
-  ld (hl),e
-  inc hl
-removezeroes:
-  ld a,l
-  sub (scrap+4)&255
-  ld c,a
-  ld b,0
-  ld hl,scrap+4
-  ld d,h
-  ld e,l
-  ld a,(hl)
-  cp $1A
-  jr nz,+_+1
-  inc de
-  dec c
-  inc hl
-_:
-  ld a,(hl) \ cp 30h \ jr z,$-5 ;loops back a little before _:
-  ldir
-  ex de,hl
-_:
-  dec hl
-  ld a,(hl)
-  cp 30h
-  jr z,-_
-  cp '.'
-  jr nz,+_
-  ld a,l
-  cp (scrap+4)&255
-  jr z,$+7
-  dec hl
-  ld a,(hl)
-  cp $1A
-  jr nz,+_
-  ld (hl),'0'
-_:
-  inc hl
-  ld (hl),0
-  ret
-decimal_stay:
-  ld (hl),0
-  ld hl,scrap+4
-  ld a,'.'
-  cpir
-  dec hl
-  ld d,h
-  ld e,l
-  ld a,(exp)
-  ld b,0
-  jr nc,decimalmovleft
-  ld c,a
-  inc hl
-  or a
-  jr z,enddecimalmov
-  ldir
-  jr enddecimalmov
-decimalmovleft:
-  dec hl
-  neg
-  ld c,a
-  lddr
-enddecimalmov:
-  ld a,'.'
-  ld (de),a
-  xor a
-  cpir
-  dec hl
-  jr removezeroes
-mul10_sub_:
-;(scrap) is treated as an 8.24 fixed-point number
-;This multiplies the fractional part by 10.0, storing the result back in (scrap)
-;Returns a copy of the integer part in A
+  push hl
   push bc
-  ld hl,(scrap)
+  call singletostrmul10
+  pop bc
+  pop hl
+  djnz -_
+
+;Save the pointer to the end of the string
+  ld d,h
+  ld e,l
+
+;Now let's round!
+  cp 5
+  jr c,rounding_done_single
+  .db $DA ;start of `jp c,*` in order to skip the next instruction
+_:
+  ld (hl),'0'
+  dec hl
+  inc (hl)
+  ld a,(hl)
+  cp $3A
+  jr z,-_
+rounding_done_single:
+
+
+;Strip the leading zero if it exists (rounding may have bumped this to `1`)
+  ld hl,strout_single
+  ld a,(hl)
+  cp $1A
+  jr nz,+_
+  inc hl
+  ld a,(hl)
+_:
+  cp '0'
+  jr nz,+_
+  dec de
+  ex de,hl
+  ;Now lets move HL-DE bytes at DE+1 to DE
+  sbc hl,de
   ld b,h
   ld c,l
-  ld de,(scrap+2)
-  xor a
-  add hl,hl
-  rl e
-  rla
-  add hl,hl
-  rl e
-  rla
-  ld d,a
-  add hl,bc
-  ld bc,(scrap+2)
-  ld b,0
-  ex de,hl
-  adc hl,bc
-  ex de,hl
-  add hl,hl
-  ld (scrap),hl
-  ex de,hl
-  adc hl,hl
-  ld (scrap+2),hl
-  ld a,h
-  pop bc
-  ret
-fpfix8_24:
-;convert the absolute value of the number at HL to 8.24 fixed point at scrap
-  ld e,(hl)
+  ld h,d
+  ld l,e
   inc hl
-  ld d,(hl)
-  inc hl
+  ldir
+  cp a
+_:
+
+  push de
+;If z flag is reset, this means that the exponent should be bumped up 1
+  ld a,(pow10exp_single)
+  jr z,+_
+  inc a
+  ld (pow10exp_single),a
+_:
+
+  ;if -4<=A<=6, then need to insert the decimal place somewhere.
+  add a,4
+  cp 10
+  jp c,movdec_single
+_:
+  ;for this, we need to insert the decimal after the first digit
+  ;Then, we need to append the exponent string
+  ld hl,strout_single
+  ld de,strout_single-1
   ld a,(hl)
-  or 80h
-  inc hl
-  ld h,(hl)
-  ld l,a
-  ld a,h
-  sub 80h
-  ld h,a
-  jr c,+_
-;if we get here, it means we need to shift left a times
-  ex de,hl
-  inc d
-  xor a
-  add hl,hl \ rl e \ rla \ dec d \ jr nz,$-5
-  ld d,a
-  ld (scrap),hl \ ld (scrap+2),de
-  ret
-_:
-  inc h
-  jr z,+_
-  ld a,e
-  ld e,h
-  ld h,0
-  srl h \ rr l \ rr d \ rra \ inc e \ jr nz,$-8
-  ld e,a
-  jr nc,+_
-  inc e \ jr nz,+_
-  inc d \ jr nz,+_ \ inc hl
-_:
-  ld (scrap),de \ ld (scrap+2),hl
-  ret
-single2str_special:
-  pop hl
-  pop hl
-  dec de
-  ld a,(de)
-  add a,a
-  jr nc,$+5
-  ld (hl),1Ah
-  inc hl
-  ex de,hl
-  ld hl,str_zero
-  jr z,+_
-  add a,a
-  ld hl,str_INF
-  jr z,+_
-  add a,a
-  ld hl,str_NAN
-_:
-copyS:
-  ld a,e
-  cp l
-  jr nz,$+5
-  ld a,d
-  cp h
-  ret z
-  ld a,(hl)
-  or a
+  cp $1A    ;negative sign
+  jr nz,+_
   ldi
-  jr nz,$-4
+_:
+  ldi
+  ld a,'.'
+  ld (de),a
+
+;remove any stray zeroes at the end before appending the exponent
+  pop hl
+  call strip_zeroes
+
+; Write the exponent
+  ld (hl),'e'
+  inc hl
+  ld a,(pow10exp_single)
+  or a
+  jp p,+_
+  ld (hl),$1A    ;negative sign
+  inc hl
+  neg
+_:
+  cp 10
+  jr c,+_
+  ld (hl),'0'-1
+  inc (hl)
+  sub 10
+  jr nc,$-3
+  add a,10
+  inc hl
+_:
+  add a,'0'
+  ld (hl),a
+  inc hl
+  ld (hl),0
+  ld hl,strout_single-1
   ret
-#undefine exp
-#undefine fpOP1
-#undefine fpOP2
+movdec_single:
+  ld a,(pow10exp_single)
+  or a
+  jp p,posdec_single
+  ld l,a
+;need to put zeroes before everything
+  ld de,strout_single
+  ld a,(de)
+  cp $1A    ;negative sign
+  push af
+  ld a,'0'
+  jr z,$+3
+_:
+  dec de
+  ld (de),a
+  inc l
+  jr nz,-_
+_:
+  ex de,hl
+  ld (hl),'.'
+  pop af
+  jr nz,+_
+  dec hl
+  ld (hl),a
+_:
+  ex de,hl
+  pop hl
+  call strip_zeroes
+  ld (hl),0
+  ex de,hl
+  ret
+
+posdec_single:
+  ld hl,strout_single
+  ld de,strout_single-1
+  ld c,a
+  ld a,(hl)
+  ld b,0
+  cp $1A    ;negative sign
+  jr nz,+_
+  inc c
+_:
+  inc c
+  ldir
+  ld a,'.'
+  ld (de),a
+  pop hl
+  call strip_zeroes
+  ld (hl),0
+  ld hl,strout_single-1
+  ret
+strcase_single:
+  ld de,str_Zero
+  ld a,(scrap+2)
+  add a,a
+  and $C0
+  jr z,+_
+  ld de,str_Inf
+  jp pe,+_
+  ld de,str_NaN
+_:
+  ex de,hl
+  call mov4
+  ld hl,strout_single
+  ret
+
+singletostrmul10:
+;multiply the 0.24 fixed point number at scrap by 10
+;overflow in A register
+  ld a,(scrap+2)
+  ld e,a
+  ld hl,(scrap)
+  xor a
+  ld d,e
+  ld b,h
+  ld c,l
+  add hl,hl \ rl d \ rla
+  add hl,hl \ rl d \ rla
+  add hl,bc
+  ld b,a
+  ld a,d
+  adc a,e
+  ld d,a
+  ld a,b
+  adc a,0
+  add hl,hl \ rl d \ rla
+  ld (scrap+1),de
+  ld (scrap),hl
+  ret
+
+
+
+strip_zeroes:
+  ld a,'0'
+_:
+  dec hl
+  cp (hl)
+  jr z,-_
+
+;Check that the last  digit isn't a decimal!
+  ld a,'.'
+  cp (hl)
+  ret z
+  inc hl
+  ret
+
+singletostr_mul:
+  rra
+  call c,+_
+  ld hl,4
+  add hl,de
+  ex de,hl
+  ret
+_:
+  ld h,b
+  ld l,c
+  jp mulSingle
+mul8:
+;H*E => HL
+  ld l,0
+  ld d,l
+mul8_preset:
+  sla h \ jr nc,$+3 \ ld l,e
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ jr nc,$+3 \ add hl,de
+  add hl,hl \ ret nc \ add hl,de
+  ret
 str_zero:   .db "0",0
 str_NAN:    .db "NaN",0
 str_inf     .db "INF",0
-.echo "single2str:",$-single2str
