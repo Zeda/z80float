@@ -29,17 +29,17 @@ str2single:
 ;Check if the next char is '.'
   cp '.'
   jr nz,+_
-  ld b,-7     ;the ascii_to_uint8 will increment this 8 times
+  .db $FE   ;start of cp *
 ;Get rid of zeroes
   dec b
   inc hl
   ld a,(hl)
   cp '0'
   jr z,$-5      ;jumps back to the `dec b`
+  scf
 _:
 ;Now we read in the next 8 digits
   ld de,scrap+3
-  xor a
   call ascii_to_uint8
   call ascii_to_uint8
   call ascii_to_uint8

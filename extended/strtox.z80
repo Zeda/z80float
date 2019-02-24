@@ -31,16 +31,16 @@ strtox:
 ;Check if the next char is '.'
   cp '.'
   jr nz,+_
-  ld bc,-19     ;the ascii_to_uint8 will increment this 8 times
+  inc c
 ;Get rid of zeroes
   ld a,'0'
   cpi
   jr z,$-2
+  scf
 _:
 ;Now we read in the next 8 digits
   ld de,xOP1+9
   push bc
-  xor a
   call ascii_to_uint8
   call ascii_to_uint8
   call ascii_to_uint8
