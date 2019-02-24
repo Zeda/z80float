@@ -4,10 +4,7 @@ ascii_to_uint8:
   ld a,(hl)
   jr c,ascii_to_uint8_noexp
   cp '.'
-  jr nz,+_
-  inc hl
-  ld a,(hl)
-  jr ascii_to_uint8_noexp
+  jr z,ascii_to_uint8_noexp-2
 _:
   sub 3Ah
   add a,10
@@ -37,6 +34,9 @@ _:
   dec de
   or a
   ret
+
+  inc hl
+  ld a,(hl)
 ascii_to_uint8_noexp:
   sub 3Ah
   add a,10
