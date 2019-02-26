@@ -1,40 +1,22 @@
 ;==========================================================
-;The following constants are accurate to 120 bits of precision.
-;Obtained via Wolfram Alpha.
+;The following are common constants given to 64-bit precision.
 ;==========================================================
-xconst_log10_2_ext:
-  .db $91,$7C,$0B,$AC,$59,$89,$8F
 xconst_log10_2:
-  .db $98,$F7,$CF,$FB,$84,$9A,$20,$9A \ .dw $3FFE
-xconst_lg_10_ext:
-  .db $DB,$AF,$4D,$FF,$F6,$2B,$49
+  .db $99,$F7,$CF,$FB,$84,$9A,$20,$9A \ .dw $3FFE
 xconst_lg_10:
   .db $FE,$8A,$1B,$CD,$4B,$78,$9A,$D4 \ .dw $4001
-xconst_e_ext:
-  .db $3C,$3D,$27,$20,$56,$dc,$af
 xconst_e:
-  .db $9A,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
-xconst_pi_ext:
-  .db $1C,$DC,$80,$8B,$62,$C6,$C4
+  .db $9B,$4a,$bb,$a2,$58,$54,$f8,$ad \ .dw $4001
 xconst_pi:
-  .db $34,$C2,$68,$21,$a2,$da,$0f,$c9 \ .dw $4001
-xconst_lg_e_ext:
-  .db $3E,$1d,$69,$d0,$fe,$87,$be
+  .db $35,$C2,$68,$21,$a2,$da,$0f,$c9 \ .dw $4001
 xconst_lg_e:
-  .db $bb,$f0,$17,$5c,$29,$3b,$aa,$b8 \ .dw $4000
-xconst_ln_2_ext:
-  .db $f6,$f2,$03,$98,$b3,$e3,$c9
+  .db $bC,$f0,$17,$5c,$29,$3b,$aa,$b8 \ .dw $4000
 xconst_ln_2:
-  .db $ab,$79,$cf,$d1,$f7,$17,$72,$b1 \ .dw $3FFF
-xconst_sqrt_p5_ext:
-  .db $E2,$25,$78,$DC,$3E,$B6,$62
+  .db $aC,$79,$cf,$d1,$f7,$17,$72,$b1 \ .dw $3FFF
 xconst_sqrt_2:
   .db $0F,$6D,$DE,$F9,$33,$F3,$04,$B5 \ .dw $4000
 xconst_log10_e:
   .db $95,$71,$28,$37,$A9,$D8,$5B,$DE,$FE,$3F
-;==========================================================
-;The following are common constants given to 64-bit precision.
-;==========================================================
 xconst_1:
   .db $00,$00,$00,$00,$00,$00,$00,$80 \ .dw $4000
 xconst_0:
@@ -45,5 +27,8 @@ xconst_INF:
   .db $00,$00,$00,$00,$00,$00,$00,$C0 \ .dw $0000
 xconst_nINF:
   .db $00,$00,$00,$00,$00,$00,$00,$C0 \ .dw $8000
+;==========================================================
+;The following are used by internal routines.
+;==========================================================
 xconst_3028466566125:
   .db $00,$00,$40,$FB,$20,$AB,$47,$B0 \ .dw $4029
