@@ -1,0 +1,10 @@
+rl64:
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl) \ inc hl
+  rl (hl)
+  ret
