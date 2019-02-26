@@ -67,6 +67,7 @@ srlxOP2_4:
   ld hl,xOP2+7
 srl64_4:
   xor a
+rrd8:
   rrd \ dec hl
   rrd \ dec hl
   rrd \ dec hl
@@ -78,15 +79,7 @@ srl64_4:
   ret
 srlxOP2:
   ld hl,xOP2+7
-  srl (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl)
-  ret
+  jp srl64
 srlxOP1_mantissa:
 ;182cc
   ld hl,xOP1+7
