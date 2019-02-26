@@ -9,17 +9,7 @@
 ;So only TWO iterations are needed for single precision instead of ten.
 lnSingle:
 ;need to add ln(2)*x_exp to end result
-    push hl
-    push de
-    push bc
-    push af
-    call +_
-    pop af
-    pop bc
-    pop de
-    pop hl
-    ret
-_:
+    call pushpop
     push bc
     ld de,var_X
     ldi
