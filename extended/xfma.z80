@@ -7,7 +7,6 @@ xfma:
 ;BC points to z
 ;IX points to t
   call pushpop
-  scf \ jr c,$
   push bc   ;save the output location
   push ix   ;save the location of what to add
 
