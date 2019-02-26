@@ -43,8 +43,9 @@ _:
   call mov10
   pop hl
   call mov10
-	ld hl,(xOP1+8)
 	ld de,(xOP2+8)
+	ld hl,(xOP1+8)
+xmul_stepin_geomean:
 	ld a,h
 	xor d
   ld b,a
@@ -71,12 +72,12 @@ _:
   ld hl,var_z
   call rl64
 #else
-ld hl,var_z+7
-; We only need 1 byte for xmul, but need the full thing for FMA :(
-  sla (hl) \ inc hl
+  ld hl,var_z+7
+  sla (hl)
 #endif
-
+  inc hl
   jp rl64
+
 _:
   inc de
   ret
