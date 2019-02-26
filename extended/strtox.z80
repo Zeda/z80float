@@ -1,3 +1,14 @@
+#ifdef char_TI_TOK
+#define char_NEG  $1A
+#define char_ENG  $1B
+#define char_DEC  '.'
+#else
+;otherwise, char_TI_CHR
+#define char_NEG  $B0
+#define char_ENG  $3B
+#define char_DEC  $3A
+#endif
+
 #ifndef strtox_ptr
 #define strtox_ptr xOP1+25
 #endif
@@ -17,7 +28,7 @@ strtox:
 ;   Save for later
 ;   Advance ptr
   ld a,(hl)
-  sub $1A
+  sub char_NEG
   sub 1
   push af
   jr nc,$+3
@@ -28,8 +39,8 @@ strtox:
   jr z,$-4      ;jumps back to the `inc hl`
 ;Set exponent to 0
   ld bc,0
-;Check if the next char is '.'
-  cp '.'
+;Check if the next char is char_DEC
+  cp char_DEC
   jr nz,+_
   inc c
 ;Get rid of zeroes
@@ -65,7 +76,7 @@ _:
 ;Otherwise, need to get rid of remaining digits, while incrementing the exponent
   call skipdigits
 ;Now check for engineering `E` to modify the exponent
-  cp $1B
+  cp char_ENG
   call z,str_xeng_exp
 ;Gotta multiply the number at (xOP1) by 2^64
   ld (strtox_ptr),hl
@@ -167,7 +178,7 @@ str_xeng_exp:
   ld de,0
   inc hl
   ld a,(hl)
-  cp $1A    ;negative exponent?
+  cp char_NEG    ;negative exponent?
   push af
   jr nz,$+3
   inc hl
