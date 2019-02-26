@@ -65,19 +65,18 @@ _:
 	call mul64
   ld a,(var_z+15)
   add a,a
-  ld hl,var_z+7
   pop de
   jr c,+_
+#ifdef inc_FMA
+  ld hl,var_z
+  call rl64
+#else
+ld hl,var_z+7
+; We only need 1 byte for xmul, but need the full thing for FMA :(
   sla (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl)
-  ret
+#endif
+
+  jp rl64
 _:
   inc de
   ret
