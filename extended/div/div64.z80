@@ -5,9 +5,9 @@ div64:
 ;2*div64_32+3128.7937843
 ;
 ;304+2*div64_32+mul32+sub64+{0,72+add64+{0,19+{0,19+{0,3
-;min: 6704cc
-;max: 11490cc
-;avg: 9780.520cc
+;min: 6683cc
+;max: 11469cc
+;avg: 9759.520cc
   call div64_32
   ld (var_q+4),ix
   ld (var_q+6),bc

@@ -7,11 +7,11 @@ xmul:
 ;Timing, excluding special cases (which take ~ 800cc):
 ;1057+{0,3}+{0,172}+mul64
 ;max: 1232+max(mul64)
-;     11308cc
+;     11245cc
 ;min: 1057+min(mul64)
-;     6751cc
+;     6688cc
 ;avg: 1144.5+avg(mul64)
-;     9928.233cc
+;     9865.233ccs
 
 
   push hl

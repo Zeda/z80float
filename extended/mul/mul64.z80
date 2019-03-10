@@ -6,11 +6,11 @@
 mul64:
 ;multiplies the 64-bit integers at xOP1 and xOP2
 ;min: 1740+3*min(mul32)
-;     5694cc
+;     5631cc
 ;max: 1901+3*max(mul32)
-;     10076cc
+;     10013cc
 ;avg: 1797+3*avg(mul32) + 9572881/2^24
-;   :~8783.733cc
+;   :~8720.733cc
 
   ld de,(xOP1+6)
   ld hl,(xOP1+4)
