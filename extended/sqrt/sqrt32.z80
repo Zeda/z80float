@@ -6,135 +6,37 @@
 #define var_z0 xOP2+8;used in sqr32
 ;NOTE!
 ;This expects the top two bits to be non-zero
+
 sqrt32:
-;returns 0.HLDE as the square root
-;Speed: 1078+8{0,3+{0,3}}+{0,1}+7{0,6}+{0,43}+{0,85+{0,33}}+sqrtHL+div32_16+mul16
-;min: 1078+min(sqrtHL+div32_16+mul16)
-;max: 1330+max(sqrtHL+div32_16+mul16)
-;avg: 1189.75+avg(sqrtHL+div32_16+mul16)
-;     2992.887cc
-
-;Step one is to generate 8 accurate bits
+;Speed: 358+sqrtHLIX+div32_16+mul16
+;min: 2472
+;max: 3304
+;avg: 2979.137
+;Step one is to generate 16 accurate bits
   ld hl,(var_y+2)
-  call sqrtHL   ;HL is remainder, A is the square root
-  ld e,a
-  ld (var_x+7),a
-
-;Now we need to create b0
-  srl h
-  rr l
-  ld h,l
-  ld a,(var_y+1)
-  rra
-  ld l,a
-;now perform HL/E
-;This is a NOT a general purpose division
-;It assumes E>H
-;A is remainder, L is result
-
-  ld a,h
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-
-;shift in low bit of (var_y+1) to the remainder
-;store L to (var_x+4)
-  ld e,a
-  ld a,(var_y+1)
-  rra
-  rl e
-  ld d,0
+  ld ix,(var_y)
+  call sqrtHLIX
+  ld (var_x+6),de
   ld b,d
-  rl d
-
-  ld a,l
-  ld (var_x+6),a
-
-;now we need to compute l*l
-  ld c,l
-  ld l,b
-  add a,a
-  ld h,a
-  jr nc,$+3 \ ld l,c
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-;leaves c flag reset
-
-  ex de,hl
-;now need to perform HL*256+(var_y)-DE
-  ld c,h
-  ld h,l
-  ld a,(var_y)
-  ld l,a
-  ld a,c
-  sbc hl,de
-  sbc a,b
+  ld c,e
+;now AHL is the remainder with A at most 1.
+;Fetch the next 16 bits and put them in DE
   ld de,(var_c+2)
+
 ;AHLDE is the new remainder
 ;Need to divide by 2, then divide by the 16-bit (var_x+4)
-  push af
   rra
   rr h
   rr l
   rr d
   rr e
-  inc a
-  jr nz,+_
-  ld b,a \ sub e \ ld e,a
-  ld a,b \ sbc a,d \ ld d,a
-  ld a,b \ sbc a,l \ ld l,a
-  ld a,b \ sbc a,h \ ld h,a
-_:
-  push de
-  pop ix
-  ld bc,(var_x+6)
+  ld ixh,d
+  ld ixl,e
   call div32_16   ;returns DE=quotient, HL is remainder
+;Need to compute remainder
+;(HL*2+(var_c+2)&1)*65536+(var_c))-DE*DE
   ld (var_x+4),de
-  pop af
-  jr nc,sqr32_pos
-;
-  ld b,h  ;remainder
-  ld c,l
-  push de
-  xor a
-  sub e
-  ld e,a
-  ld a,0
-  sbc a,d
-  ld d,a
-  ld (var_x+4),de
-  jr nc,+_      ;need to analyze this. Might always execute.
-  ld hl,(var_x+6)
-  dec hl
-  ld (var_x+6),hl
-_:
-  xor a
-  sub c
-  ld c,a
-  ld a,0
-  sbc a,b
-  ld b,a
-  sbc a,a
-  ld hl,(var_c+2)
-  rr l
-  rl c
-  rl b
-  rla
-  ;ABC is the remainder
-  pop de
-  push bc
-sqr32_end:
-  push af
+  push hl
   ld b,d
   ld c,e
   call mul16
@@ -142,27 +44,19 @@ sqr32_end:
   ld c,l
   ;DEBC
   ld hl,(var_c)
-  pop af
-  or a
+  ld a,(var_c+2)
+  and 1
   sbc hl,bc
   ld b,h
   ld c,l
-  ;BC is the low 16 bits
+
+  rra
   pop hl
+  adc hl,hl
+  rla
   sbc hl,de
   sbc a,0
   ret
-sqr32_pos;
-;Need to compute remainder
-;(BC*2+(var_c+2)&1)*65536+(var_c))-DE*DE
-  ld (var_x+4),de
-  ld a,(var_c+2)
-  rra
-  adc hl,hl
-  ld a,0
-  rla
-  push hl
-  jp sqr32_end
 
 #undefine var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
 #undefine var_a xOP2   ;   2 bytes
