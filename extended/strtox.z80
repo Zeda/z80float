@@ -31,53 +31,11 @@ strtox:
   sub char_NEG
   sub 1
   push af
-  jr nc,$+3
+  jr nc,+_
   inc hl
-;Skip all leading zeroes
-  ld a,(hl)
-  cp '0'
-  jr z,$-4      ;jumps back to the `inc hl`
-;Set exponent to 0
-  ld bc,0
-;Check if the next char is char_DEC
-  cp char_DEC
-  jr nz,+_
-  inc c
-;Get rid of zeroes
-  ld a,'0'
-  cpi
-  jr z,$-2
-  scf
 _:
-;Now we read in the next 8 digits
-  ld de,xOP1+9
-  push bc
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  call ascii_to_uint8
-  ld a,b
-  pop bc
-  push af
-  add a,c
-  ld c,a
-  jr nc,$+3
-  inc b
-  pop af
-;Now `xOP1` holds the 10-digit base-100 number.
-;BC is the exponent
-;if carry flag is set, just need to get rid of remaining digits
-;Otherwise, need to get rid of remaining digits, while incrementing the exponent
-  call skipdigits
-;Now check for engineering `E` to modify the exponent
-  cp char_ENG
-  call z,str_xeng_exp
+  call strtox_sub0
+TItox_stepin:
 ;Gotta multiply the number at (xOP1) by 2^64
   ld (strtox_ptr),hl
   ld d,100
@@ -174,6 +132,53 @@ _:
   ret nc
   dec d
   ret
+
+strtox_sub0:
+;Skip all leading zeroes
+  ld a,(hl)
+  cp '0'
+  jr z,$-4      ;jumps back to the `inc hl`
+;Set exponent to 0
+  ld bc,0
+;Check if the next char is char_DEC
+  cp char_DEC
+  jr nz,+_
+  inc c
+;Get rid of zeroes
+  ld a,'0'
+  cpi
+  jr z,$-2
+  scf
+_:
+;Now we read in the next 20 digits
+  ld de,xOP1+9
+  push bc
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  call ascii_to_uint8
+  ld a,b
+  pop bc
+  push af
+  add a,c
+  ld c,a
+  jr nc,$+3
+  inc b
+  pop af
+;Now `xOP1` holds the 10-digit base-100 number.
+;BC is the exponent
+;if carry flag is set, just need to get rid of remaining digits
+;Otherwise, need to get rid of remaining digits, while incrementing the exponent
+  call skipdigits
+;Now check for engineering `E` to modify the exponent
+  cp char_ENG
+  ret nz
 str_xeng_exp:
   ld de,0
   inc hl
