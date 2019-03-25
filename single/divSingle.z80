@@ -17,6 +17,7 @@ divSingle:
 inv_inject:
     push bc
     push af
+    scf \ jr c,$
     inc hl \ inc de
     inc hl \ inc de
     ld a,(de)   ;\
@@ -29,9 +30,20 @@ inv_inject:
     ex de,hl    ; |Get exponent
     sub (hl)    ; |
     ex de,hl    ; |
-    jp c,divunderflow
+
+    ld b,-1
+    jr nc,+_
+    dec b
+_:
+    add a,128
+    jr nc,+_
+    inc b
+_:
+    inc b
+    jr z,+_
+    jp p,divunderflow
     jp m,divoverflow
-    xor 80h     ; |
+_:
     ld (quot+3),a
     dec hl
     dec de
@@ -104,10 +116,11 @@ writeback:
     pop hl
     ret
 divoverflow:
-    ld bc,$40
-    jr writeback
+    ld b,$40
+    jr +_
 divunderflow:
   ld b,0
+  jr +_
 setmantissa0:
   ld bc,(quot+2)
 _:
