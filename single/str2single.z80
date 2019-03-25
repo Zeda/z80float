@@ -130,10 +130,10 @@ strToSingle_normed:
   jp p,+_
   ld a,b
   ld de,pow10LUT
-  cp 39
+  cp 40
   jp nc,strToSingle_inf+1
 _:
-  cp 39
+  cp 40
   jp nc,strToSingle_zero
   ld hl,scrap
   ld b,h
@@ -186,7 +186,7 @@ _:
   jp nz,eng_overflow
 _:
   ld a,e
-  cp 39
+  cp 40
   jr nc,eng_overflow
   pop af
   ld a,b
