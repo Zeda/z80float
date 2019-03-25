@@ -9,25 +9,37 @@ sinSingle:
 ;a3=2^-13 * 13408017/2^23
 ;x(1-y(a1-y(a2-y*a3)))
 ;
-  push hl
-  push de
+  call pushpop
   push bc
-  push af
-  call +_
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-;Need to verify that we are in fact in range
+;Need to apply range reduction
+; We want the input on [-pi/4,pi/4]
+; First multiply by 1/(2pi)
+  ld de,const_2pi_inv
+  ld bc,var_x
+  call mulSingle
+
+;Now add .25
+  ld h,b
+  ld l,c
+  ld de,const_p25
+  call addSingle
+
+;Now grab the fpart
+  call fpartSingle
+
+;Let's convert this to a cosine problem
+  ld de,const_p5
+  call rsubSingle
+  jp cosSingle_stepin
+
+sin_subroutine:
+;Multiply by 2pi
   push bc
-  ld de,var_x
-  ldi
-  ldi
-  ldi
-  ldi
-  ld hl,var_x
+  ld de,const_2pi
+  ld b,h
+  ld c,l
+  call mulSingle
+
   ld d,h
   ld e,l
   ld bc,var_y
@@ -52,6 +64,7 @@ _:
   ld hl,var_x
   pop bc
   jp mulSingle
+
 #undefine var_x
 #undefine var_y
 #undefine temp

@@ -7,7 +7,6 @@ cosSingle:
 ;1-y(.49999887-y(.041655882-y.0013591743))
 ;1-y(a1-y(a2-y*a3))
 
-
   call pushpop
   push bc
 ;Need to apply range reduction
@@ -28,6 +27,7 @@ cosSingle:
 
 ;subtract off the .5
   call subSingle
+cosSingle_stepin:
 ;now x is on [-.5,.5], but we need to evaluate cos(x*2pi) with x on [-.125,.125]
 ;We need to employ some identities
 ;  cos(-x)=cos(x)
@@ -50,6 +50,7 @@ cosSingle:
   jr c,+_
   ld h,b
   ld l,c
+  ld de,const_p5
   call subSingle
   pop bc
   push bc
@@ -67,6 +68,7 @@ _:
   jr nz,+_
   ld h,b
   ld l,c
+  ld de,const_p25
   call rsubSingle
   pop bc
   jp sin_subroutine
@@ -102,39 +104,6 @@ cos_subroutine:
   ld hl,const_1
   pop bc
   jp subSingle
-sin_subroutine:
-;Multiply by 2pi
-  push bc
-  ld de,const_2pi
-  ld b,h
-  ld c,l
-  call mulSingle
-
-  ld d,h
-  ld e,l
-  ld bc,var_y
-  call mulSingle
-  ld h,b
-  ld l,c
-  ld de,sin_a3
-  ld bc,temp
-  call mulSingle
-  ld hl,sin_a2
-  ld d,b
-  ld e,c
-  call subSingle
-  ld hl,var_y
-  call mulSingle
-  ld hl,sin_a1
-  call subSingle
-  ld hl,var_y
-  call mulSingle
-  ld hl,const_1
-  call subSingle
-  ld hl,var_x
-  pop bc
-  jp mulSingle
-
 #undefine var_x
 #undefine var_y
 #undefine temp
