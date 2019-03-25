@@ -16,6 +16,9 @@ const_10_inv: .db $CD,$CC,$4C,$7C    ;roughly 0.1
 const_pi_inv: .db $83,$F9,$22,$7E
 const_e_inv:  .db $B2,$5A,$3C,$7E
 const_log10_e:.db $D9,$5B,$5E,$7E
+const_2pi:    .db $DB,$0F,$49,$82
+const_2pi_inv:.db $83,$F9,$22,$7D
+const_p5:     .db $00,$00,$00,$7F
 ;    .db $,$,$,$
 end_const:
 sin_a1: .db $A4,$AA,$2A,$7D ;a1= 2^-3 * 11184804/2^23
