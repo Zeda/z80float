@@ -128,4 +128,3 @@ div_NaN:
   ld a,$40
   ld (xOP1+7),a
   ret
-.echo "xdiv: ",$-xdiv

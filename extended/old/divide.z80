@@ -75,4 +75,3 @@ div16_14_2:
   add a,a \ sbc hl,bc \ add hl,hl \ jr nc,div16_15_1
 div16_15_2:
   add a,a \ ld e,a \ sbc hl,bc \ ret
-.echo "divide: ",$-divide," bytes"

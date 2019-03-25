@@ -24,4 +24,3 @@ randSingle:
     pop hl
     pop af
     ret
-.echo "randSingle:",$-randSingle

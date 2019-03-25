@@ -21,4 +21,3 @@ absSingle:
     pop de
     pop hl
     ret
-.echo "absSingle:",$-absSingle

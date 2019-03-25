@@ -167,7 +167,6 @@ _:
   ld h,a
   ld c,0
   ret
-.echo "mulSingle:",$-mulSingle
 mul24:
 ;;BDE*CHL -> HLBCDE
 ;;155 bytes
@@ -217,7 +216,6 @@ mul24:
     adc hl,de
     ld de,(var48)
     ret
-.echo "mul24:",$-mul24
 
 
 C_times_BDE:

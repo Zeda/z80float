@@ -67,7 +67,6 @@ sqrtNAN:
   ld hl,xconst_NaN
   ld de,xOP1
   jp mov10
-.echo "xsqrt: ",$-xsqrt
 #undefine var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
 #undefine var_a xOP2   ;   2 bytes
 #undefine var_c xOP2+8 ;input

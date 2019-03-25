@@ -198,4 +198,3 @@ caseadd2:
 	add a,a
 	ret nc
 	jp fpOP2_to_fpOP1
-.echo "FloatAdd/Sub :",$-FloatSub_80

@@ -342,4 +342,3 @@ add_inf:
   ld l,a
   ld (xOP3+8),hl
   ret
-.echo "xadd: ",$-xadd

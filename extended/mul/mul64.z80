@@ -182,4 +182,3 @@ mul64_add:
   ld (xOP1+6),hl
   adc a,0
   jp mul64_final
-.echo "  mul64: +",$-mul64

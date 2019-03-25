@@ -11,6 +11,9 @@ textWrite     = 7
 _GrBufClr     = 4BD0h
 _GrBufCpy     = 486Ah
 _PutS         = 450Ah
+#define inc_FMA
+#define char_TI_TOK
+
 .db $BB,$6D
 .org $9D95
   bcall(_GrBufClr)
@@ -98,6 +101,7 @@ puts:
 #include "../extended/xgeomean.z80"
 #include "../extended/xsqrt.z80"
 #include "../extended/sqrt/sqrt16.z80"
+#include "../extended/sqrt/sqrtHLIX.z80"
 #include "../extended/sqrt/sqrt32.z80"
 #include "../extended/sqrt/sqrt64.z80"
 #include "../extended/div/div32.z80"
@@ -123,6 +127,7 @@ puts:
 #include "../extended/mul/xmul17.z80"
 #include "../extended/mul/xmul31.z80"
 #include "../extended/mul/xOP1mul10.z80"
+#include "../extended/xfma.z80"
 #include "../extended/xln.z80"
 #include "../extended/xlg.z80"
 #include "../extended/xlog10.z80"
@@ -139,12 +144,15 @@ puts:
 #include "../extended/xpow.z80"
 #include "../extended/xpow2.z80"
 #include "../extended/xpow10.z80"
-#include "../extended/xsinh.z80" 
+#include "../extended/xsinh.z80"
 #include "../extended/xcosh.z80"
 #include "../extended/xtanh.z80"
-xroutines:
+#include "../extended/strtox.z80"
+#include "../extended/routines/ascii_to_uint8.z80"
+#include "../extended/routines/sla64.z80"
+#include "../extended/routines/rl64.z80"
+#include "../extended/routines/swapbuf.z80"
 #include "../extended/routines.z80"
-.echo "routines: ",$-xroutines
 #include "../extended/data.z80"
 #include "../extended/tables.z80"
 .echo "Total: ",$-$9D95

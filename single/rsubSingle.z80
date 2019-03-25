@@ -18,4 +18,3 @@ rsubSingle:
     pop de
     ld hl,addend2
     jp addInject    ;jumps in to the addSingle routine
-.echo "rsubSingle:",$-rsubSingle

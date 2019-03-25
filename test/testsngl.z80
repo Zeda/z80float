@@ -1,3 +1,4 @@
+#define char_TI_TOK
 #define bcall(x) rst 28h \ .dw x
 #include "../single/single.inc"
 fontFlags     = 32h
@@ -9,15 +10,17 @@ _NewLine      = 452Eh
 .org $9D95
   bcall(_GrBufClr)
   res fracDrawLFont,(iy + fontFlags)
-  set textWrite, (IY + sGrFlags)
+  set textWrite,(iy + sGrFlags)
   ld hl,0
   ld (penCol),hl
 ;
 ;
-  call testputs \ .db "sqrt(pi)=",0
-  ld hl,const_pi
+  call testputs \ .db "FLOAT "
+s_float:
+  .db "3.14=",0
+  ld hl,s_float
   ld bc,8800h
-  call sqrtSingle
+  call str2single
   ld h,b
   ld l,c
   ld bc,8000h
@@ -27,8 +30,8 @@ _NewLine      = 452Eh
   call puts
   call newline
 
-  call testputs \ .db "sin(ln(2))=",0
-  ld hl,const_ln_2
+  call testputs \ .db "sin(e)=",0
+  ld hl,const_e
   ld bc,8800h
   call sinSingle
   ld h,b
@@ -40,8 +43,8 @@ _NewLine      = 452Eh
   call puts
   call newline
 
-  call testputs \ .db "cos(ln(2))=",0
-  ld hl,const_ln_2
+  call testputs \ .db "cos(e)=",0
+  ld hl,const_e
   ld bc,8800h
   call cosSingle
   ld h,b
@@ -53,10 +56,10 @@ _NewLine      = 452Eh
   call puts
   call newline
 
-  call testputs \ .db "tanh(1/pi)=",0
-  ld hl,const_pi_inv
+  call testputs \ .db "tan(e)=",0
+  ld hl,const_e
   ld bc,8800h
-  call tanhSingle
+  call tanSingle
   ld h,b
   ld l,c
   ld bc,8000h
@@ -65,87 +68,6 @@ _NewLine      = 452Eh
   ld l,c
   call puts
   call newline
-
-  call testputs \ .db "sinh(1/pi)=",0
-  ld hl,const_pi_inv
-  ld bc,8800h
-  call sinhSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-  call testputs \ .db "cosh(1/pi)=",0
-  ld hl,const_pi_inv
-  ld bc,8800h
-  call coshSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-  call testputs \ .db "e^10=",0
-  ld hl,const_10
-  ld bc,8800h
-  call expSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-  call testputs \ .db "log_pi(10)=",0
-  ld hl,const_10
-  ld de,const_pi
-  ld bc,8800h
-  call logSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-  call testputs \ .db "atan(ln(2))=",0
-  ld hl,const_ln_2
-  ld bc,8800h
-  call atanSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-  call testputs \ .db "asinh(1/ln(2))=",0
-  ld hl,const_lg_e
-  ld bc,8800h
-  call asinhSingle
-  ld h,b
-  ld l,c
-  ld bc,8000h
-  call single2str
-  ld h,b
-  ld l,c
-  call puts
-  call newline
-
-
 
 
   bcall(_GrBufCpy)
@@ -217,6 +139,7 @@ __:
 #include "../single/single2str.z80"
 #include "../single/single2TI.z80"
 #include "../single/str2single.z80"
+#include "../single/routines/ascii_to_uint8.z80"
 #include "../single/lut.z80"
 #include "../single/absSingle.z80"
 #include "../single/acosSingle.z80"
@@ -239,4 +162,6 @@ __:
 #include "../single/negSingle.z80"
 #include "../single/ti2single.z80"
 #include "../single/single2char.z80"
+#include "../single/fpartSingle.z80"
+
 .echo $-__," bytes"

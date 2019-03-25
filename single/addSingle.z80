@@ -164,4 +164,3 @@ add_unneeded:
     dec hl
     dec hl
     jr add_copy
-.echo "addSingle:",$-addSingle

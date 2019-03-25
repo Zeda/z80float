@@ -154,7 +154,7 @@ label_2:
 	ld bc,(outp128+10)
 	adc hl,bc
 	ld (outp128+10),hl
-	
+
 	ld hl,(outp128+12)
 	ld e,a
 	adc hl,de
@@ -164,7 +164,6 @@ label_2:
 	inc hl
 	ld (outp128+14),hl
 	ret
-.echo "  Karatsuba64:",$-Karatsuba64
 KaratsubaMul32:
 ;Input: (word32_1), (word32_2)
 ;Output: (outp64)
@@ -198,7 +197,7 @@ KaratsubaMul32:
 	add hl,bc
 	ld b,h
 	ld c,l
-	
+
 	push af
   call mul16
 ;DEHL
@@ -212,7 +211,7 @@ KaratsubaMul32:
 ;
 ;x=2^16
 ;a,c are 0 or 1
-;  If a = 1, add c to A (A is the overflow thing), add (word32_2)+(word32_2+2) to DE 
+;  If a = 1, add c to A (A is the overflow thing), add (word32_2)+(word32_2+2) to DE
 ;  If c = 1, add b to DE
 	ld a,c
 	ld bc,(word32_1)
@@ -269,4 +268,3 @@ label_1:
 	adc hl,de
 	ld (outp+6),hl
 	ret
-.echo "  Karatsuba32:",$-KaratsubaMul32

@@ -18,4 +18,3 @@ xinv:
   ex de,hl
   pop de
   ret
-.echo "xinv: ",$-xinv

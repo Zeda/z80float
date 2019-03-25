@@ -25,4 +25,3 @@ pow_inject:
     ld h,b
     ld l,c
     jp exp_inject
-.echo "expSingle:",$-expSingle

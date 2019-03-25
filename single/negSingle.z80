@@ -21,4 +21,3 @@ negSingle:
     pop de
     pop hl
     ret
-.echo "negSingle:",$-negSingle

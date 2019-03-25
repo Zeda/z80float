@@ -307,5 +307,3 @@ Set_0:
 	ld (hl),d \ dec hl
 	ld (hl),e \ dec hl
 	ld (hl),e \ ret
-
-.echo "FloatDiv Size:",$-FloatDiv_80

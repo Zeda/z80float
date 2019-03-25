@@ -99,4 +99,3 @@ Copy8:
 	ldi
 	ldi
 	ret
-.echo "Subroutines  :",$-subroutine_start

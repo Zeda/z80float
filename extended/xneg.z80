@@ -7,4 +7,3 @@ xneg:
   xor 80h
   ld (de),a
   ret
-.echo "xneg:",$-xabs

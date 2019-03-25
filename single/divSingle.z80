@@ -138,4 +138,3 @@ divsub1:
     ret c
     inc b \ sbc hl,de \ sbc a,c
     ret
-.echo "divSingle:",$-divSingle

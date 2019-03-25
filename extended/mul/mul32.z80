@@ -111,4 +111,3 @@ mul32_add:
   adc hl,bc
   adc a,0
   jp mul32_final
-.echo "  mul32: +",$-mul32

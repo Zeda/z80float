@@ -153,7 +153,7 @@ shiftbits:
 	push hl \ or a \ ld b,c	;number of bytes to shift
 	rr (hl) \ dec hl \ djnz $-3
 	pop hl \ dec a \ jr nz,$-10
-	ret	
+	ret
 bitunroll_64b:
 ;A is the number of 0 bits between 1s
 	ld c,a
@@ -232,5 +232,3 @@ arbu:
 	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
 	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ jr nc,$+10 \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a
 	dec hl \ ld b,a \ ld (hl),0 \ sub 8 \ ret nc \ add a,c \ ld d,a \ ld a,1 \ inc b \ rrca \ djnz $-1 \ ld (hl),a \ ret
-
-.echo "FloatSqrt    :",$-FloatSqrt_80

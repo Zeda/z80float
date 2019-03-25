@@ -140,4 +140,3 @@ mul_inf:
   dec a
   ld (var_z+15),a
   ret
-.echo "xmul: ",$-xmul

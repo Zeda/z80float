@@ -6,4 +6,3 @@ ti2single:
 ;;
 ;;
     ret
-.echo "ti2single:",$-ti2single

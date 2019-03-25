@@ -7,4 +7,3 @@ xabs:
   and $7F
   ld (de),a
   ret
-.echo "xabs:",$-xabs

@@ -20,4 +20,3 @@ subSingle:
     pop hl
     ld de,addend2
     jp addInject    ;jumps in to the addSingle routine
-.echo "subSingle:",$-subSingle

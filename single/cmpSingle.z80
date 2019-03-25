@@ -51,4 +51,3 @@ cmp_is_sign:
 cmp_close:
   xor a
   ret
-.echo "cmpSingle:",$-cmpSingle

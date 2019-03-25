@@ -86,4 +86,3 @@ toti_sub:
 toti_sub_end:
     rld
     ret
-.echo "single2ti:",$-single2ti

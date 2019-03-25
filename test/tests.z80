@@ -1,10 +1,14 @@
 ;Hey, add more tests here!
-  ld hl,xconst_pi
+  ld hl,str_num
   ld bc,xOP1
-  call xtanh
-  call testputs \ .db "2^pi=",0
+  call strtox
+  call testputs
+  .db "Float "
+str_num:
+  .db ".1234",0
   ld hl,xOP1
-  ld bc,xOP1
+  ld b,h
+  ld c,l
   call xtostr
 ;  strx(xOP1,xOP1)
   ld h,b
@@ -18,10 +22,12 @@
   ld l,c
   call puts
 
-  ld hl,xconst_ln_2
+  ld hl,xconst_p2
+  ld de,xconst_p2
+  ld ix,xconst_p04
   ld bc,xOP1
-  call xatanh
-  call testputs \ .db "atanh(ln(2))=",0
+  call xfma
+  call testputs \ .db "fma(.2,.2,-.04)=",0
   strx(xOP1,xOP1)
   ld h,b
   ld l,c
@@ -37,7 +43,20 @@
   ld l,c
   call puts
 
+  ld hl,xconst_pi
+  ld bc,xOP1
+  call xsqrt
+  call testputs \ .db "sqrt(pi)=",0
+  strx(xOP1,xOP1)
+  ld h,b
+  ld l,c
+  call puts
+
 
 
   bcall(_GrBufCpy)
   ret
+xconst_p2:
+ .db $CC,$CC,$CC,$CC,$CC,$CC,$CC,$CC \ .dw $3FFD
+xconst_p04:
+ .db $0A,$D7,$A3,$70,$3D,$0A,$D7,$A3 \ .dw $BFFB

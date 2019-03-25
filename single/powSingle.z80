@@ -16,6 +16,5 @@ powSingle:
     ld l,c
     ex de,hl
     jp pow_inject
-.echo "powSingle:",$-powSingle
 #undefine var_x
 #undefine var_c

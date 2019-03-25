@@ -233,8 +233,8 @@ strToSingle_inf:
 ;return inf
   pop af
   ld hl,const_inf
-  jr nc,$+5
+  jr nc,+_
   ld hl,const_NegInf
+_:
   pop de
   jp mov4
-.echo "str2Single: ",$-str2single

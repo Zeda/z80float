@@ -9,8 +9,6 @@ keyCount=80F7h
 hyperout=scrap+9
 hyperout2=scrap+13
 
-.echo "===Math:",$-math_single
-
 gbuf        = 9340h
 _VPutS      = 4561h
 _VPutMap    = 455Eh

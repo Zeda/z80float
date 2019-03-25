@@ -79,7 +79,6 @@ _:
   pop ix
   pop bc
   ret
-.echo "  div64_32: +",$-div64_32
 div32_32:
 ;228+{0,115}+2*div32_16+mul16
 ;min: 1982cc
@@ -124,7 +123,6 @@ _:
   call div32_16
   ld (var_b),de   ;low 16-bits
   ret
-.echo "  div32: +",$-div32_32
 div32_16:
 ;HLDE/BC
 ;770+16{0,10}+{0,20+{0,21}}
@@ -173,7 +171,6 @@ div32_16:
   add hl,bc
   dec de
   ret
-.echo "  div32_16: +",$-div32_16
 divide16:
 ;max: 958cc
 ;min: 663cc
@@ -250,6 +247,5 @@ div16_14_2:
   add a,a \ sbc hl,bc \ add hl,hl \ jr nc,div16_15_1
 div16_15_2:
   add a,a \ ld e,a \ sbc hl,bc \ ret
-.echo "  div16: +",$-divide16
 #undefine var_x
 #undefine var_b

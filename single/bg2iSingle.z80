@@ -83,7 +83,6 @@ _:
   ld hl,const_1p40625
   jp divSingle
 ;return 1.40625/a
-.echo "B-G Algorithm:",$-bgiSingle
 
 #undefine var_a
 #undefine var_g

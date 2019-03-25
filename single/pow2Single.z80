@@ -154,6 +154,5 @@ exp_zero:
     or a
     ld de,$8000
     jr exp_return_spec
-.echo "pow2Single:",$-pow2Single
 #undefine var_x
 #undefine var_c

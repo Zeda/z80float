@@ -65,4 +65,3 @@ _:
   or 1
   rla
   ret
-.echo "xcmp:",$-xcmp

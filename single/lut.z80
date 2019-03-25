@@ -14,4 +14,3 @@ pow10LUT:
 .db $20,$BC,$3E,$9A ;10^8
 .db $CA,$1B,$0E,$B5 ;10^16
 .db $AE,$C5,$1D,$EA ;10^32
-.echo "LUTs:",$-lut
