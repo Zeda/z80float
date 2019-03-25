@@ -10,8 +10,8 @@
 sqrt32:
 ;Speed: 358+sqrtHLIX+div32_16+mul16
 ;min: 2472
-;max: 3304
-;avg: 2979.137
+;max: 3262
+;avg: 2958.637
 ;Step one is to generate 16 accurate bits
   ld hl,(var_y+2)
   ld ix,(var_y)

@@ -1,18 +1,10 @@
 sqrtHLIX:
 ;Input: HLIX
 ;Output: DE is the sqrt, AHL is the remainder
-;speed: 223+{0,1}+{0,38}+sqrtHL+3*sqrt32sub_2+sqrt32_iter15
-;-102cc from no more calls
-;+6cc extra overhead
-;-60cc in worst case
-;-30cc in average case
-;-17 overhead
-;min: -2
-;max: -4
-;avg: -5.75
+;speed: 754+{0,1}+6{0,6}+{0,3+{0,18}}+{0,38}+sqrtHL
 ;min: 1130
-;max: 1308
-;avg: 1211
+;max: 1266
+;avg: 1190.5
 
 
   call sqrtHL
