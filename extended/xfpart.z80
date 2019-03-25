@@ -1,0 +1,7 @@
+;This routine performs `x mod 1`, returning a non-negative value.
+;+inf -> NaN
+;-inf -> NaN
+;NaN  -> NaN
+
+xfpart:
+  ret

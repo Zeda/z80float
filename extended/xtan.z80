@@ -1,0 +1,17 @@
+#define tan_x xOP1+72
+#define tan_y xOP1+62
+xtan:
+  call pushpop
+  push bc
+  ld bc,tan_x
+  call xcos
+  ld d,b
+  ld e,c
+  ld bc,tan_y
+  call xsin
+  ld h,b
+  ld l,c
+  pop bc
+  jp xdiv
+#undefine tan_x
+#undefine tan_y
