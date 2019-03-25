@@ -10,6 +10,9 @@
 #ifndef TOK_ENG
 #define TOK_ENG 'e'
 #endif
+#ifndef TOK_NEG
+#define TOK_NEG $1A
+#endif
 
 
 
@@ -41,7 +44,7 @@ _:
   jr z,+_
   res 7,d
   ld (xOP1+8),de   ;just making it positive
-  ld (hl),$1A    ;negative sign
+  ld (hl),TOK_NEG    ;negative sign
   inc hl
 _:
   ld a,d
@@ -190,7 +193,7 @@ _:
   ex de,hl
   ld hl,strout
   ld a,(hl)
-  cp $1A
+  cp TOK_NEG
   jr nz,+_
   inc hl
   ld a,(hl)
@@ -233,7 +236,7 @@ _:
   ld hl,strout
   ld de,strout-1
   ld a,(hl)
-  cp $1A    ;negative sign
+  cp TOK_NEG    ;negative sign
   jr nz,+_
   ldi
 _:
@@ -247,7 +250,7 @@ _:
   ld de,(pow10exp)
   bit 7,d
   jr z,+_
-  ld (hl),$1A    ;negative sign
+  ld (hl),TOK_NEG    ;negative sign
   inc hl
   xor a
   sub e
@@ -314,7 +317,7 @@ movdec:
 ;need to put zeroes before everything
   ld de,strout
   ld a,(de)
-  cp $1A    ;negative sign
+  cp TOK_NEG    ;negative sign
   push af
   ld a,'0'
   jr z,$+3
@@ -343,7 +346,7 @@ posdec:
   ld de,strout-1
   ld a,(hl)
   ld bc,(pow10exp)
-  cp $1A    ;negative sign
+  cp TOK_NEG    ;negative sign
   jr nz,+_
   inc bc
 _:
