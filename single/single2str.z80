@@ -282,16 +282,15 @@ _:
   ld hl,strout_single-1
   ret
 strcase_single:
-  ld de,str_Zero
+  ld hl,str_Zero
   ld a,(scrap+2)
   add a,a
   and $C0
   jr z,+_
-  ld de,str_Inf
+  ld hl,str_Inf
   jp pe,+_
-  ld de,str_NaN
+  ld hl,str_NaN
 _:
-  ex de,hl
   call mov4
   ld hl,strout_single
   ret
