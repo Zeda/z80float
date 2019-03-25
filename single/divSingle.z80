@@ -29,10 +29,9 @@ inv_inject:
     ex de,hl    ; |Get exponent
     sub (hl)    ; |
     ex de,hl    ; |
-.echo "Need to check overflow/underflow for divSingle"
-;    jp pe,divunderflow   ; |Actually this needs to be handled as either over or underflow
+    jp c,divunderflow
+    jp m,divoverflow
     xor 80h     ; |
-    jr z,divunderflow  ;/
     ld (quot+3),a
     dec hl
     dec de
@@ -104,14 +103,17 @@ writeback:
     pop de
     pop hl
     ret
-divunderflow:
-    ld b,0
-    jr $+6
-setmantissa0:
-    ld bc,(quot+2)
-    ld de,0
-    ld c,e
+divoverflow:
+    ld bc,$40
     jr writeback
+divunderflow:
+  ld b,0
+setmantissa0:
+  ld bc,(quot+2)
+_:
+  ld de,0
+  ld c,e
+  jr writeback
 divsub0:
 ;;882cc max
     call divsub1    ;34 or 66
