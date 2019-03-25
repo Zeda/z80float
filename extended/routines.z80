@@ -105,24 +105,6 @@ rr64:
   rr (hl) \ dec hl
   rr (hl)
   ret
-mov10:
-  ldi
-mov9:
-  ldi
-mov8:
-  ldi
-mov7:
-  ldi
-mov6:
-  ldi
-mov5:
-  ldi
-mov4:
-  ldi
-  ldi
-  ldi
-  ldi
-  ret
 swapxOP2xOP3:
 ;370cc
   ld hl,(xOP2+8)

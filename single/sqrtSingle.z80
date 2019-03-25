@@ -224,9 +224,3 @@ _:
   srl d
   rra
   ret
-mov4:
-  ldi
-  ldi
-  ldi
-  ldi
-  ret

@@ -1,0 +1,6 @@
+mov4:
+  ldi
+  ldi
+  ldi
+  ldi
+  ret
