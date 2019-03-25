@@ -18,6 +18,7 @@ const_e_inv:  .db $B2,$5A,$3C,$7E
 const_log10_e:.db $D9,$5B,$5E,$7E
 const_2pi:    .db $DB,$0F,$49,$82
 const_2pi_inv:.db $83,$F9,$22,$7D
+const_p25:    .db $00,$00,$00,$7E
 const_p5:     .db $00,$00,$00,$7F
 ;    .db $,$,$,$
 end_const:
