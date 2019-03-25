@@ -1,6 +1,6 @@
-#define var_x 800Bh
-#define var_y 800Fh
-#define temp 8013h
+#define var_x scrap+11
+#define var_y scrap+15
+#define temp scrap+19
 cosSingle:
 ;cos(-pi/4<=x<pi/4)
 ;y=x*x
@@ -8,25 +8,78 @@ cosSingle:
 ;1-y(a1-y(a2-y*a3))
 
 
-  push hl
-  push de
+  call pushpop
   push bc
-  push af
-  call +_
-  pop af
+;Need to apply range reduction
+; We want the input on [-pi/4,pi/4]
+; First multiply by 1/(2pi)
+  ld de,const_2pi_inv
+  ld bc,var_x
+  call mulSingle
+
+; Add .5
+  ld h,b
+  ld l,c
+  ld de,const_p5
+  call addSingle
+
+;Now grab the fpart
+  call fpartSingle
+
+;subtract off the .5
+  call subSingle
+;now x is on [-.5,.5], but we need to evaluate cos(x*2pi) with x on [-.125,.125]
+;We need to employ some identities
+;  cos(-x)=cos(x)
+;    make x positive
+;  cos(x-pi)=-cos(x)
+;   if our x is now on [.25,.5], then subtract .5 and take the absolute value,
+;   and return the negative result.
+;  cos(pi/2-x)=sin(x)
+;    if our x is now on [.125,.25], subtract .25 and feed it to the sine routine.
+
+; maxe x positive
+  ;call absSingle
+  ld hl,var_x+2
+  res 7,(hl)
+
+;Check if the exponent is -2 or more. If so, return -cos(x-pi)
+  inc hl
+  ld a,(hl)
+  sub $7E
+  jr c,+_
+  ld h,b
+  ld l,c
+  call subSingle
   pop bc
-  pop de
+  push bc
+  call cos_subroutine
   pop hl
+  inc hl
+  inc hl
+  ld a,(hl)
+  xor $80
+  ld (hl),a
   ret
 _:
-;Need to verify that we are in fact in range
+;Check if the exponent is -3. If so, return sin(pi/2-x)
+  inc a
+  jr nz,+_
+  ld h,b
+  ld l,c
+  call rsubSingle
+  pop bc
+  jp sin_subroutine
+_:
+
+cos_subroutine:
+;Multiply by 2pi
   push bc
-  ld de,var_x
-  ldi
-  ldi
-  ldi
-  ldi
-  ld hl,var_x
+  ld de,const_2pi
+  ld b,h
+  ld c,l
+  call mulSingle
+
   ld d,h
   ld e,l
   ld bc,var_y
@@ -49,6 +102,39 @@ _:
   ld hl,const_1
   pop bc
   jp subSingle
+sin_subroutine:
+;Multiply by 2pi
+  push bc
+  ld de,const_2pi
+  ld b,h
+  ld c,l
+  call mulSingle
+
+  ld d,h
+  ld e,l
+  ld bc,var_y
+  call mulSingle
+  ld h,b
+  ld l,c
+  ld de,sin_a3
+  ld bc,temp
+  call mulSingle
+  ld hl,sin_a2
+  ld d,b
+  ld e,c
+  call subSingle
+  ld hl,var_y
+  call mulSingle
+  ld hl,sin_a1
+  call subSingle
+  ld hl,var_y
+  call mulSingle
+  ld hl,const_1
+  call subSingle
+  ld hl,var_x
+  pop bc
+  jp mulSingle
+
 #undefine var_x
 #undefine var_y
 #undefine temp
