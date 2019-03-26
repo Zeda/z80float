@@ -25,8 +25,8 @@ xsin:
   ld de,xconst_p25
   call xadd
 
-;Now grab the fpart
-  call xfpart
+;Now grab the xmod1
+  call xxmod1
 
 ;Let's convert this to a cosine problem
   ld de,xconst_p5

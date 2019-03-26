@@ -22,8 +22,8 @@ xcos:
   ld de,xconst_p5
   call xadd
 
-;Now grab the fpart
-  call xfpart
+;Now grab mod 1
+  call xmod1
 
 ;subtract off the .5
   call xsub

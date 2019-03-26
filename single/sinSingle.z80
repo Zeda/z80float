@@ -24,8 +24,8 @@ sinSingle:
   ld de,const_p25
   call addSingle
 
-;Now grab the fpart
-  call fpartSingle
+;Now grab the xmod1
+  call mod1Single
 
 ;Let's convert this to a cosine problem
   ld de,const_p5

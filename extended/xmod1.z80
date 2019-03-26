@@ -3,7 +3,7 @@
 ;-inf -> NaN
 ;NaN  -> NaN
 
-xfpart:
+xmod1:
   call pushpop
   push bc
   ld de,xOP1
@@ -15,20 +15,20 @@ xfpart:
   and $7F
   ld h,a
   or l
-  jp z,xfpart_special
+  jp z,xmod1_special
 
 ;If H<0x40, then there is no integer part!
   ld a,h
   sub $40
-  jr c,xfpart_end
+  jr c,xxmod1_end
 
 ;if A is non-zero, then this number is too big to have stored an integer part
-  jp nz,xfpart_return_0
+  jp nz,xxmod1_return_0
 
 ;If L is >=63, then this number is too big to have stored an integer part
   ld a,l
   cp 63
-  jp nc,xfpart_return_0
+  jp nc,xxmod1_return_0
   inc a
 ;Now we need to shift the mantissa up to remove the integer part
   cp 32
@@ -58,19 +58,19 @@ _:
   ld (xOP1),hl
 _:
   and 7
-  jr z,xfpart_normalize
+  jr z,xxmod1_normalize
   ld b,a
 _:
   call sla64_xOP1
   djnz -_
-xfpart_normalize:
+xxmod1_normalize:
   ld a,(xOP1+9)
   add a,a
   ld hl,$7FFF
   rr h
   ld (xOP1+8),hl
   call normalizexOP1
-xfpart_end:
+xxmod1_end:
 ;If it is negative, add 1
   ld a,(xOP1+9)
   add a,a
@@ -84,14 +84,14 @@ return_xOP1:
   ld hl,xOP1
   pop de
   jp mov10
-xfpart_special:
+xxmod1_special:
   ld a,(xOP1+7)
   add a,a
   jr nc,return_xOP1
   ld a,$40
   ld (xOP1+7),a
   jr return_xOP1
-xfpart_return_0:
+xxmod1_return_0:
   xor a
   ld h,a
   ld l,a
