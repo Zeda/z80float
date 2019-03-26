@@ -1,5 +1,5 @@
 #define var_z xOP3+16
-
+;uses 60 bytes after xOP1
 xmul:
 ;Input:
 ;  HL points to one number
