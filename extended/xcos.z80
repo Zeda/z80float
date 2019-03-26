@@ -55,7 +55,7 @@ xcos_stepin:
   call xsub
   pop bc
   push bc
-  call cos_subroutine
+  call xcos_subroutine
   pop hl
   ld a,9
   add a,l
@@ -76,7 +76,7 @@ _:
   call xrsub
   pop bc
   jp xsin_subroutine
-cos_subroutine:
+xcos_subroutine:
 ;Multiply by 2pi
   push bc
 _:
