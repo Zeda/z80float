@@ -1,5 +1,5 @@
-#define tan_x xOP1+72
-#define tan_y xOP1+62
+#define tan_x xOP1+90
+#define tan_y xOP1+80
 xtan:
   call pushpop
   push bc

@@ -1,6 +1,6 @@
-#define sin_x xOP1+42
-#define sin_y xOP1+52
-#define temp xOP1+62
+#define sin_x xOP1+60
+#define sin_y xOP1+70
+#define temp xOP1+80
 
 xsin:
 ;sine(-pi/4<=x<pi/4)
@@ -53,37 +53,37 @@ xsin_subroutine:
   ld hl,xsin_p6
   ld d,b
   ld e,c
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
   ld hl,xsin_p5
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
 
   ld hl,xsin_p4
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
 
   ld hl,xsin_p3
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
 
   ld hl,xsin_p2
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
 
   ld hl,xsin_p1
-  call xsub
+  call xadd
   ld hl,sin_y
   call xmul
 
 
   ld hl,xsin_p0
-  call xsub
+  call xadd
   ld hl,sin_x
   pop bc
   jp xmul

@@ -1,13 +1,12 @@
-#define cos_x xOP1+42
-#define cos_y xOP1+52
-#define temp xOP1+62
+#define cos_x xOP1+60
+#define cos_y xOP1+70
+#define temp xOP1+80
 
 xcos:
 ;cos(-pi/4<=x<pi/4)
 ;y=x*x
 ;1-y(.49999887-y(.041655882-y.0013591743))
 ;1-y(a1-y(a2-y*a3))
-
   call pushpop
   push bc
 ;Need to apply range reduction
@@ -47,6 +46,7 @@ xcos_stepin:
 ;Check if the exponent is -2 or more. If so, return -cos(x-pi)
   dec hl
   ld a,(hl)
+  ld hl,cos_x
   sub $FE
   jr c,+_
   ld h,b
@@ -76,11 +76,10 @@ _:
   call xrsub
   pop bc
   jp xsin_subroutine
-_:
-
 cos_subroutine:
 ;Multiply by 2pi
   push bc
+_:
   ld de,xconst_2pi
   ld b,h
   ld c,l
@@ -98,37 +97,37 @@ cos_subroutine:
   ld hl,xcos_p6
   ld d,b
   ld e,c
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
   ld hl,xcos_p5
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
 
   ld hl,xcos_p4
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
 
   ld hl,xcos_p3
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
 
   ld hl,xcos_p2
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
 
   ld hl,xcos_p1
-  call xsub
+  call xadd
   ld hl,cos_y
   call xmul
 
   ld hl,xcos_p0
   pop bc
-  jp xsub
+  jp xadd
 #undefine cos_x
 #undefine cos_y
 #undefine temp
