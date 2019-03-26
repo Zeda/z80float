@@ -26,7 +26,7 @@ xsin:
   call xadd
 
 ;Now grab the xmod1
-  call xxmod1
+  call xmod1
 
 ;Let's convert this to a cosine problem
   ld de,xconst_p5
