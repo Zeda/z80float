@@ -17,7 +17,6 @@ divSingle:
 inv_inject:
     push bc
     push af
-    scf \ jr c,$
     inc hl \ inc de
     inc hl \ inc de
     ld a,(de)   ;\
