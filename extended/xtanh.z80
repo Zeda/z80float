@@ -19,32 +19,15 @@ xtanh:
 ;  = 1-2/(e^2x+1)
 
   call pushpop
-  ld d,h
-  ld e,l
-  call xadd
+  push bc
+  ld bc,xOP1
+  call x_times_2
   ld h,b
   ld l,c
   call xexp
   ld de,xconst_1
   call xadd
   call xinv
-  ld de,8
-  ex de,hl    ;points to output
-  add hl,de
-  dec (hl)
-  jr nz,+_
-  inc hl
-  ld a,(hl)
-  add a,a
-  ld c,a
-  dec a
-  dec a
-  rra
-  ld (hl),a
-  jr nz,+_
-  dec hl
-  dec hl
-  ld (hl),0
-_:
-  ld hl,xconst_1
-  jp xsub
+  call x_times_2
+  pop bc
+  jp xrsub
