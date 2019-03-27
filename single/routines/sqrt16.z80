@@ -1,0 +1,87 @@
+sqrtHL:
+;returns A as the sqrt, HL as the remainder, D = 0
+;min: 376cc
+;max: 416cc
+;avg: 393cc
+  ld de,$5040
+  ld a,h
+  sub e
+  jr nc,+_
+  add a,e
+  ld d,$10
+_:
+  sub d
+  jr nc,+_
+  add a,d
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  set 5,d
+  res 4,d
+  srl d
+
+  set 2,d
+  sub d
+  jr nc,+_
+  add a,d
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  set 3,d
+  res 2,d
+  srl d
+
+  inc d
+  sub d
+  jr nc,+_
+  add a,d
+  dec d   ;this resets the low bit of D, so `srl d` resets carry.
+  .db $06   ;start of ld b,* which is 7cc to skip the next byte.
+_:
+  inc d
+  srl d
+  ld h,a
+
+
+  sbc hl,de
+  ld a,e
+  jr nc,+_
+  add hl,de
+_:
+  ccf
+  rra
+  srl d
+  rra
+  ld e,a
+
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  or %00100000
+  xor %00011000
+  srl d
+  rra
+  ld e,a
+
+
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
+_:
+  or %00001000
+  xor %00000110
+  srl d
+  rra
+  ld e,a
+  sbc hl,de
+  jr nc,+_
+  add hl,de
+  srl d
+  rra
+  ret
+_:
+  inc a
+  srl d
+  rra
+  ret
