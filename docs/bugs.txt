@@ -1,5 +1,0 @@
-xdiv seems to be having issues around the 10th digit (shown with tan(1/(2pi)), where cosine and sine are accurate, tan computed with sin/cos)
-xinv is failing on 1/pi at the tenth digit
-xlog10 is failing on, for example, log(pi)
-xlog is failing terribly
-xtanh is not computing properly. It looks like an issue with the final subtraction
