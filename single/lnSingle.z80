@@ -39,8 +39,10 @@ lnSingle:
     pop af
     ;need to multiply ln2*(A-80h) and addd it to the final result
     sub 80h
-    jr nc,$+4
+    jr z,lnSingle_noadjust
+    jr nc,+_
     neg
+_:
     push af
     ld c,a
     ld b,$B1 \ ld de,$7218    ;ln(2)
@@ -49,10 +51,12 @@ lnSingle:
     ld b,$7F
     inc c
     dec c
-    jr z,$+14
+    jr z,lnSingle_noshift
+_:
     inc b \ srl c \ rra \ rr h \ rr l
     inc c \ dec c
-    jr nz,$-10
+    jr nz,-_
+lnSingle_noshift:
   ;;C*BDE => CAHL
     ;BAHL
     ld c,a
@@ -68,13 +72,9 @@ _:
     ld c,e
     call addSingle
     ex de,hl
-_:
+lnSingle_noadjust:
     pop de
-    ldi
-    ldi
-    ldi
-    ldi
-    ret
+    jp mov4
 #undefine var_a
 #undefine var_g
 #undefine var_b
