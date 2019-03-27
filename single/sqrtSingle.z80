@@ -1,9 +1,9 @@
 ;Uses 3 bytes at scrap
 sqrtSingle:
-;733+2{0,15}+{0,1}+7{0,6}+{0,3}+pushpop+sqrtHL+2*HL_Div_E_special
-;min: 1751
-;max: 1985
-;avg: 1856.5
+;552+{0,19}+8{0,3+{0,3}}+pushpop+sqrtHLIX
+;min: 1784
+;max: 1987
+;avg: 1872
   call pushpop
   push bc
   ld c,(hl)
@@ -32,30 +32,33 @@ _:
   ld ixh,c
   ld ixl,0
   call sqrtHLIX
-  ld (scrap+1),de
-
 ;AHL is the new remainder
 ;Need to divide by 2, then divide by the 16-bit (var_x+4)
   rra
-  rr h
-  rr l
-  ld bc,(scrap+1)
-;HL/BC to 8 bits, allowed to destroy remainder
+  ld a,h
+;HL/DE to 8 bits
 ;We are just going to approximate it
-  ld e,b
-  call HL_Div_E_special
-  pop de
+  res 0,l \     jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+  sla l \ rla \ jr c,$+5 \ cp d \ jr c,$+4 \ sub d \ inc l
+
+  pop bc
   ld a,l
   pop hl
-  ;DBCA
+  ;BDEA
   ld (hl),a
   inc hl
-  ld (hl),c
+  ld (hl),e
   inc hl
-  res 7,b
-  ld (hl),b
-  inc hl
+  res 7,d
   ld (hl),d
+  inc hl
+  ld (hl),b
   ret
 sqrtSingle_NaN:
   ld hl,const_NaN
@@ -66,105 +69,3 @@ sqrtSingle_special:
   dec hl
   pop de
   jp mov4
-HL_Div_E_special:
-;262+7{0,3+{0,3}}+{8,{0,12}}
-;min: 262cc
-;max: 316cc
-;avg: 284.75cc
-  ld a,h
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+5 \ cp e \ jr c,$+4 \ sub e \ inc l
-  sla l \ rla \ jr c,$+4 \ cp e \ ret c \ sub e \ inc l
-  ret
-sqrtHL:
-;returns A as the sqrt, HL as the remainder, D = 0
-;min: 376cc
-;max: 416cc
-;avg: 393cc
-  ld de,$5040
-  ld a,h
-  sub e
-  jr nc,+_
-  add a,e
-  ld d,$10
-_:
-  sub d
-  jr nc,+_
-  add a,d
-  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
-_:
-  set 5,d
-  res 4,d
-  srl d
-
-  set 2,d
-  sub d
-  jr nc,+_
-  add a,d
-  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
-_:
-  set 3,d
-  res 2,d
-  srl d
-
-  inc d
-  sub d
-  jr nc,+_
-  add a,d
-  dec d   ;this resets the low bit of D, so `srl d` resets carry.
-  .db $06   ;start of ld b,* which is 7cc to skip the next byte.
-_:
-  inc d
-  srl d
-  ld h,a
-
-
-  sbc hl,de
-  ld a,e
-  jr nc,+_
-  add hl,de
-_:
-  ccf
-  rra
-  srl d
-  rra
-  ld e,a
-
-  sbc hl,de
-  jr nc,+_
-  add hl,de
-  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
-_:
-  or %00100000
-  xor %00011000
-  srl d
-  rra
-  ld e,a
-
-
-  sbc hl,de
-  jr nc,+_
-  add hl,de
-  .db $01   ;start of ld bc,** which is 10cc to skip the next two bytes.
-_:
-  or %00001000
-  xor %00000110
-  srl d
-  rra
-  ld e,a
-  sbc hl,de
-  jr nc,+_
-  add hl,de
-  srl d
-  rra
-  ret
-_:
-  inc a
-  srl d
-  rra
-  ret
