@@ -29,80 +29,24 @@ sqrtSingle:
   rr c
 _:
   ex de,hl
-  ;HLC
-  push bc
-  call sqrtHL
-  pop bc
-  ld (scrap+2),a
-  rr h
-  ld h,l
-  rr h
-  ld l,c
-  rr l
-  ld e,a
-  ;HL/E
-  call HL_Div_E_special
-  ld e,a
-  ld a,c
-  rra
-  rl e
-  ld d,0
-  ld b,d
-  rl d
+  ld ixh,c
+  ld ixl,0
+  call sqrtHLIX
+  ld (scrap+1),de
 
-  ld a,l
-  ld (scrap+1),a
-
-
-
-;now we need to compute l*l
-  ld c,l
-  ld l,b
-  add a,a
-  ld h,a
-  jr nc,$+3 \ ld l,c
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-  add hl,hl \ jr nc,$+3 \ add hl,bc
-;leaves c flag reset
-
-;now need to perform DE*256-HL --> AHL
-  xor a
-  sub l
-  ld l,a
-  ld a,e
-  sbc a,h
-  ld h,a
-  ld a,d
-  sbc a,0
 ;AHL is the new remainder
 ;Need to divide by 2, then divide by the 16-bit (var_x+4)
-  push af
   rra
   rr h
   rr l
-  inc a
-  jr nz,+_
-  sub l \ ld l,a
-  sbc a,a \ sub h \ ld h,a
-_:
   ld bc,(scrap+1)
 ;HL/BC to 8 bits, allowed to destroy remainder
 ;We are just going to approximate it
   ld e,b
   call HL_Div_E_special
-  pop af
   pop de
   ld a,l
   pop hl
-  jr nc,+_
-  neg
-  dec bc
-_:
   ;DBCA
   ld (hl),a
   inc hl
