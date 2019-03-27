@@ -1,3 +1,4 @@
+#define var_x xOP2   ;output
 div64:
 ;var_n / var_x
 ;304+2*div64_32+mul32+sub64+{0,72+add64+{0,19+{0,19+{0,3
@@ -16,7 +17,7 @@ div64:
   ld (var_n+4),de
   ld hl,(var_x)
   ld de,(var_x+2)
-  call mul32  ;DEHL * BCIX
+  call mul32  ;DEHL * BCIX      ;Zeda, investigate if this is always 0xFFFFFFFF or similar
   ;var_z0 holds the 64-bit result
   ;need var_n-z0_32
   ld hl,0
