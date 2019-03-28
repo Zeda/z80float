@@ -35,7 +35,6 @@ xsin:
 
 xsin_subroutine:
 ;Multiply by 2pi
-  push bc
   ld de,xconst_2pi
   ld b,h
   ld c,l
@@ -87,25 +86,6 @@ xsin_subroutine:
   ld hl,sin_x
   pop bc
   jp xmul
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 xsin_p0:
 .db $00,$00,$00,$00,$00,$00,$00,$80,$00,$40    ;0.9999999999999999999981204044115315796

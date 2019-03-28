@@ -34,10 +34,7 @@ sinSingle:
 
 sin_subroutine:
 ;Multiply by 2pi
-  push bc
   ld de,const_2pi
-  ld b,h
-  ld c,l
   call mulSingle
 
   ld d,h
