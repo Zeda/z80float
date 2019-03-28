@@ -27,6 +27,10 @@ xcos:
 
 ;subtract off the .5
   call xsub
+  jr xcos_stepin
+xcos_readjust:
+  push bc
+  ld bc,cos_x
 xcos_stepin:
 ;now x is on [-.5,.5], but we need to evaluate cos(x*2pi) with x on [-.125,.125]
 ;We need to employ some identities
@@ -52,12 +56,18 @@ xcos_stepin:
   jr c,+_
   ld de,xconst_p5
   call xsub
+;We don't want to infinite loop if the result is .25-.5 = -.25 !
+  ld a,(cos_x+8)
+  sub $7E
+  jr nz,$+9
+  ld a,80h
+  ld (cos_x+8),a
+  jr +_
   pop bc
-  push bc
-  call xcos_subroutine
-  pop hl
+  call xcos_readjust
+  ld h,b
   ld a,9
-  add a,l
+  add a,c
   ld l,a
   jr nc,$+3
   inc h
@@ -71,11 +81,7 @@ _:
   jr nz,+_
   ld de,xconst_p25
   call xrsub
-  pop bc
   jp xsin_subroutine
-xcos_subroutine:
-;Multiply by 2pi
-  push bc
 _:
   ld de,xconst_2pi
   ld b,h

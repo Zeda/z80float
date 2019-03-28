@@ -27,6 +27,10 @@ cosSingle:
 
 ;subtract off the .5
   call subSingle
+  jr cosSingle_stepin
+cosSingle_readjust:
+  push bc
+  ld bc,var_x
 cosSingle_stepin:
 ;now x is on [-.5,.5], but we need to evaluate cos(x*2pi) with x on [-.125,.125]
 ;We need to employ some identities
@@ -52,7 +56,14 @@ cosSingle_stepin:
   jr c,+_
   ld de,const_p5
   call subSingle
-  call cos_subroutine+1
+;We don't want to infinite loop if the result is .25-.5 = -.25 !
+  ld a,(var_x+3)
+  sub $7E
+  jr nz,$+7
+  ld (var_x+2),a
+  jr +_
+  pop bc
+  call cosSingle_readjust
   ld h,b
   ld l,c
   inc hl
@@ -67,11 +78,7 @@ _:
   jr nz,+_
   ld de,const_p25
   call rsubSingle
-  pop bc
   jp sin_subroutine
-cos_subroutine:
-;Multiply by 2pi
-  push bc
 _:
   ld de,const_2pi
   ld b,h
