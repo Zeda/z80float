@@ -1,3 +1,6 @@
+#define hyperout scrap+9
+#define hyperout2 scrap+13
+
 tanhSingle:
     push af
     push hl

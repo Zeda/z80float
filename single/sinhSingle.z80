@@ -1,3 +1,5 @@
+#define hyperout scrap+9
+#define hyperout2 scrap+13
 sinhSingle:
     push af
     push hl
