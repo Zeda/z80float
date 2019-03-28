@@ -1,26 +1,55 @@
 randSingle:
-    push af
-    push hl
-    push de
-    push bc
-    call rand
-;ADECHL
-    ld a,b
-    ld b,7Fh
-    or a
-    jp m,$+15
-    dec b \ add hl,hl \ rl c \ rl e \ rl d \ adc a,a \ jp p,$-9
-    pop hl
-    ld (hl),e
-    ld e,b
-    ld b,h
-    ld c,l
-    inc hl
-    ld (hl),d \ inc hl
-    and 7Fh
-    ld (hl),a \ inc hl
-    ld (hl),e
-    pop de
-    pop hl
-    pop af
-    ret
+;Stores a pseudo-random number on [0,1)
+;it won't produce values on (0,2^-23)
+  call pushpop
+  push bc
+  call rand
+  push hl
+  call rand
+  pop de
+  ex de,hl
+  ld bc,$207F
+;DEHL is the mantissa, B is the exponent
+  ld a,d
+  or a
+  jp m,rand_normed
+_:
+  dec c
+  add hl,hl \ rl e \ rl d
+  jp m,rand_normed
+  djnz -_
+rand_zero:
+  ld c,l
+  ld b,l
+  jr rand_done
+rand_normed:
+;If we needed to shift more than 8 bits, we'll load in more random data
+  ld a,b
+  cp 8
+  jr c,rand_zero
+  sub 24
+  jp nc,rand_no_more_rand_data
+  push bc
+  push de
+  call rand
+  pop de
+  ld e,h
+  ld h,l
+  pop bc
+rand_no_more_rand_data:
+  ld b,e
+  ld e,d
+  ld d,c
+  ld c,h
+  res 7,e
+rand_done:
+  pop hl
+  ;DEBC
+  ld (hl),b
+  inc hl
+  ld (hl),c
+  inc hl
+  ld (hl),e
+  inc hl
+  ld (hl),d
+  ret
