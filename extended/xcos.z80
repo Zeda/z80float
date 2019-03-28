@@ -46,11 +46,10 @@ xcos_stepin:
 ;Check if the exponent is -2 or more. If so, return -cos(x-pi)
   dec hl
   ld a,(hl)
-  ld hl,cos_x
-  sub $FE
-  jr c,+_
   ld h,b
   ld l,c
+  sub $FE
+  jr c,+_
   ld de,xconst_p5
   call xsub
   pop bc
@@ -70,8 +69,6 @@ _:
 ;Check if the exponent is -3. If so, return sin(pi/2-x)
   inc a
   jr nz,+_
-  ld h,b
-  ld l,c
   ld de,xconst_p25
   call xrsub
   pop bc

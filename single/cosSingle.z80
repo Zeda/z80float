@@ -46,16 +46,15 @@ cosSingle_stepin:
 ;Check if the exponent is -2 or more. If so, return -cos(x-pi)
   inc hl
   ld a,(hl)
-  sub $7E
-  jr c,+_
   ld h,b
   ld l,c
+  sub $7E
+  jr c,+_
   ld de,const_p5
   call subSingle
-  pop bc
-  push bc
-  call cos_subroutine
-  pop hl
+  call cos_subroutine+1
+  ld h,b
+  ld l,c
   inc hl
   inc hl
   ld a,(hl)
@@ -66,8 +65,6 @@ _:
 ;Check if the exponent is -3. If so, return sin(pi/2-x)
   inc a
   jr nz,+_
-  ld h,b
-  ld l,c
   ld de,const_p25
   call rsubSingle
   pop bc
