@@ -131,12 +131,9 @@ mul_zero:
   xor a
   ld (var_z+15),a
   ld d,a
-  ld e,a
   ret
 mul_inf:
-  xor a
-  ld d,a
-  ld e,a
-  dec a
+  ld d,e
+  ld a,255
   ld (var_z+15),a
   ret
