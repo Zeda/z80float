@@ -2,79 +2,79 @@ sub64:
 ;266cc
   or a
 sbc64:
-;234cc
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc e \ inc l
+;262cc
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ sbc a,(hl) \ ld (de),a \ inc de \ inc hl
   ld a,(de) \ sbc a,(hl) \ ld (de),a
   ret
 rsub40:
-  ld a,(de) \ sub (hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
+  ld a,(de) \ sub (hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
   ld a,(de) \ sbc a,(hl) \ ld (hl),a
   ret
 add64:
 ;266cc
   or a
 adc64:
-;234cc
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
-  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc e \ inc l
+;262cc
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
   ld a,(de) \ adc a,(hl) \ ld (de),a
   ret
 rsbc64:
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
-  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc l \ inc e
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
+  ld a,(de) \ sbc a,(hl) \ ld (hl),a \ inc hl \ inc de
   ld a,(de) \ sbc a,(hl) \ ld (hl),a
   ret
 neg64:
   xor a
-  ld c,a \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
-  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc l
+  ld c,a \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
+  ld a,c \ sbc a,(hl) \ ld (hl),a \ inc hl
   ld a,c \ sbc a,(hl) \ ld (hl),a
   ret
 cmp64:
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
-  ld a,(de) \ cp (hl) \ ret nz \ inc e \ inc l
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
+  ld a,(de) \ cp (hl) \ ret nz \ inc de \ inc hl
   ld a,(de) \ cp (hl) \ ret
 srlxOP2_4:
   ld hl,xOP2+7
 srl64_4:
   xor a
 rrd8:
-  rrd \ dec l
-  rrd \ dec l
-  rrd \ dec l
-  rrd \ dec l
-  rrd \ dec l
-  rrd \ dec l
-  rrd \ dec l
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
+  rrd \ dec hl
   rrd
   ret
 srlxOP2:
@@ -84,25 +84,25 @@ srlxOP1_mantissa:
 ;182cc
   ld hl,xOP1+7
 srl64:
-;158cc
-  srl (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
+;172cc
+  srl (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
   rr (hl)
   ret
 rr64:
-;158cc
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
-  rr (hl) \ dec l
+;172cc
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
+  rr (hl) \ dec hl
   rr (hl)
   ret
 swapxOP2xOP3:
@@ -164,19 +164,20 @@ restoredi:
 restoreei:
   ei
   ret
+
 normalizexOP1:
   ld a,(xOP1+7)
   add a,a
   ret c
 _:
   ld hl,xOP1
-  sla (hl) \ inc l
-  rl (hl) \ inc l
-  rl (hl) \ inc l
-  rl (hl) \ inc l
-  rl (hl) \ inc l
-  rl (hl) \ inc l
-  rl (hl) \ inc l
+  sla (hl) \ inc_hl_opt(xOP1)
+  rl (hl) \ inc_hl_opt(xOP1+1)
+  rl (hl) \ inc_hl_opt(xOP1+2)
+  rl (hl) \ inc_hl_opt(xOP1+3)
+  rl (hl) \ inc_hl_opt(xOP1+4)
+  rl (hl) \ inc_hl_opt(xOP1+5)
+  rl (hl) \ inc_hl_opt(xOP1+6)
   rl (hl)
   ld hl,(xOP1+8)
   dec hl
@@ -192,10 +193,14 @@ addmantissa0102:
   call rr64
   ex de,hl
   call srl64
-  ld l,$08
+#if ((xOP1+8)>>8)==(xOP1>>8)
+  ld l,(xOP1+8)&255
+#else
+  ld hl,xOP1+8
+#endif
   inc (hl)
   ret nz
-  inc l
+  inc_hl_opt(xOP1+8)
   ld a,(hl)
   inc (hl)
   xor (hl)
