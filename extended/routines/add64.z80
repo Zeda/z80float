@@ -1,0 +1,14 @@
+add64:
+;266cc
+  or a
+adc64:
+;262cc
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a \ inc de \ inc hl
+  ld a,(de) \ adc a,(hl) \ ld (de),a
+  ret

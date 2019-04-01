@@ -1,0 +1,25 @@
+swapxOP2xOP3:
+;370cc
+  ld hl,(xOP2+8)
+  ld de,(xOP3+8)
+  ld (xOP3+8),hl
+  ld (xOP2+8),de
+swapxOP2xOP3_mantissa:
+;298cc
+  ld hl,(xOP2)
+  ld de,(xOP3)
+  ld (xOP3),hl
+  ld (xOP2),de
+  ld hl,(xOP2+2)
+  ld de,(xOP3+2)
+  ld (xOP3+2),hl
+  ld (xOP2+2),de
+  ld hl,(xOP2+4)
+  ld de,(xOP3+4)
+  ld (xOP3+4),hl
+  ld (xOP2+4),de
+  ld hl,(xOP2+6)
+  ld de,(xOP3+6)
+  ld (xOP3+6),hl
+  ld (xOP2+6),de
+  ret
