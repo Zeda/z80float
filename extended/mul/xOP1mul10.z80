@@ -3,48 +3,48 @@ xOP1mul10:
   ld hl,xOP1
   ld de,xOP2
   call mov8
-  ld hl,xOP1+8
+  ; ld hl,xOP1+8 ; useless thanks to the 8x LDI's just before...
   ld a,3
   add a,(hl)
   ld (hl),a
   jr nc,+_
-  inc hl
+  inc l
   inc (hl)
 _:
-  ld hl,xOP2+7
-  srl (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
+  ld l,$11
+  srl (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
   rr (hl)
-  ld hl,xOP2+7
-  srl (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
+  ld l,$11
+  srl (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
   rr (hl)
   ld de,xOP1
   call adc64
   ret nc
-  ld hl,xOP1+8
+  ld l,$08
   inc (hl)
   jr nz,+_
-  inc hl
+  inc l
   inc (hl)
 _:
   ex de,hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
-  rr (hl) \ dec hl
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
+  rr (hl) \ dec l
   rr (hl)
   ret
