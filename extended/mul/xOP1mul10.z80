@@ -11,7 +11,11 @@ xOP1mul10:
   inc l
   inc (hl)
 _:
-  ld l,$11
+#if ((xOP2+7)>>8)==((xOP1+8)>>8)
+  ld l,255&(xOP2+7)
+#else
+  ld hl,xOP2+7
+#endif
   srl (hl) \ dec l
   rr (hl) \ dec l
   rr (hl) \ dec l
@@ -20,7 +24,11 @@ _:
   rr (hl) \ dec l
   rr (hl) \ dec l
   rr (hl)
-  ld l,$11
+#if ((xOP2+7)>>8)==(xOP2>>8)
+  ld l,255&(xOP2+7)
+#else
+  ld hl,xOP2+7
+#endif
   srl (hl) \ dec l
   rr (hl) \ dec l
   rr (hl) \ dec l
@@ -32,7 +40,11 @@ _:
   ld de,xOP1
   call adc64
   ret nc
-  ld l,$08
+#if ((xOP1+8)>>8)==(xOP2>>8)
+  ld l,255&(xOP1+8)
+#else
+  ld hl,xOP1+8
+#endif
   inc (hl)
   jr nz,+_
   inc l
