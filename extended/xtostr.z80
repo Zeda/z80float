@@ -137,14 +137,15 @@ _:
 
   ld a,(hl) ;the first digit, might be as large as twenty
   pop hl
-  cp 10
+  ld c,10
+  cp c
   jr c,+_
   ld de,(pow10exp)
-  dec de
   ld (hl),'0'-1
-  inc de \ inc (hl) \ sub 10 \ jr nc,$-4
+  .db $FE   ;start of `cp **` (to avoid the very first "inc de")
+  inc de \ inc (hl) \ sub c \ jr nc,$-4
   ld (pow10exp),de
-  add a,10
+  add a,c
   inc hl
   dec b
 #ifdef EXTERNAL_FORMAT_LEN
@@ -178,10 +179,10 @@ xtostr_round:
   ld a,(hl)
   cp $3A
   jr z,$-7
-  inc hl
-_:
 
 ;Strip trailing zeros
+  .db $FE   ;start of `cp **` (to avoid the very first "dec hl")
+_:
   dec hl
   ld a,(hl)
   cp '0'
@@ -347,11 +348,11 @@ posdec:
   ld a,(hl)
   ld bc,(pow10exp)
   cp TOK_NEG    ;negative sign
-  jr nz,+_
-  inc bc
-_:
-  inc bc
   ldir
+  jr nz,+_
+  ldi
+_:
+  ldi
   pop hl
 ;HL points to the end of the string
 ;DE points to where the decimal is printed
