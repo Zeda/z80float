@@ -1,9 +1,7 @@
 #ifndef included_div32
 #define included_div32
-#ifdef ZAPP
-#include "div32_16.z80"
-#include "../mul/mul16.z80"
-#endif
+#include "div/div32_16.z80"
+#include "mul/mul16.z80"
 
 #define var_x xOP2   ;output
 #define var_b xOP2   ; 4 bytes, result gets copied to bottom anyways

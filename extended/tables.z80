@@ -1,3 +1,5 @@
+#ifndef included_tables
+#define included_tables
 pown10table:
 .db $DE,$9F,$CE,$D2,$C8,$04,$DD,$A6 \ .dw $0AD9  ;10^-4096
 .db $E4,$2D,$36,$34,$4F,$53,$AE,$CE \ .dw $256C  ;10^-2048
@@ -29,3 +31,4 @@ pow10table:
 .db $00,$00,$00,$00,$00,$00,$00,$C8 \ .dw $4006  ;10^2
 xconst_10:
 .db $00,$00,$00,$00,$00,$00,$00,$A0 \ .dw $4003  ;10^1
+#endif

@@ -1,3 +1,5 @@
+#ifndef included_rr64
+#define included_rr64
 rr64:
 ;172cc
   rr (hl) \ dec hl
@@ -9,3 +11,4 @@ rr64:
   rr (hl) \ dec hl
   rr (hl)
   ret
+#endif

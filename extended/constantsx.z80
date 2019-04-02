@@ -1,3 +1,5 @@
+#ifndef included_constantsx
+#define included_constantsx
 ;==========================================================
 ;The following are common constants given to 64-bit precision.
 ;==========================================================
@@ -42,3 +44,4 @@ end_xconst:
 ;==========================================================
 xconst_3028466566125:
   .db $00,$00,$40,$FB,$20,$AB,$47,$B0 \ .dw $4029
+#endif

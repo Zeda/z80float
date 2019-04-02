@@ -1,54 +1,12 @@
 ;Hey, add more tests here!
-  ld hl,str_num
-  ld bc,xOP1
-  call strtox
-  call testputs
-  .db "Float "
-str_num:
-  .db ".1234",0
-  ld hl,xOP1
-  ld b,h
-  ld c,l
-  call xtostr
+;  ld hl,xconst_pi
+;  ld bc,xOP1
+;  call xmul11
+;  call testputs \ .db "11pi=",0
 ;  strx(xOP1,xOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  rsubx(xconst_pi,xconst_e,xOP4)
-  call testputs \ .db "(e-pi)=",0
-  strx(xOP4,xOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  ld hl,xconst_pi
-  ld bc,xOP1
-  call xmul11
-  call testputs \ .db "11pi=",0
-  strx(xOP1,xOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  ld hl,xconst_pi
-  ld de,xconst_10
-  ld bc,xOP1
-  call xmul7
-  call testputs \ .db "7pi=",0
-  strx(xOP1,xOP1)
-  ld h,b
-  ld l,c
-  call puts
-
-  ld hl,xconst_e
-  ld bc,xOP1
-  call xcos
-  call testputs \ .db "cos(e)=",0
-  strx(xOP1,xOP1)
-  ld h,b
-  ld l,c
-  call puts
+;  ld h,b
+;  ld l,c
+;  call puts
 
 
   bcall(_GrBufCpy)

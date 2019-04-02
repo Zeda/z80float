@@ -1,3 +1,14 @@
+#ifndef included_xtanh
+#define included_xtanh
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "xrsub.z80"
+#include "xadd.z80"
+#include "xinv.z80"
+#include "xexp.z80"
+#include "constantsx.z80"
+#include "mul/xmul2.z80"
+
 ;https://www.math.utah.edu/~beebe/software/ieee/tanh.pdf
 ;p0 = -1613.4119023996228053
 ;p1 = -99.225929672236083313
@@ -21,13 +32,14 @@ xtanh:
   call pushpop
   push bc
   ld bc,xOP1
-  call x_times_2
+  call xmul2
   ld h,b
   ld l,c
   call xexp
   ld de,xconst_1
   call xadd
   call xinv
-  call x_times_2
+  call xmul2
   pop bc
   jp xrsub
+#endif

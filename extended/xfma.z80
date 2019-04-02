@@ -1,4 +1,17 @@
-#ifdef inc_FMA
+#ifndef included_xfma
+#define included_xfma
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/add64.z80"
+#include "routines/sub64.z80"
+#include "routines/sla64.z80"
+#include "routines/rr64.z80"
+#include "routines/srl64.z80"
+#include "routines/srl64_x4.z80"
+#include "routines/swapbuf.z80"
+#include "xmul.z80"
+
+
 xfma:
 ;Fused Multiply-Add
 ;Performs x*y+t -> z
@@ -225,6 +238,4 @@ add_inf_fma:
   ld l,a
   ld (var_z+16),hl
   ret
-#else
-.echo "*** Need a `#define inc_FMA`
 #endif

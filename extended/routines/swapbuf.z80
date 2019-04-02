@@ -1,3 +1,5 @@
+#ifndef included_swapbuf
+#define included_swapbuf
 swapbuf:
 ;HL and DE point to the buffers to swap
 ;BC is the number of bytes
@@ -9,3 +11,4 @@ swapbuf:
   inc hl
   jp pe,swapbuf
   ret
+#endif

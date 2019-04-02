@@ -1,3 +1,13 @@
+#ifndef included_xsin
+#define included_xsin
+#include "routines/pushpop.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xadd.z80"
+#include "xrsub.z80"
+#include "xmod1.z80"
+#include "xcos.z80"
+
 #define sin_x xOP1+60
 #define sin_y xOP1+70
 #define temp xOP1+80
@@ -107,3 +117,4 @@ xsin_p7:
 #undefine sin_x
 #undefine sin_y
 #undefine temp
+#endif

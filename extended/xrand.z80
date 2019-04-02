@@ -1,10 +1,14 @@
+#ifndef included_xrand
+#define included_xrand
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/rand.z80"
+#include "routines/normalizexOP1.z80"
+
 xrand:
 ;Stores a pseudo-random number on [0,1)
 ;it won't produce values on (0,2^-63)
-  push hl
-  push de
-  push bc
-  push af
+  call pushpop
   push bc
 
   call rand
@@ -45,9 +49,5 @@ _:
 randdone:
   pop de
   ld hl,xOP1
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
+  jp mov10
+#endif

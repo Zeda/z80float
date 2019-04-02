@@ -1,27 +1,24 @@
+#ifndef included_xln
+#define included_xln
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xamean.z80"
+#include "xsub.z80"
+#include "xbg.z80"
+
+
 ;NOTE! Doesn't yet check for special numbers!
 ;Not accurate on x<1, or some large x.
 ;ln(1) is pretty broken, probably an issue with subtraction.
 ;
-;We are going to compute ln(x) using teh B-G algo.
+;We are going to compute ln(x) using the B-G algo.
 ;(x-1)/BG(.5(1+x), sqrt(x))
 #define var_x  xOP1+152
 xln:
-  push hl
-  push de
+  call pushpop
   push bc
-  push af
-  push bc
-  call +_
-  pop de
-  ld hl,xOP4
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-;(x-1)/BG(.5(1+x),sqrt(x))
   ld de,var_x
   call mov10
   ld hl,var_x
@@ -41,4 +38,6 @@ _:
   ld hl,var_x
   ld d,b
   ld e,c
+  pop bc
   jp xmul
+#endif

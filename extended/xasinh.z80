@@ -1,20 +1,17 @@
+#ifndef included_xasinh
+#define included_xasinh
+#include "routines/pushpop.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xadd.z80"
+#include "xsqrt.z80"
+#include "xbg.z80"
+
 ;x/BG(sqrt(1-x^2),1)
 #define var_x  xOP1+152
 xasinh:
-  push hl
-  push de
+  call pushpop
   push bc
-  push af
-  push bc
-  call +_
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
   push hl
   ld d,h
   ld e,l
@@ -27,4 +24,6 @@ _:
   call xsqrt
   call xbg
   pop de
+  pop bc
   jp xmul
+#endif

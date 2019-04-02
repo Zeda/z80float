@@ -1,8 +1,6 @@
 #ifndef included_mul32
 #define included_mul32
-#ifdef ZAPP
-#include "mul16.z80"
-#endif
+#include "mul/mul16.z80"
 #define var_z xOP3+16
 #define z0_64 var_z
 #define z2_64 z0_64+8

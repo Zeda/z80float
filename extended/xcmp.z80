@@ -1,9 +1,7 @@
 #ifndef included_xabs
 #define included_xabs
-#ifdef ZAPP
 #include "routines/mov.z80"
 #include "xsub.z80"
-#endif
 
 xcmp:
 ;Input: DE points to float1, HL points to float2

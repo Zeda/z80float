@@ -1,9 +1,7 @@
 #ifndef included_sqrt64
 #define included_sqrt64
-#ifdef ZAPP
-#include "sqrt32.z80"
-#include "../div/div32.z80"
-#endif
+#include "sqrt/sqrt32.z80"
+#include "div/div32.z80"
 
 sqrt64:
 ;avg: 7544.059294cc

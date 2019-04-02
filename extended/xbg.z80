@@ -1,11 +1,19 @@
 #ifndef included_xbg
 #define included_xbg
-#ifdef ZAPP
 #include "routines/pushpop.z80"
 #include "routines/mov.z80"
+#include "mul/xmul11.z80"
+#include "mul/xmul13.z80"
+#include "mul/xmul31.z80"
+#include "mul/xmul7.z80"
+#include "mul/xmul17.z80"
+#include "mul/xmul15.z80"
+#include "mul/xmul5.z80"
+
+#include "xsub.z80"
+#include "xdiv.z80"
 #include "xamean.z80"
 #include "xgeomean.z80"
-#endif
 
 #define var_a xOP3+42
 #define var_g var_a+10

@@ -1,10 +1,8 @@
 #ifndef included_sqrt32
 #define included_sqrt32
-#ifdef ZAPP
-#include "sqrtHLIX.z80"
-#include "../mul/mul16.z80"
-#include "../div/div32_16.z80"
-#endif
+#include "sqrt/sqrtHLIX.z80"
+#include "mul/mul16.z80"
+#include "div/div32_16.z80"
 
 
 #define var_c xOP1   ;input

@@ -1,23 +1,22 @@
+#ifndef included_xmul3
+#define included_xmul3
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/rr64.z80"
+#include "routines/add64.z80"
+
 xmul3:
-;518+{0,7+rr64}+{0,31}+2*mov10+mov8+adc64
-;1348-{0,1}+{0,31}
-;min: 1347cc
-;max: 1379cc
-;avg: 1363cc
-  push hl
-  push de
-  push bc
-  push af
+;535+{0,7+rr64}+{0,31}+2*mov10+mov8+adc64
+;1365-{0,1}+{0,31}
+;min: 1364scc
+;max: 1396cc
+;avg: 1380cc
+  call pushpop
   push bc
   call +_
   pop de
   ld hl,xOP1
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
+  jp mov10
 _:
   ld de,xOP1
   call mov10
@@ -58,3 +57,4 @@ constmul_overflow:
   ld hl,xOP1+7
   ld (hl),-1
   ret
+#endif

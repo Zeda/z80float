@@ -1,9 +1,7 @@
 #ifndef included_xabs
 #define included_xabs
-#ifdef ZAPP
 #include "routines/pushpop.z80"
 #include "routines/mov.z80"
-#endif
 
 xabs:
   call pushpop

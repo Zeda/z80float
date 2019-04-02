@@ -1,12 +1,12 @@
-#ifndef included_xtoTI
-#define included_xtoTI
-#ifdef ZAPP
+#ifndef included_strtox
+#define included_strtox
 #include "routines/mov.z80"
 #include "routines/pushpop.z80"
 #include "routines/sla64.z80"
 #include "routines/ascii_to_uint8.z80"
 #include "tables.z80"
-#endif
+#include "constantsx.z80"
+#include "xmul.z80"
 
 #ifdef char_TI_TOK
 #define char_NEG  $1A

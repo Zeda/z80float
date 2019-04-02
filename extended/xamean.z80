@@ -1,10 +1,8 @@
 #ifndef included_xamean
 #define included_xamean
-#ifdef ZAPP
 #include "routines/pushpop.z80"
 #include "routines/mov.z80"
 #include "xadd.z80"
-#endif
 
 xamean:
 ;229+{0(special case),17}+mov10+xadd

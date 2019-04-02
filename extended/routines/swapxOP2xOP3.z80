@@ -1,3 +1,5 @@
+#ifndef included_swapxOP2xOP3
+#define included_swapxOP2xOP3
 swapxOP2xOP3:
 ;370cc
   ld hl,(xOP2+8)
@@ -23,3 +25,4 @@ swapxOP2xOP3_mantissa:
   ld (xOP3+6),hl
   ld (xOP2+6),de
   ret
+#endif

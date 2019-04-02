@@ -1,3 +1,6 @@
+#ifndef included_srl64
+#define included_srl64
+
 srlxOP2:
   ld hl,xOP2+7
   jp srl64
@@ -15,3 +18,4 @@ srl64:
   rr (hl) \ dec hl
   rr (hl)
   ret
+#endif

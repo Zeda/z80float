@@ -1,10 +1,8 @@
 #ifndef included_xdiv
 #define included_xdiv
-#ifdef ZAPP
 #include "routines/mov.z80"
 #include "div/div64.z80"
 #include "routines/cmp64.z80"
-#endif
 
 #define var_q xOP1
 #define var_x xOP2

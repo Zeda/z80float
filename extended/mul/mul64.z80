@@ -1,9 +1,7 @@
 #ifndef included_mul64
 #define included_mul64
-#ifdef ZAPP
-#include "../routines/mov.z80"
-#include "mul32.z80"
-#endif
+#include "routines/mov.z80"
+#include "mul/mul32.z80"
 
 #define var_z xOP3+16
 #define z0_64 var_z

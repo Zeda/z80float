@@ -1,8 +1,6 @@
 #ifndef included_sqrtHLIX
 #define included_sqrtHLIX
-#ifdef ZAPP
-#include "sqrt16.z80"
-#endif
+#include "sqrt/sqrt16.z80"
 
 sqrtHLIX:
 ;Input: HLIX

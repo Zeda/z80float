@@ -1,11 +1,9 @@
 #ifndef included_xsqrt
 #define included_xsqrt
-#ifdef ZAPP
 #include "routines/mov.z80"
-#include "routines/pushpop.z80"
 #include "routines/srl64.z80"
 #include "sqrt/sqrt64.z80"
-#endif
+#include "constantsx.z80"
 
 #define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32

@@ -1,13 +1,4 @@
 #!/bin/bash
 cd test
-#spasm testsngl.z80 testsngl.8xp
-python3 ../tools/zapp/zapp.py testsngl.z80 test.asm
-spasm -DZAPP test.asm testsngl.8xp
-rm test.md
-rm test.asm
-
-#spasm test.z80 test.8xp
-python3 ../tools/zapp/zapp.py test.z80 test.asm
-spasm -DZAPP test.asm test.8xp
-rm test.md
-#rm test.asm
+spasm testsngl.z80 testsngl.8xp
+spasm test.z80 test.8xp -I ../extended

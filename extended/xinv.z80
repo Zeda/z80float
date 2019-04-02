@@ -1,9 +1,7 @@
 #ifndef included_xinv
 #define included_xinv
-#ifdef ZAPP
 #include "xdiv.z80"
-#include "constants.z80"
-#endif
+#include "constantsx.z80"
 
 #define var_q xOP1
 #define var_x xOP2
