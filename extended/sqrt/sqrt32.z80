@@ -1,3 +1,12 @@
+#ifndef included_sqrt32
+#define included_sqrt32
+#ifdef ZAPP
+#include "sqrtHLIX.z80"
+#include "../mul/mul16.z80"
+#include "../div/div32_16.z80"
+#endif
+
+
 #define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32
 #define var_x xOP2   ;output
@@ -63,3 +72,4 @@ sqrt32:
 #undefine var_c xOP2+8 ;input
 #undefine var_y var_c+4 ;  used for sqrt32
 #undefine var_z0 xOP2+16
+#endif

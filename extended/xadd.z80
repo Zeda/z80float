@@ -1,91 +1,12 @@
-xamean:
-;212+{0(special case),17}+mov10+xadd
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  ld bc,xOP1
-  call xadd
-  ld hl,(xOP1+8)
-  ld a,h
-  and $7F
-  or l
-  jr z,+_
-  dec hl
-  ld (xOP1+8),hl
-_:
-  ld hl,xOP1
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-xrsub:
-;Input:
-;  HL points to one number
-;  DE points to another
-;xadd+43
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  pop de
-  ld hl,xOP3
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-;copy the inputs to xOP2 and xOP3, leaving xOP1 open for shifting
-  push de
-  ld de,xOP2
-  call mov10
-  dec de
-  ld a,(de)
-  xor 80h
-  ld (de),a
-  inc de
-  pop hl
-  call mov10
-  jp subadd_stepin
-xsub:
-;Input:
-;  HL points to one number
-;  DE points to another
-;xadd+37
-  push hl
-  push de
-  push bc
-  push af
-  push bc
-  call +_
-  pop de
-  ld hl,xOP3
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-;copy the inputs to xOP2 and xOP3, leaving xOP1 open for shifting
-  push de
-  ld de,xOP2
-  call mov10
-  pop hl
-  call mov10
-  dec de
-  ld a,(de)
-  xor 80h
-  ld (de),a
-  jp subadd_stepin
+#ifndef included_xadd
+#define included_xadd
+#ifdef ZAPP
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/swapxOP2xOP3.z80"
+#include "routines/sub64.z80"
+#include "routines/add64.z80"
+#endif
 
 xadd:
 ;Input:
@@ -101,21 +22,13 @@ xadd:
 ;  {0,333+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,7+13+{0,29}}}}}}}}   ;this part happens at most once (50%) unless inputs have the same exponent, then it is about 8/3 (accurate to 17 digits)
 ;add:
 ;  69+adc64+{0,201+{0,39}
-;avg: 2094.3076938cc, I think. A lot of weird probability.
-  push hl
-  push de
-  push bc
-  push af
+;avg: 2111.3076938cc, I think. A lot of weird probability.
+  call pushpop
   push bc
   call +_
   pop de
   ld hl,xOP3
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
+  jp mov10
 _:
 ;copy the inputs to xOP2 and xOP3, leaving xOP1 open for shifting
   push de
@@ -342,3 +255,4 @@ add_inf:
   ld l,a
   ld (xOP3+8),hl
   ret
+#endif

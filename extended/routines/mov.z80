@@ -1,3 +1,6 @@
+#ifndef included_mov10
+#define included_mov10
+#define included_mov4
 mov10:
   ldi
 mov9:
@@ -16,3 +19,4 @@ mov4:
   ldi
   ldi
   ret
+#endif

@@ -1,3 +1,11 @@
+#ifndef included_xdiv
+#define included_xdiv
+#ifdef ZAPP
+#include "routines/mov.z80"
+#include "div/div64.z80"
+#include "routines/cmp64.z80"
+#endif
+
 #define var_q xOP1
 #define var_x xOP2
 #define var_n xOP3
@@ -128,3 +136,4 @@ div_NaN:
   ld a,$40
   ld (xOP1+7),a
   ret
+#endif

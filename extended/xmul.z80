@@ -1,3 +1,12 @@
+#ifndef included_xmul
+#define included_xmul
+#ifdef ZAPP
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "mul/mul64.z80"
+#include "routines/rl64.z80"
+#endif
+
 #define var_z xOP3+16
 ;uses 60 bytes after xOP1
 xmul:
@@ -137,3 +146,4 @@ mul_inf:
   ld a,255
   ld (var_z+15),a
   ret
+#endif

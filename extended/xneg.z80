@@ -1,3 +1,9 @@
+#ifndef included_xneg
+#define included_xneg
+#ifdef ZAPP
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#endif
 xneg:
   call pushpop
   ld d,b
@@ -7,3 +13,4 @@ xneg:
   xor 80h
   ld (de),a
   ret
+#endif

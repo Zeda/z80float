@@ -1,3 +1,13 @@
+#ifndef included_xtoTI
+#define included_xtoTI
+#ifdef ZAPP
+#include "routines/mov.z80"
+#include "routines/pushpop.z80"
+#include "routines/sla64.z80"
+#include "routines/ascii_to_uint8.z80"
+#include "tables.z80"
+#endif
+
 #ifdef char_TI_TOK
 #define char_NEG  $1A
 #define char_ENG  $1B
@@ -268,8 +278,9 @@ strtox_inf:
 ;return inf
   pop af
   ld hl,xconst_inf
-  jr nc,$+5
+  jr nc,+_
   ld hl,xconst_nINF
+_:
   pop de
   jp mov10
 
@@ -291,3 +302,4 @@ skipdigits_nodec:
   cp '0'
   jr z,-_
   ret
+#endif

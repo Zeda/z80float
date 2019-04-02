@@ -1,4 +1,5 @@
-#define inc_pushpop
+#ifndef included_pushpop
+#define included_pushpop
 pushpop:
 ;26 bytes, adds 118cc to the traditional routine
   ex (sp),hl
@@ -24,3 +25,4 @@ pushpopret:
   pop de
   pop hl
   ret
+#endif

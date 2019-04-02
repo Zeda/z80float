@@ -1,3 +1,7 @@
+#ifndef included_mul16
+#define included_mul16
+
+
 ;This was made by Runer112
 ;Tested by jacobly
 mul16:
@@ -158,3 +162,4 @@ Mul_BC_DE_DEHL_FunkyCarry:
 	ret	nc
 	inc	e
 	ret
+#endif

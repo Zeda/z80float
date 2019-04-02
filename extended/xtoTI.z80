@@ -1,3 +1,12 @@
+#ifndef included_xtoTI
+#define included_xtoTI
+#ifdef ZAPP
+#include "routines/mov.z80"
+#include "routines/pushpop.z80"
+#include "xtostr.z80"
+#include "strtox.z80"
+#endif
+
 #ifdef char_TI_TOK
 #define char_NEG  $1A
 #define char_ENG  $1B
@@ -84,3 +93,4 @@ _:
   ld (hl),$99
   djnz -_
   ret
+#endif

@@ -1,3 +1,12 @@
+#ifndef included_div64
+#define included_div64
+#ifdef ZAPP
+#include "div64_32.z80"
+#include "../mul/mul32.z80"
+#include "../routines/add64.z80"
+#include "../routines/sub64.z80"
+#endif
+
 #define var_x xOP2   ;output
 div64:
 ;var_n / var_x
@@ -46,3 +55,4 @@ div64_end:
   ld (var_q),ix
   ld (var_q+2),bc
   ret
+#endif

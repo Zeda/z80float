@@ -1,3 +1,12 @@
+#ifndef included_xbg
+#define included_xbg
+#ifdef ZAPP
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "xamean.z80"
+#include "xgeomean.z80"
+#endif
+
 #define var_a xOP3+42
 #define var_g var_a+10
 #define var_a0 var_a+20
@@ -236,3 +245,4 @@ bg_NaN:
 #undefine var_a3
 #undefine var_a4
 #undefine var_a5
+#endif

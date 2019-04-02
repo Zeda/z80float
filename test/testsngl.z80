@@ -1,6 +1,19 @@
 #define char_TI_TOK
 #define bcall(x) rst 28h \ .dw x
 #include "../single/single.inc"
+curKey  =80F6h
+keyCount=80F7h
+
+gbuf        = 9340h
+_VPutS      = 4561h
+_VPutMap    = 455Eh
+_GrBufCpy   = 486Ah
+_InvertRect = 4D5Fh
+penCol      = 86D7h
+penRow      = 86D8h
+sGrFlags    = 14h
+textWrite   = 7
+flags       =89F0h
 fontFlags     = 32h
 fracDrawLFont = 2
 _GrBufClr     = 4BD0h
@@ -30,8 +43,8 @@ s_float:
   call puts
   call newline
 
-  call testputs \ .db "sin(e)=",0
-  ld hl,const_e
+  call testputs \ .db "sin(1/(2pi))=",0
+  ld hl,const_2pi_inv
   ld bc,8800h
   call sinSingle
   ld h,b
@@ -43,8 +56,8 @@ s_float:
   call puts
   call newline
 
-  call testputs \ .db "cos(e)=",0
-  ld hl,const_e
+  call testputs \ .db "cos(1/(2pi))=",0
+  ld hl,const_2pi_inv
   ld bc,8800h
   call cosSingle
   ld h,b
@@ -56,10 +69,23 @@ s_float:
   call puts
   call newline
 
-  call testputs \ .db "tan(e)=",0
-  ld hl,const_e
+  call testputs \ .db "tan(1/(2pi))=",0
+  ld hl,const_2pi_inv
   ld bc,8800h
   call tanSingle
+  ld h,b
+  ld l,c
+  ld bc,8000h
+  call single2str
+  ld h,b
+  ld l,c
+  call puts
+  call newline
+
+  call testputs \ .db "sqrt(1/(2pi))=",0
+  ld hl,const_2pi_inv
+  ld bc,8800h
+  call sqrtSingle
   ld h,b
   ld l,c
   ld bc,8000h
@@ -72,6 +98,8 @@ s_float:
 
   bcall(_GrBufCpy)
   ret
+ti_PI:
+  .db $00,$80,$31,$41,$59,$26,$53,$58,$97
 test_cmp:
   ld hl,const_pi_
   ld de,const_pi
@@ -140,6 +168,9 @@ __:
 #include "../single/single2TI.z80"
 #include "../single/str2single.z80"
 #include "../single/routines/ascii_to_uint8.z80"
+#include "../single/routines/mov4.z80"
+#include "../single/routines/sqrt16.z80"
+#include "../single/routines/sqrtHLIX.z80"
 #include "../single/lut.z80"
 #include "../single/absSingle.z80"
 #include "../single/acosSingle.z80"
@@ -162,6 +193,6 @@ __:
 #include "../single/negSingle.z80"
 #include "../single/ti2single.z80"
 #include "../single/single2char.z80"
-#include "../single/fpartSingle.z80"
+#include "../single/mod1Single.z80"
 
 .echo $-__," bytes"

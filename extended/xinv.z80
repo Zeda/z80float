@@ -1,3 +1,10 @@
+#ifndef included_xinv
+#define included_xinv
+#ifdef ZAPP
+#include "xdiv.z80"
+#include "constants.z80"
+#endif
+
 #define var_q xOP1
 #define var_x xOP2
 #define var_n xOP3
@@ -18,3 +25,5 @@ xinv:
   ex de,hl
   pop de
   ret
+
+#endif

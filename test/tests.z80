@@ -22,41 +22,36 @@ str_num:
   ld l,c
   call puts
 
-  ld hl,xconst_p2
-  ld de,xconst_p2
-  ld ix,xconst_p04
+  ld hl,xconst_pi
   ld bc,xOP1
-  call xfma
-  call testputs \ .db "fma(.2,.2,-.04)=",0
+  call xmul11
+  call testputs \ .db "11pi=",0
   strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
 
   ld hl,xconst_pi
-  ld de,xconst_e
+  ld de,xconst_10
   ld bc,xOP1
-  call xmul
-  call testputs \ .db "pi*e=",0
+  call xmul7
+  call testputs \ .db "7pi=",0
   strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
 
-  ld hl,xconst_pi
+  ld hl,xconst_e
   ld bc,xOP1
-  call xsqrt
-  call testputs \ .db "sqrt(pi)=",0
+  call xcos
+  call testputs \ .db "cos(e)=",0
   strx(xOP1,xOP1)
   ld h,b
   ld l,c
   call puts
-
 
 
   bcall(_GrBufCpy)
   ret
-xconst_p2:
- .db $CC,$CC,$CC,$CC,$CC,$CC,$CC,$CC \ .dw $3FFD
-xconst_p04:
- .db $0A,$D7,$A3,$70,$3D,$0A,$D7,$A3 \ .dw $BFFB
+xconst_1p3:
+  .db $00,$00,$00,$00,$00,$D9,$B0,$C9 \ .dw $4000
