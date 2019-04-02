@@ -143,7 +143,7 @@ _:
   ld de,(pow10exp)
   ld (hl),'0'-1
   .db $FE   ;start of `cp **` (to avoid the very first "inc de")
-  inc de \ inc (hl) \ sub c \ jr nc,$-4
+  inc de \ inc (hl) \ sub c \ jr nc,$-3
   ld (pow10exp),de
   add a,c
   inc hl
