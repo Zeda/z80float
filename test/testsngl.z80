@@ -32,7 +32,7 @@ _NewLine      = 452Eh
   call testputs \ .db "tan(1/(2pi))=",0
   ld hl,const_2pi_inv
   ld bc,8800h
-  call tanSingle
+  call pow2Single
   ld h,b
   ld l,c
   ld bc,8000h
@@ -45,7 +45,7 @@ _NewLine      = 452Eh
   call testputs \ .db "ln(1/(2pi))=",0
   ld hl,const_2pi_inv
   ld bc,8800h
-  call lnSingle
+  call pow10Single
   ld h,b
   ld l,c
   ld bc,8000h
@@ -67,7 +67,6 @@ _NewLine      = 452Eh
   ld l,c
   call puts
   call newline
-
 
   bcall(_GrBufCpy)
   ret
