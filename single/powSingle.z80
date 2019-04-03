@@ -1,5 +1,6 @@
 #ifndef included_powSingle
 #define included_powSingle
+#include "routines/pushpop.z80"
 #include "lgSingle.z80"
 #include "expSingle.z80"
 #define var_x   scrap     ;4 bytes
@@ -9,10 +10,7 @@ powSingle:
 ;;HL points to y
 ;;DE points to x
 ;;BC points to output
-    push hl
-    push de
-    push bc
-    push af
+    call pushpop
     push bc
     ld bc,var_c
     call lgSingle
