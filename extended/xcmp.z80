@@ -1,3 +1,8 @@
+#ifndef included_xabs
+#define included_xabs
+#include "routines/mov.z80"
+#include "xsub.z80"
+
 xcmp:
 ;Input: DE points to float1, HL points to float2
 ;Output:
@@ -58,10 +63,11 @@ _:
   ld a,l
   cp 62
   ld a,h
-  jr c,$+4
+  jr c,+_
   xor a
   ret
 _:
   or 1
   rla
   ret
+#endif

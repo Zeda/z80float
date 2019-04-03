@@ -1,3 +1,10 @@
+#ifndef included_xcosh
+#define included_xcosh
+#include "routines/pushpop.z80"
+#include "xexp.z80"
+#include "xinv.z80"
+#include "xamean.z80"
+
 #define hyper_0 xOP1+72
 #define hyper_1 xOP1+82
 xcosh:
@@ -16,3 +23,4 @@ xcosh:
 
 #undefine hyper_0
 #undefine hyper_1
+#endif

@@ -1,3 +1,5 @@
+#ifndef included_diRestore
+#define included_diRestore
 diRestore:
 ;Adds 151cc if interrupts are enabled, 161cc if disabled
 ;Disables interrupts, but sets up the stack so that interrupt settings are restored.
@@ -24,3 +26,4 @@ restoredi:
 restoreei:
   ei
   ret
+#endif

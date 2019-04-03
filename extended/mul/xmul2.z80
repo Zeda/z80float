@@ -1,4 +1,8 @@
-x_times_2:
+#ifndef included_xmul2
+#define included_xmul2
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+xmul2:
   call pushpop
   ld d,b
   ld e,c
@@ -26,3 +30,4 @@ _:
   inc hl
   ld (hl),b
   ret
+#endif

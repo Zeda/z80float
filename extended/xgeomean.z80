@@ -1,3 +1,8 @@
+#ifndef included_xgeomean
+#define included_xgeomean
+#include "xmul.z80"
+#include "xsqrt.z80"
+
 #if 1=1
 xgeomean:
 ;Input:
@@ -81,4 +86,5 @@ xgeomean:
   dec hl
   ld (hl),e
   ret
+#endif
 #endif

@@ -1,3 +1,9 @@
+#ifndef included_xlog
+#define included_xlog
+#include "routines/pushpop.z80"
+#include "xdiv.z80"
+#include "xln.z80"
+
 #define var_y  xOP1+162
 #define var_y0  xOP1+172
 xlog:
@@ -14,3 +20,4 @@ xlog:
   ld hl,var_y0
   jp xdiv
 #undefine var_y
+#endif

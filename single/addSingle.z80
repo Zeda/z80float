@@ -1,3 +1,6 @@
+#ifndef included_addSingle
+#define included_addSingle
+
 addend = scrap
 addend2= scrap+7    ;4 bytes
 
@@ -164,3 +167,4 @@ add_unneeded:
     dec hl
     dec hl
     jr add_copy
+#endif

@@ -1,3 +1,8 @@
+#ifndef included_TItox
+#define included_TItox
+#include "routines/pushpop.z80"
+#include "strtox.z80"
+
 TItox:
 ;;converts a TI-float to a single precision float.
   call pushpop
@@ -46,3 +51,4 @@ _:
 
 ;Pass off to the strtox routine
   jp TItox_stepin
+#endif

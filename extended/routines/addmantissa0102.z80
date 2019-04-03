@@ -1,3 +1,9 @@
+#ifndef included_addmantissa0102
+#define included_addmantissa0102
+#include "routines/add64.z80"
+#include "routines/rr64.z80"
+#include "mul/xmul3.z80"
+
 addmantissa0102:
   ld hl,xOP2
   ld de,xOP1
@@ -20,3 +26,4 @@ addmantissa0102:
   xor (hl)
   ret p
   jp constmul_overflow
+#endif

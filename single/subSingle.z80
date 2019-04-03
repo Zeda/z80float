@@ -1,3 +1,8 @@
+#ifndef included_subSingle
+#define included_subSingle
+;#include "routines/pushpop.z80"
+#include "addSingle.z80"
+
 subSingle:
 ;;x-y
     push af
@@ -20,3 +25,4 @@ subSingle:
     pop hl
     ld de,addend2
     jp addInject    ;jumps in to the addSingle routine
+#endif

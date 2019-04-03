@@ -1,3 +1,13 @@
+#ifndef included_xpow2
+#define included_xpow2
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/sla64.z80"
+#include "routines/normalizexOP1.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xadd.z80"
+
 #define xexp_x xOP3+42
 ;use range reduction to get x on [0,1]
 ;Then use the formula:
@@ -33,7 +43,7 @@ xpow2:
   ld b,a
   ;now we need to shift bits in from the mantissa!
 _:
-  call slaxOP1_mantissa
+  call sla64_xOP1
   rl e \ rl d
   djnz -_
   ld a,(xOP1+9)
@@ -89,17 +99,6 @@ caseexp:
 exp_too_big:
   pop de
   ret
-slaxOP1_mantissa:
-  ld hl,xOP1
-  sla (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl) \ inc hl
-  rl (hl)
-  ret
 xexp_p1:
 xexp_p2 = xexp_p1+10
 xexp_p3 = xexp_p1+20
@@ -126,3 +125,4 @@ xexp_p12= xexp_p1+110
 .db $3E,$73,$CA,$31,$87,$36,$5F,$9F,$DD,$3F    ;3.6236980527707885031220529305671221862606493025011e-11
 
 #undefine xexp_x
+#endif

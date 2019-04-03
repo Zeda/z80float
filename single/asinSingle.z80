@@ -1,3 +1,13 @@
+#ifndef included_asinSingle
+#define included_asinSingle
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "constants.z80"
+#include "mulSingle.z80"
+#include "rsubSingle.z80"
+#include "sqrtSingle.z80"
+#include "bgiSingle.z80"
+
 #define var_a scrap+11
 #define var_g var_a+4
 #define var_b var_g+4
@@ -23,8 +33,4 @@ asinSingle:
   ld de,var_x
   pop bc
   jp mulSingle
-#undefine var_a
-#undefine var_g
-#undefine var_b
-#undefine var_c
-#undefine var_x
+#endif

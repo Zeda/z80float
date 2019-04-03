@@ -1,3 +1,16 @@
+#ifndef included_bgSingle
+#define included_bgSingle
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "addSingle.z80"
+#include "mulSingle_p34375.z80"
+#include "ameanSingle.z80"
+#include "subSingle.z80"
+#include "divSingle.z80"
+#include "geomeanSingle.z80"
+#include "constants.z80"
+#include "mulSingle_p041015625.z80"
+
 #define var_a scrap+11
 #define var_g var_a+4
 #define var_b var_g+4
@@ -91,3 +104,4 @@ const_1p38427734375: .db $00,$30,$31,$80  ;1.38427734375
 #undefine var_g
 #undefine var_b
 #undefine var_c
+#endif

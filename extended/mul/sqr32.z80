@@ -1,3 +1,7 @@
+#ifndef included_sqr32
+#define included_sqr32
+#include "mul/mul16.z80"
+
 #define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32
 #define var_x xOP2   ;output
@@ -41,9 +45,9 @@ sqr32:
   inc hl
   inc (hl)
   ret
-.echo "sqr32: ",$-sqr32
 #undefine var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
 #undefine var_a xOP2   ;   2 bytes
 #undefine var_c xOP2+8 ;input
 #undefine var_y var_c+4 ;  used for sqrt32
 #undefine var_z0 xOP2+16
+#endif

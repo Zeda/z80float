@@ -1,3 +1,8 @@
+#ifndef included_powSingle
+#define included_powSingle
+#include "routines/pushpop.z80"
+#include "lgSingle.z80"
+#include "expSingle.z80"
 #define var_x   scrap     ;4 bytes
 #define var_c   scrap+4   ;4 bytes
 powSingle:
@@ -5,10 +10,7 @@ powSingle:
 ;;HL points to y
 ;;DE points to x
 ;;BC points to output
-    push hl
-    push de
-    push bc
-    push af
+    call pushpop
     push bc
     ld bc,var_c
     call lgSingle
@@ -18,3 +20,4 @@ powSingle:
     jp pow_inject
 #undefine var_x
 #undefine var_c
+#endif

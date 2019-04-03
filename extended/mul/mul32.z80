@@ -1,3 +1,11 @@
+#ifndef included_mul32
+#define included_mul32
+#include "mul/mul16.z80"
+#define var_z xOP3+16
+#define z0_64 var_z
+#define z2_64 z0_64+8
+#define z0_32 z2_64+8
+#define z2_32 z0_32+4
 
 mul32:
 ;max: 703cc  + 3*mul16
@@ -111,3 +119,4 @@ mul32_add:
   adc hl,bc
   adc a,0
   jp mul32_final
+#endif

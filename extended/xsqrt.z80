@@ -1,3 +1,10 @@
+#ifndef included_xsqrt
+#define included_xsqrt
+#include "routines/mov.z80"
+#include "routines/srl64.z80"
+#include "sqrt/sqrt64.z80"
+#include "constantsx.z80"
+
 #define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32
 #define var_x xOP2   ;output
@@ -72,3 +79,4 @@ sqrtNAN:
 #undefine var_c xOP2+8 ;input
 #undefine var_y var_c+4 ;  used for sqrt32
 #undefine var_z0 xOP2+16
+#endif

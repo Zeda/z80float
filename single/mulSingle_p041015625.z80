@@ -1,3 +1,7 @@
+#ifndef included_mulSingle_p041015625
+#define included_mulSingle_p041015625
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
 #define constmul_tmp scrap
 mulSingle_p041015625:
 ;multiply by 21/512, used for bgiSingle
@@ -62,3 +66,4 @@ _:
   jp mov4
   ret
   ret
+#endif

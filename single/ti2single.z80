@@ -1,3 +1,9 @@
+#ifndef included_ti2Single
+#define included_ti2Single
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "mulSingle.z80"
+#include "str2single.z80"
 ti2single:
 ;;converts a TI-float to a single precision float.
   call pushpop
@@ -108,3 +114,4 @@ _:
   inc de
   inc de
   ret
+#endif

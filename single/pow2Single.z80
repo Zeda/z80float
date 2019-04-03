@@ -1,3 +1,12 @@
+#ifndef included_pow2Single
+#define included_pow2Single
+#include "routines/pushpop.z80"
+#include "mulSingle.z80"
+#include "subSingle.z80"
+#include "addSingle.z80"
+#include "routines/mov4.z80"
+#include "constants.z80"
+
 ;requires       by
 ;   lgSingle    powSingle
 ;   mulSingle   powSingle,expSingle
@@ -9,11 +18,8 @@
 ;           HL  DE  BC      desc
 pow2Single:
 ;;Computes 2^x
-    push hl
-    push de
-    push bc
-    push af
-    push bc
+  call pushpop
+  push bc
 
 exp_inject:
 ;if x is on [0,1):
@@ -105,12 +111,7 @@ _:
   ld (hl),a
   ex de,hl
   pop de
-  call mov4
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
+  jp mov4
 exp_spec:
 ;bit 6 means INF
 ;bit 5 means NAN
@@ -132,10 +133,6 @@ exp_return_spec:
     ld (hl),a \ inc hl
     ld (hl),e \ inc hl
     ld (hl),d
-    pop af
-    pop bc
-    pop de
-    pop hl
     ret
 exp_overflow:
 exp_inf:
@@ -156,3 +153,4 @@ exp_zero:
     jr exp_return_spec
 #undefine var_x
 #undefine var_c
+#endif

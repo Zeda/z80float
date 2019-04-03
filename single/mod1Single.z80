@@ -1,3 +1,9 @@
+#ifndef included_mod1Single
+#define included_mod1Single
+#include "routines/pushpop.z80"
+#include "addSingle.z80"
+#include "constants.z80"
+
 ;This routine performs `x mod 1`, returning a non-negative value.
 ;+inf -> NaN
 ;-inf -> NaN
@@ -87,3 +93,4 @@ _:
   inc hl
   ld (hl),b
   ret
+#endif

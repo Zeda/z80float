@@ -1,3 +1,9 @@
+#ifndef included_expSingle
+#define included_expSingle
+#include "routines/pushpop.z80"
+#include "constants.z80"
+#include "mulSingle.z80"
+#include "pow2Single.z80"
 ;requires       by
 ;   lgSingle    powSingle
 ;   mulSingle   powSingle,expSingle
@@ -12,16 +18,14 @@ expSingle:
 ;;Computes e^x
 ;;HL points to x
 ;;BC points to the output
-    push hl
-    push de
-    push bc
-    push af
-    ld de,const_lg_e
-    push bc
+  call pushpop
+  ld de,const_lg_e
+  push bc
 pow_inject:
 ;;DE points to lg(y), HL points to x, BC points to output
-    ld bc,var_x
-    call mulSingle
-    ld h,b
-    ld l,c
-    jp exp_inject
+  ld bc,var_x
+  call mulSingle
+  ld h,b
+  ld l,c
+  jp exp_inject
+#endif

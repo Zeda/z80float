@@ -1,3 +1,5 @@
+#ifndef included_ascii_to_uint8
+#define included_ascii_to_uint8
 ascii_to_uint8:
 ;c flag means don't increment the exponent
   ld c,0
@@ -60,3 +62,4 @@ ascii_to_uint8_noexp_end:
   dec de
   scf
   ret
+#endif

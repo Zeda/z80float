@@ -1,3 +1,8 @@
+#ifndef included_xabs
+#define included_xabs
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+
 xabs:
   call pushpop
   ld d,b
@@ -7,3 +12,4 @@ xabs:
   and $7F
   ld (de),a
   ret
+#endif

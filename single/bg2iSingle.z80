@@ -1,3 +1,14 @@
+#ifndef included_bg2iSingle
+#define included_bg2iSingle
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "addSingle.z80"
+#include "mulSingle_p375.z80"
+#include "ameanSingle.z80"
+#include "geomeanSingle.z80"
+#include "divSingle.z80"
+#include "constants.z80"
+
 ;Uses 23 bytes
 #define var_a scrap+11
 #define var_g var_a+4
@@ -19,24 +30,8 @@ bg2iSingle:
 ;   a+=g
 ;   a+=b
 ;   return 1.40625/a
-    push hl
-    push de
-    push bc
-    push af
-    push bc
-    call +_
-    pop de
-    ld hl,var_a
-    ldi
-    ldi
-    ldi
-    ldi
-    pop af
-    pop bc
-    pop de
-    pop hl
-    ret
-_:
+  call pushpop
+  push bc
   push de
   ld de,var_a
   call mov4
@@ -78,12 +73,14 @@ _:
   call addSingle
 ;a+=b
   ld de,var_b
-  call addSIngle
+  call addSingle
   ex de,hl
   ld hl,const_1p40625
+  pop bc
   jp divSingle
 ;return 1.40625/a
 
 #undefine var_a
 #undefine var_g
 #undefine var_b
+#endif

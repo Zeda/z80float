@@ -1,3 +1,6 @@
+#ifndef included_mul10Single
+#define included_mul10Single
+;#include "routines/pushpop.z80"
 mul10Single:
 ;;Multiplies a single precision float by 10
     push af
@@ -58,3 +61,4 @@ mul10_overflow:
     pop hl
     pop af
     ret
+#endif

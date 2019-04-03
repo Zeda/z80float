@@ -1,4 +1,4 @@
 #!/bin/bash
 cd test
-spasm test.z80 test.8xp
-spasm testsngl.z80 testsngl.8xp
+spasm test.z80 test.8xp -I ../extended
+spasm testsngl.z80 testsngl.8xp -I ../single

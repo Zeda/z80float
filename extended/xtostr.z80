@@ -1,3 +1,14 @@
+#ifndef included_xtostr
+#define included_xtostr
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/sla64.z80"
+#include "routines/add64.z80"
+#include "mul/xOP1mul10.z80"
+#include "mul/mul16.z80"
+#include "xmul.z80"
+#include "data.z80"
+#include "tables.z80"
 ;fmtDigits = 97B0h
 ;#define EXTERNAL_FORMAT_LEN    ;Uses an external reference to get the format length
 ;#define EXTERNAL_FORMAT_LEN_LOC fmtDigits    ;Use for TI-OS
@@ -14,15 +25,10 @@
 #define TOK_NEG $1A
 #endif
 
-
-
 #define pow10exp  xOP3+42
 #define strout pow10exp+3
 xtostr:
-  push hl
-  push de
-  push bc
-  push af
+  call pushpop
   push bc
   call +_
   pop de
@@ -30,10 +36,6 @@ xtostr:
   cp (hl)
   ldi
   jr nz,$-3
-  pop af
-  pop bc
-  pop de
-  pop hl
   ret
 _:
   ld de,xOP1
@@ -417,3 +419,4 @@ xtostrmul10:
   call sla64_xOP1
   rla
   ret
+#endif

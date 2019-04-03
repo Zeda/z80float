@@ -1,3 +1,13 @@
+#ifndef included_xmod1
+#define included_xmod1
+#include "routines/pushpop.z80"
+#include "routines/mov.z80"
+#include "routines/sla64.z80"
+#include "routines/normalizexOP1.z80"
+#include "constantsx.z80"
+#include "xadd.z80"
+
+
 ;This routine performs `x mod 1`, returning a non-negative value.
 ;+inf -> NaN
 ;-inf -> NaN
@@ -98,3 +108,4 @@ xmod1_return_0:
   ld (xOP1+7),a
   ld (xOP1+8),hl
   jr return_xOP1
+#endif

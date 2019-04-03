@@ -1,3 +1,10 @@
+#ifndef included_xpow
+#define included_xpow
+#include "routines/pushpop.z80"
+#include "xmul.z80"
+#include "xlg.z80"
+#include "xpow2.z80"
+
 xpow:
 ;;Computes x^y
 ;;HL points to y
@@ -14,3 +21,4 @@ xpow:
   call xmul
   pop bc
   jp xpow2
+#endif

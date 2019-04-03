@@ -1,3 +1,14 @@
+#ifndef included_xcos
+#define included_xcos
+#include "routines/pushpop.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xadd.z80"
+#include "xsub.z80"
+#include "xrsub.z80"
+#include "xmod1.z80"
+#include "xsin.z80"
+
 #define cos_x xOP1+60
 #define cos_y xOP1+70
 #define temp xOP1+80
@@ -151,3 +162,4 @@ xcos_p6:
 .db $C8,$97,$56,$CF,$3C,$AA,$74,$8F,$E3,$3F    ;.000000002087555514571344400405482331559490482
 xcos_p7:
 .db $90,$5C,$F1,$0F,$F8,$6A,$B5,$C7,$DB,$BF    ;-.00000000001135212320760413752073800267975510526
+#endif

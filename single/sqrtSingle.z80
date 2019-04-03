@@ -1,3 +1,10 @@
+#ifndef included_sqrtSingle
+#define included_sqrtSingle
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "routines/sqrtHLIX.z80"
+#include "constants.z80"
+
 ;Uses 3 bytes at scrap
 sqrtSingle:
 ;552+{0,19}+8{0,3+{0,3}}+pushpop+sqrtHLIX
@@ -69,3 +76,4 @@ sqrtSingle_special:
   dec hl
   pop de
   jp mov4
+#endif

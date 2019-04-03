@@ -1,3 +1,8 @@
+#ifndef included_logSingle
+#define included_logSingle
+#include "routines/pushpop.z80"
+#include "divSingle.z80"
+#include "lnSingle.z80"
 logSingle:
   call pushpop
   call lnSingle
@@ -11,3 +16,4 @@ logSingle:
   ld b,h
   ld c,l
   jp divSingle
+#endif

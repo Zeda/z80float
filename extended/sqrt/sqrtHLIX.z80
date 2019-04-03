@@ -1,3 +1,7 @@
+#ifndef included_sqrtHLIX
+#define included_sqrtHLIX
+#include "sqrt/sqrt16.z80"
+
 sqrtHLIX:
 ;Input: HLIX
 ;Output: DE is the sqrt, AHL is the remainder
@@ -124,3 +128,4 @@ sqrt32_iter16:
   add hl,de
   adc a,b
   ret
+#endif

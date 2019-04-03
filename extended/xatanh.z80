@@ -1,24 +1,19 @@
+#ifndef included_xatanh
+#define included_xatanh
+#include "routines/pushpop.z80"
+#include "constantsx.z80"
+#include "xmul.z80"
+#include "xrsub.z80"
+#include "xsqrt.z80"
+#include "xbg.z80"
+
 ;NOTE: Does not check special cases yet, or 1 and -1.
 ;
 ;x/BG(1,sqrt(1-x^2))
 #define var_x  xOP1+152
 xatanh:
-  push hl
-  push de
+  call pushpop
   push bc
-  push af
-  push bc
-  call +_
-  ex de,hl
-  pop de
-  call mov10
-  pop af
-  pop bc
-  pop de
-  pop hl
-  ret
-_:
-;x/BG(1,sqrt(1-x^2)))
   ld de,var_x
   call mov10
   ld hl,var_x
@@ -34,4 +29,6 @@ _:
   ex de,hl
   call xbg
   ld hl,var_x
+  pop bc
   jp xmul
+#endif
