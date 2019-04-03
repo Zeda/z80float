@@ -1,3 +1,8 @@
+#ifndef included_expSingle
+#define included_expSingle
+#include "constants.z80"
+#include "mulSingle.z80"
+#include "pow2Single.z80"
 ;requires       by
 ;   lgSingle    powSingle
 ;   mulSingle   powSingle,expSingle
@@ -25,3 +30,4 @@ pow_inject:
     ld h,b
     ld l,c
     jp exp_inject
+#endif

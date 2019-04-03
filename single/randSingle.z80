@@ -1,3 +1,8 @@
+#ifndef included_absSingle
+#define included_absSingle
+#include "routines/pushpop.z80"
+#include "routines/rand.z80"
+
 randSingle:
 ;Stores a pseudo-random number on [0,1)
 ;it won't produce values on (0,2^-23)
@@ -53,3 +58,4 @@ rand_done:
   inc hl
   ld (hl),d
   ret
+#endif

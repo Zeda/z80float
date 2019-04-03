@@ -1,3 +1,7 @@
+#ifndef included_cmpSingle
+#define included_cmpSingle
+#include "subSingle.z80"
+
 cmpSingle:
 ;Input: DE points to float1, HL points to float2
 ;Output:
@@ -37,7 +41,9 @@ _:
   ld bc,scrap
   call subSingle
   ld a,(scrap+3)    ;new power
-  pop bc            ;B is old power/
+  pop bc            ;B is old power
+  or a
+  jr z,cmp_close
   sub b
   jr nc,cmp_is_sign
   dec a
@@ -51,3 +57,4 @@ cmp_is_sign:
 cmp_close:
   xor a
   ret
+#endif

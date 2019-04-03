@@ -1,3 +1,5 @@
+#ifndef included_negSingle
+#define included_negSingle
 negSingle:
 ;;HL points to the float
 ;;BC points to where to output the result
@@ -21,3 +23,4 @@ negSingle:
     pop de
     pop hl
     ret
+#endif

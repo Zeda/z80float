@@ -1,22 +1,14 @@
+#ifndef included_divSingle
+#define included_divSingle
+#include "routines/pushpop.z80"
+.echo "Test div"
 quot=scrap+1
-invSingle:
-;;HL points to denominator
-;;BC points to where the quotient gets written
-;;
-    push hl
-    push de
-    ex de,hl
-    ld hl,const_1
-    jr inv_inject
 divSingle:
 ;;HL points to numerator
 ;;DE points to denominator
 ;;BC points to where the quotient gets written
-    push hl
-    push de
-inv_inject:
-    push bc
-    push af
+  call pushpop
+divSingle_no_pushpop:
     inc hl \ inc de
     inc hl \ inc de
     ld a,(de)   ;\
@@ -90,8 +82,9 @@ startdiv:
     ld (quot),bc
     call divsub0
     ld (quot-1),bc
-    add hl,hl \ rla \ jr c,$+6
+    add hl,hl \ rla \ jr c,+_
     sbc hl,de \ sbc a,c \ ccf
+_:
     ld hl,(quot)
     ld de,(quot+2)
     ld bc,0
@@ -109,10 +102,6 @@ writeback:
     rr c
     ld (hl),c \ inc hl
     ld (hl),b
-    pop af
-    pop bc
-    pop de
-    pop hl
     ret
 divoverflow:
     ld b,$40
@@ -152,3 +141,4 @@ divsub1:
     ret c
     inc b \ sbc hl,de \ sbc a,c
     ret
+#endif

@@ -1,3 +1,12 @@
+#ifndef included_lnSingle
+#define included_lnSingle
+#include "routines/pushpop.z80"
+;#include "constants.z80"
+#include "sqrtSingle.z80"
+#include "ameanSingle.z80"
+#include "subSingle.z80"
+#include "bg2iSingle.z80"
+;#include "lnSingle.z80"
 ;Uses 27 bytes
 #define var_a scrap+11
 #define var_g var_a+4
@@ -79,3 +88,4 @@ lnSingle_noadjust:
 #undefine var_g
 #undefine var_b
 #undefine var_x
+#endif

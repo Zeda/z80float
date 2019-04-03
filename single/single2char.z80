@@ -1,3 +1,5 @@
+#ifndef included_single2char
+#define included_single2char
 single2char:
 ;;returns in A
     push hl
@@ -34,3 +36,4 @@ return_char:
     pop de
     pop hl
     ret
+#endif

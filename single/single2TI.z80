@@ -1,3 +1,6 @@
+#ifndef included_single2ti
+#define included_single2ti
+#include "single2str.z80"
 single2ti:
 ;;Turns a single precision float into a TI-float
 ;;HL points to the input float.
@@ -86,3 +89,4 @@ toti_sub:
 toti_sub_end:
     rld
     ret
+#endif

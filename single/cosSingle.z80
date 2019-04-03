@@ -1,3 +1,14 @@
+#ifndef included_cosSingle
+#define included_cosSingle
+#include "routines/pushpop.z80"
+#include "mulSingle.z80"
+#include "addSingle.z80"
+#include "subSingle.z80"
+#include "rsubSingle.z80"
+#include "sinSingle.z80"
+#include "mod1Single.z80"
+#include "constants.z80"
+
 #define var_x scrap+11
 #define var_y scrap+15
 #define temp scrap+19
@@ -110,3 +121,4 @@ _:
 #undefine var_x
 #undefine var_y
 #undefine temp
+#endif

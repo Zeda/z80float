@@ -1,3 +1,14 @@
+#ifndef included_sinSingle
+#define included_sinSingle
+#include "routines/pushpop.z80"
+#include "mulSingle.z80"
+#include "addSingle.z80"
+#include "subSingle.z80"
+#include "rsubSingle.z80"
+#include "cosSingle.z80"
+#include "mod1Single.z80"
+#include "constants.z80"
+
 #define var_x 800Bh
 #define var_y 800Fh
 #define temp 8013h
@@ -65,3 +76,4 @@ sin_subroutine:
 #undefine var_x
 #undefine var_y
 #undefine temp
+#endif

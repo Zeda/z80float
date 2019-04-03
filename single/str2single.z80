@@ -1,3 +1,12 @@
+#ifndef included_str2Single
+#define included_str2Single
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "routines/ascii_to_uint8.z80"
+#include "mulSingle.z80"
+#include "constants.z80"
+#include "lut.z80"
+
 #ifdef char_TI_TOK
 #define char_NEG  $1A
 #define char_ENG  $1B
@@ -238,3 +247,4 @@ strToSingle_inf:
 _:
   pop de
   jp mov4
+#endif

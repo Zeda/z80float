@@ -1,3 +1,6 @@
+#ifndef included_sqrtHL
+#define included_sqrtHL
+
 sqrtHL:
 ;returns A as the sqrt, HL as the remainder, D = 0
 ;min: 376cc
@@ -85,3 +88,5 @@ _:
   srl d
   rra
   ret
+
+#endif

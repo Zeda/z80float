@@ -1,19 +1,5 @@
 #ifndef included_rand
 #define included_rand
-
-randinit:
-  ld a,r
-  ld hl,seed0
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  or 97   ;no particular reason
-  or (hl) \ ld (hl),a
-  ret
 rand:
 ;;Tested and passes all CAcert tests
 ;;Uses a very simple 32-bit LCG and 32-bit LFSR

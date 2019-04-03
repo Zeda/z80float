@@ -1,10 +1,10 @@
+#ifndef included_absSingle
+#define included_absSingle
+#include "routines/pushpop.z80"
 absSingle:
 ;;HL points to the float
 ;;BC points to where to output the result
-    push hl
-    push de
-    push bc
-    push af
+    call pushpop
     ld d,b
     ld e,c
     ldi
@@ -16,8 +16,5 @@ absSingle:
     inc de
     ld a,(hl)
     ld (de),a
-    pop af
-    pop bc
-    pop de
-    pop hl
     ret
+#endif

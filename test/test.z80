@@ -148,5 +148,6 @@ puts:
 #include "xmod1.z80"
 #include "xconst.z80"
 #include "routines/rand.z80"
+#include "routines/randinit.z80"
 .echo "Total: ",$-$9D95
-#include "constants.z80"
+#include "constantsx.z80"

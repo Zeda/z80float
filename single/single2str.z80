@@ -1,11 +1,16 @@
+#ifndef included_single2str
+#define included_single2str
+#include "routines/pushpop.z80"
+#include "routines/mov4.z80"
+#include "mulSingle.z80"
+#include "constants.z80"
+#include "lut.z80"
+
 #define pow10exp_single  scrap+9
 #define strout_single pow10exp_single+2
 
 single2str:
-  push hl
-  push de
-  push bc
-  push af
+  call pushpop
   push bc
   call +_
   pop de
@@ -13,10 +18,6 @@ single2str:
   cp (hl)
   ldi
   jr nz,$-3
-  pop af
-  pop bc
-  pop de
-  pop hl
   ret
 _:
 ; Move the float to scrap
@@ -363,3 +364,4 @@ mul8_preset:
 str_zero:   .db "0",0
 str_NAN:    .db "NaN",0
 str_inf     .db "INF",0
+#endif
