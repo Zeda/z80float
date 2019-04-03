@@ -1,7 +1,6 @@
 #ifndef included_divSingle
 #define included_divSingle
 #include "routines/pushpop.z80"
-.echo "Test div"
 quot=scrap+1
 divSingle:
 ;;HL points to numerator

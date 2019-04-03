@@ -17,7 +17,6 @@
 ;http://www.ams.org/journals/mcom/1972-26-118/S0025-5718-1972-0307438-2/S0025-5718-1972-0307438-2.pdf
 ;It offers quadratic convergence, instead of linear convergence for only a little more work each iteration.
 ;So only TWO iterations are needed for single precision instead of ten.
-.echo "Must Test bg2i!"
 bg2iSingle:
 ;HL points to 'A'
 ;DE points to 'G'
