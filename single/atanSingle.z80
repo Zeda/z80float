@@ -1,5 +1,5 @@
-#ifndef included_atanhSingle
-#define included_atanhSingle
+#ifndef included_atanSingle
+#define included_atanSingle
 #include "routines/pushpop.z80"
 #include "routines/mov4.z80"
 #include "constants.z80"

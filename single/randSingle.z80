@@ -1,5 +1,5 @@
-#ifndef included_absSingle
-#define included_absSingle
+#ifndef included_randSingle
+#define included_randSingle
 #include "routines/pushpop.z80"
 #include "routines/rand.z80"
 
