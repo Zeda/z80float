@@ -5,6 +5,7 @@
 #include "mulSingle.z80"
 #include "constants.z80"
 #include "lut.z80"
+#include "data.z80"
 
 #define pow10exp_single  scrap+9
 #define strout_single pow10exp_single+2
@@ -361,7 +362,4 @@ mul8_preset:
   add hl,hl \ jr nc,$+3 \ add hl,de
   add hl,hl \ ret nc \ add hl,de
   ret
-str_zero:   .db "0",0
-str_NAN:    .db "NaN",0
-str_inf     .db "INF",0
 #endif
