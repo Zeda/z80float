@@ -1,6 +1,6 @@
 import sys
 import mpmath
-#This program converts a number to a single-precision float to insert into assembly source code
+#This program converts a number to an extended-precision float to insert into assembly source code
 def dbify(l):
     s='.db $'
     for i in l:
