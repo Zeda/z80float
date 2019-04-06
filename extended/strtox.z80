@@ -152,7 +152,12 @@ strtox_sub0:
   ld bc,0
 ;Check if the next char is char_DEC
 
+<<<<<<< HEAD
   cp char_DEC
+=======
+  sub char_DEC
+  or a
+>>>>>>> bb900effb8c4098b1e2eb12cf9a82326ea780ddd
   jr nz,+_
   inc c
 ;Get rid of zeroes
