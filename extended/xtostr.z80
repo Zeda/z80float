@@ -383,16 +383,16 @@ _:
   pop hl
 ;HL points to the end of the string
 ;DE points to where the decimal is printed
-;If HL < DE, then don't write a decimal, and set HL=DE
+;If HL <= DE, then don't write a decimal, and set HL=DE
+  ex de,hl
   or a
   sbc hl,de
   add hl,de
-  jr c,+_
+  jr nc,+_
+  ex de,hl
   ld a,'.'
   ld (de),a
-  .db $FE
 _:
-  ex de,hl
   ld (hl),0
   ld hl,strout-1
   ret
