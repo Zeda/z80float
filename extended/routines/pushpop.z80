@@ -1,24 +1,19 @@
 #ifndef included_pushpop
 #define included_pushpop
 pushpop:
-;26 bytes, adds 118cc to the traditional routine
+;(used to be) 26 bytes, adds 118cc to the traditional routine
+  ld (pushpopSaveHL+1),hl
   ex (sp),hl
+  ld (pushpopBackJP+1),hl
   push de
   push bc
   push af
-  push hl
   ld hl,pushpopret
-  ex (sp),hl
   push hl
-  push af
-  ld hl,12
-  add hl,sp
-  ld a,(hl)
-  inc hl
-  ld h,(hl)
-  ld l,a
-  pop af
-  ret
+pushpopSaveHL:
+  ld hl,0
+pushpopBackJP
+  jp 0
 pushpopret:
   pop af
   pop bc
