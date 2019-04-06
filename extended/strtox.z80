@@ -143,21 +143,18 @@ _:
   dec d
   ret
 
+_:
+  inc hl
 strtox_sub0:
 ;Skip all leading zeroes
   ld a,(hl)
   cp '0'
-  jr z,$-4      ;jumps back to the `inc hl`
+  jr z,-_
 ;Set exponent to 0
   ld bc,0
 ;Check if the next char is char_DEC
-
-<<<<<<< HEAD
-  cp char_DEC
-=======
   sub char_DEC
   or a
->>>>>>> bb900effb8c4098b1e2eb12cf9a82326ea780ddd
   jr nz,+_
   inc c
 ;Get rid of zeroes
