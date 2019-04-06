@@ -59,7 +59,8 @@ I use [spasm-ng](https://github.com/alberthdev/spasm-ng) with its `-I` flag. For
 example:
 
 ```
-spasm foo.z80 foo.8xp -I bar/z80float/extended```
+spasm foo.z80 foo.8xp -I bar/z80float/extended
+```
 
 ## General Syntax
 The calling syntax for the single- and extended-precision float routines are:
