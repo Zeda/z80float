@@ -204,16 +204,38 @@ _:
   cp '0'
   jr nz,+_
   dec de
+  push de
   ex de,hl
-  ;Now lets move HL-DE bytes at DE+1 to DE
-  sbc hl,de
-  ld b,h
-  ld c,l
+  ;Now lets shift the string back 1 byte from DE+1 to DE
+
+#ifdef EXTERNAL_FORMAT_LEN
+  ld a,(EXTERNAL_FORMAT_LEN_LOC)
+; If it is 0 or 1, reset it to the default
+  inc a
+  jr z,$+5
+  dec a
+  jr nz,+_
+  ld a,DEFAULT_FORMAT_LEN
+_:
+;If it is greater than the maximum length, need to set it to the max
+  cp MAX_FORMAT_LEN
+  jr c,+_
+  ld a,MAX_FORMAT_LEN
+_:
+  ld c,a
+  inc c
+  ld b,0
+#else
+  ld bc,DEFAULT_FORMAT_LEN+1
+#endif
+
+
   ld h,d
   ld l,e
   inc hl
   ldir
   cp a
+  .db $3E
 _:
   push de
 
@@ -350,7 +372,7 @@ posdec:
   ld bc,(pow10exp)
   ld a,b
   or c
-  jr +_
+  jr z,+_
   ld a,(hl)
   cp TOK_NEG    ;negative sign
   ldir
@@ -361,15 +383,16 @@ _:
   pop hl
 ;HL points to the end of the string
 ;DE points to where the decimal is printed
-;If HL-DE-1 = 0, then don't write a decimal !
-  scf
+;If HL < DE, then don't write a decimal, and set HL=DE
+  or a
   sbc hl,de
   add hl,de
-  jr z,+_
+  jr c,+_
   ld a,'.'
   ld (de),a
-  inc hl
+  .db $FE
 _:
+  ex de,hl
   ld (hl),0
   ld hl,strout-1
   ret
