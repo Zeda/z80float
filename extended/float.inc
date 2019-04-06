@@ -1,5 +1,5 @@
 ; Equates
-xOP1 = 86FCh
+xOP1 = 8000h
 xOP2 = xOP1+10
 xOP3 = xOP1+20
 xOP4 = xOP1+30
