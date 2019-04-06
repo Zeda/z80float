@@ -143,15 +143,18 @@ _:
   dec d
   ret
 
+_:
+  inc hl
 strtox_sub0:
 ;Skip all leading zeroes
   ld a,(hl)
   cp '0'
-  jr z,$-4      ;jumps back to the `inc hl` ; but which "inc hl" would it be ?
+  jr z,-_
 ;Set exponent to 0
   ld bc,0
 ;Check if the next char is char_DEC
-  cp char_DEC
+  sub char_DEC
+  or a
   jr nz,+_
   inc c
 ;Get rid of zeroes
