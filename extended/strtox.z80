@@ -151,6 +151,7 @@ strtox_sub0:
 ;Set exponent to 0
   ld bc,0
 ;Check if the next char is char_DEC
+
   cp char_DEC
   jr nz,+_
   inc c
