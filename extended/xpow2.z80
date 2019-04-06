@@ -12,6 +12,12 @@
 ;use range reduction to get x on [0,1]
 ;Then use the formula:
 ;2^x ~ 1+x(p1+x(p2+...+x(p11+x*p12)...))
+
+caseexp:
+exp_too_big:
+  pop de
+  ret
+  
 xpow2:
   call pushpop
   push bc
@@ -21,15 +27,15 @@ xpow2:
   res 7,h
   ld a,h
   or l
-  jp z,caseexp
+  jr z,caseexp
   ;If HL<3FF3 or HL>=400E, then magnitudes are too high
   ld bc,-$3EF3
   add hl,bc
   dec h
-  jp nz,exp_too_big
+  jr nz,exp_too_big
   ld a,l
   cp 27
-  jp nc,exp_too_big
+  jr nc,exp_too_big
 ;Now we know the exponent isn't too big
 ;
 ;Range Reduction phase
@@ -93,12 +99,6 @@ _:
   call xadd
   ld de,xexp_x
   jp xmul
-caseexp:
-  pop de
-  ret
-exp_too_big:
-  pop de
-  ret
 xexp_p1:
 xexp_p2 = xexp_p1+10
 xexp_p3 = xexp_p1+20
