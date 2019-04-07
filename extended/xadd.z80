@@ -43,10 +43,10 @@ subadd_stepin:
   ld (xOP2-1),a
   ld a,h
   or l
-  jp z,caseadd
+  ret z
   ld a,d
   or e
-  jp z,caseadd1
+  ret z
 ; Now make sure xOP3 has the bigger exponent
   sbc hl,de
   jr nc,+_
@@ -147,13 +147,19 @@ _:
   ld l,a
   ld (xOP3+8),hl
   ret
+add_zero:
+  ld (xOP3+7),a
+  ld h,a
+  ld l,a
+  ld (xOP3+8),hl
+  ret
 _:
   dec de
   ld a,d
   and $7F
   or e
-  jp z,add_zero
-
+  jr z,add_zero
+  
   ld hl,xOP3-1
   sla (hl) \ inc hl
   rl (hl) \ inc hl
@@ -232,25 +238,15 @@ caseadd:
 ;NaN +x => NaN for all x
 ;inf-inf=> NaN
 ;inf +x => inf, x != inf
-  ret
+
 caseadd1:
 ;x+zero => x
 ;x+inf  => inf
 ;x+NaN  => NaN
-  ret
-add_zero:
-  xor a
-  ld (xOP3+7),a
-  ld h,a
-  ld l,a
-  ld (xOP3+8),hl
-  ret
+
 add_inf:
-  xor a
   ld (xOP3+7),a
-  dec a
-  ld h,a
-  ld l,a
+  ld hl,-1
   ld (xOP3+8),hl
   ret
 #endif
