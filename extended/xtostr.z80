@@ -93,16 +93,17 @@ _:
   call xtostr_mul
   call xtostr_mul
 ;now the number is pretty close to a nice value
+  jp inloop
 _:
-  ld a,(xOP1+8)
-  add a,a
-  jr nc,+_
   call xOP1mul10
   ld hl,(pow10exp)
   dec hl
   ld (pow10exp),hl
-  jr -_     ;For speed, could perform test here instead.
-_:
+inloop:  
+  ld a,(xOP1+8)
+  add a,a
+  jr c,-_
+
 ;quick, convert to a fixed-point number !
   rra
   inc a
