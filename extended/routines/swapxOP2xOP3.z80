@@ -16,18 +16,4 @@ swapxOP2xOP3:
   ld a,(de) \ ldd \ ld (bc),a
   ld a,(de) \ ldd \ ld (bc),a
   ret
-swapxOP2xOP3_mantissa:
-;280cc
-  ld bc,xOP2+8
-  ld hl,xOP2+7
-  ld de,xOP3+7
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ld a,(de) \ ldd \ ld (bc),a
-  ret
 #endif
