@@ -43,10 +43,10 @@ subadd_stepin:
   ld (xOP2-1),a
   ld a,h
   or l
-  ret z
+  ret z       ;special case
   ld a,d
   or e
-  ret z
+  ret z	      ;special case 2
 ; Now make sure xOP3 has the bigger exponent
   sbc hl,de
   jr nc,+_
