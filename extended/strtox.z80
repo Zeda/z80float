@@ -38,8 +38,7 @@ strtox:
 ;   Save for later
 ;   Advance ptr
   ld a,(hl)
-  sub char_NEG
-  sub 1
+  sub char_NEG+1
   push af
   jr nc,+_
   inc hl
@@ -118,7 +117,6 @@ strtox_normed:
   jp p,+_
   xor a \ sub c \ ld c,a
   sbc a,a \ sub b \ ld b,a
-  ld de,pown10table+120
 _:
   ld hl,xOP1
 _:
@@ -154,7 +152,6 @@ strtox_sub0:
   ld bc,0
 ;Check if the next char is char_DEC
   sub char_DEC
-  or a
   jr nz,+_
   inc c
 ;Get rid of zeroes
