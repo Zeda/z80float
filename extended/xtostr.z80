@@ -99,7 +99,7 @@ _:
   ld hl,(pow10exp)
   dec hl
   ld (pow10exp),hl
-inloop:  
+inloop:
   ld a,(xOP1+8)
   add a,a
   jr c,-_
@@ -373,22 +373,25 @@ posdec:
   ld bc,(pow10exp)
   ld a,b
   or c
-  jr z,+_
   ld a,(hl)
-  cp TOK_NEG    ;negative sign
+  jr z,+_
   ldir
+_:
+  ldi
+  cp TOK_NEG    ;negative sign
   jr nz,+_
   ldi
 _:
-  ldi
   pop hl
 ;HL points to the end of the string
 ;DE points to where the decimal is printed
-;If HL <= DE, then don't write a decimal, and set HL=DE
+;If HL+1 <= DE, then don't write a decimal, and set HL=DE
   ex de,hl
   or a
+  dec de
   sbc hl,de
   add hl,de
+  inc de
   jr nc,+_
   ex de,hl
   ld a,'.'
