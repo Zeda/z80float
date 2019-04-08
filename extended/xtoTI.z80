@@ -58,14 +58,14 @@ _:
   jr nz,xtoTI_inf
 
   ld (de),a
-  ld b,7
+  ld bc,$0700
   ld hl,xOP1+9
 _:
   inc de
   push hl
   ld l,(hl)
 ;L_To_BCD_no_overflow:
-    ld h,0
+    ld h,c
     add hl,hl
     add hl,hl
     add hl,hl
@@ -81,14 +81,13 @@ _:
   djnz -_
   ret
 xtoTI_inf:
-  ld a,128+99
   ex de,hl
   ld hl,OP1+1
-  ld (hl),a
-  ld b,7
+  ld (hl),128+99
+  ld bc,$0799
 _:
   inc hl
-  ld (hl),$99
+  ld (hl),c
   djnz -_
   ret
 #endif
