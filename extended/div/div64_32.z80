@@ -36,7 +36,8 @@ div64_32:
   ex de,hl
   pop hl
   sbc hl,bc
-  jr nc,+_
+  jr nc,div64_32_adjust_done
+_:
   pop bc
   dec bc
   push bc
@@ -46,7 +47,8 @@ div64_32:
   ld bc,(var_x+6)
   ex de,hl
   adc hl,bc
-_:
+  jr nc,-_
+div64_32_adjust_done:
 ;HLDE is the new remainder
   ld bc,(var_x+6)
   call div32_16

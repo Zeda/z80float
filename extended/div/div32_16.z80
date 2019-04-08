@@ -6,10 +6,10 @@
 #define var_n xOP3
 div32_16:
 ;HLDE/BC
-;770+16{0,10}+{0,20+{0,21}}
+;770+16{0,10}+{0,20+{0,22+{0,21}}}
 ;min: 770
-;max: 971
-;avg: 865.25
+;max: 993
+;avg: 868.125
 
   push bc
   ld a,b
@@ -49,6 +49,9 @@ div32_16:
 ;r-Q*E = HL-DE
   sbc hl,de
   ret nc
+  add hl,bc
+  dec de
+  ret c
   add hl,bc
   dec de
   ret
