@@ -35,8 +35,7 @@ xtoTI:
   ld h,b
   ld l,c
   ld a,(hl)
-  sub char_NEG
-  sub 1
+  sub char_NEG+1
   ld a,0
   jr nc,+_
   rra
