@@ -1,53 +1,86 @@
 #ifndef included_xrand
 #define included_xrand
 #include "routines/pushpop.z80"
-#include "routines/mov.z80"
 #include "routines/rand.z80"
-#include "routines/normalizexOP1.z80"
 
 xrand:
-;Stores a pseudo-random number on [0,1)
-;it won't produce values on (0,2^-63)
+;Stores a pseudo-random number on [0,1) with uniform distribution.
+;speed: 312+pushpop+m*40+n*(67+rand)+4*rand
+;          n is at least 1
+;          m is the number of random bits that we had to generate
+;          probability that n <= k is 1-65536^-k
+;          probability that n == k is 65535*65536^-k
+;          probability that m == k is 2^-k
+;
+;min: 2152cc
+;max:~1056442cc  (absurdly unlikely to happen before heatdeath of the universe).
+;avg: 2192.00595102cc
+;83 bytes.
+
   call pushpop
   push bc
 
-  call rand
-  ld (xOP1),hl
-  call rand
-  ld (xOP1+2),hl
-  call rand
-  ld (xOP1+4),hl
-  call rand
-  ld (xOP1+6),hl
-  ld hl,$3FFF
-  ld (xOP1+8),hl
-  call normalizexOP1
-;If we had to normalize, we should load in more random bits!
-  ld hl,(xOP1+8)
-  ld a,h    ;First, make sure it isn't zero.
-  or l
-  jr z,randdone
-  ld a,l
-  inc a
-  jr z,randdone
-  ld hl,xOP1
+;The first thing we'll do is generate the exponent.
+;Initialize to 0 (stored as 0x4000) and we'll generate
+;random bits, decrementing the exponent until we get a 1.
+
+  ld bc,$4000    ;exponent
+  jr rand_gen_exp
 _:
-  push hl
-  push af
+  dec bc
+  add hl,hl
+  jr c,+_   ;we have completed calculation of the exponent
+  dec a
+  jr nz,-_
+
+;make sure the exponent isn't zero!
+  ld a,b
+  or c
+  jr z,xrand_zero
+
+rand_gen_exp:
+  push bc
   call rand
-  ex de,hl
-  pop af
+  pop bc
+  ld a,16
+  jr -_
+_:
+
+; Now we have generated the exponent, let's generate the mantissa
+  pop ix    ;pointer to the output
+  ld (ix+8),c
+  ld (ix+9),b
+
+
+  call rand
+  ld (ix),h
+  ld (ix+1),l
+
+  call rand
+  ld (ix+2),h
+  ld (ix+3),l
+
+
+  call rand
+  ld (ix+4),l   ;it's "random" anyways, just fun to change it up :P
+  ld (ix+5),h
+
+  call rand
+  ld (ix+6),h
+  ld (ix+7),l
+
+  ret
+
+xrand_zero:
   pop hl
-  ld (hl),d   ;loading it in backwards because why not ? Want it to be as random as possible anyways.
-  add a,8
-  jr c,randdone
+
+set_xzero:
+;HL points to where to write 0 as an extended precision float.
+  xor a
+  ld b,10
+_:
+  ld (hl),a
   inc hl
-  ld (hl),e
-  inc hl
-  add a,8
-  jr nc,-_
-randdone:
-  pop de
-  ld hl,xOP1
-  jp mov10
+  djnz -_
+  ret
 #endif

@@ -4,58 +4,61 @@
 #include "routines/rand.z80"
 
 randSingle:
-;Stores a pseudo-random number on [0,1)
-;it won't produce values on (0,2^-23)
+;Generates a pseudo-random number on [0,1) with uniform distribution.
+
   call pushpop
+  push bc
+
+;The first thing we'll do is generate the exponent.
+;Initialize to -1 (stored as 0x7F) and we'll generate
+;random bits, decrementing the exponent until we get a 1.
+
+  ld c,$80    ;exponent
+  jr rand_gen_exp
+_:
+  dec c
+  add hl,hl
+  jr c,+_   ;we have completed calculation of the exponent
+  djnz -_
+
+;make sure the exponent isn't zero!
+  inc c
+  dec c
+  jr z,rand_zero
+
+rand_gen_exp:
+  push bc
+  call rand
+  pop bc
+  ld b,16
+  jr -_
+_:
+
+; Now we have generated the exponent, let's generate the mantissa
+
   push bc
   call rand
   push hl
   call rand
   pop de
-  ex de,hl
-  ld bc,$207F
-;DEHL is the mantissa, B is the exponent
-  ld a,d
-  or a
-  jp m,rand_normed
-_:
-  dec c
-  add hl,hl \ rl e \ rl d
-  jp m,rand_normed
-  djnz -_
-rand_zero:
-  ld c,l
-  ld b,l
-  jr rand_done
-rand_normed:
-;If we needed to shift more than 8 bits, we'll load in more random data
-  ld a,b
-  cp 8
-  jr c,rand_zero
-  sub 24
-  jp nc,rand_no_more_rand_data
-  push bc
-  push de
-  call rand
-  pop de
-  ld e,h
-  ld h,l
   pop bc
-rand_no_more_rand_data:
-  ld b,e
-  ld e,d
-  ld d,c
-  ld c,h
-  res 7,e
-rand_done:
+  ld b,h
+;Now our float is stored in CBDE
+
+; Make the float positive
+  res 7,b
+
+  .db $FE   ;start of `cp *` to skip `ld b,c`
+rand_zero:
+  ld b,c
+
   pop hl
-  ;DEBC
-  ld (hl),b
-  inc hl
-  ld (hl),c
-  inc hl
   ld (hl),e
   inc hl
   ld (hl),d
+  inc hl
+  ld (hl),b
+  inc hl
+  ld (hl),c
   ret
 #endif
