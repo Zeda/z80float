@@ -6,10 +6,10 @@ var48 = scrap+4
 mulSingle:
 ;Inputs: HL points to float1, DE points to float2, BC points to where the result is copied
 ;Outputs: float1*float2 is stored to (BC)
-;573+mul24+{0,35}+{0,30}
+;573+mul24+{0,34}+{0,30}
 ;min: 1398cc
-;max: 2564cc
-;avg: 2055.13839751681cc
+;max: 2563cc
+;avg: 2054.63839751681cc
     push af
     push hl
     push de
@@ -75,7 +75,7 @@ _:
     rl c
     rl b
     adc hl,hl
-    dec d
+    .db $FE   ;start of `cp *` to skip the `inc d`
 _:
     inc d
     jr z,overflow
