@@ -15,6 +15,7 @@ xOP5 = xOP1+40
 #define divx(o1,o2,d) ld hl,o1 \ ld de,o2 \ ld bc,d \ call xdiv
 #define sqrtx(o1,d) ld hl,o1 \ ld bc,d \ call xsqrt
 #define strx(o1,d) ld hl,o1 \ ld bc,d \ call xtostr
+#define movx(src,dest)  ld hl,src \ ld de,dest \ call mov10
 
 ; Macros
 #macro dec_hl_opt(x)
