@@ -10,6 +10,7 @@ mul16:
 ;min: 214cc  (DE = 1)
 ;max: 667cc
 ;avg: 544.4507883cc   however, deferring to jacobly's result as mine may have math issues ?
+;177 bytes
 	ld	a,d
 	ld	d,0
 	ld	h,b
