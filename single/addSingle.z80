@@ -4,9 +4,9 @@
 addend = scrap
 addend2= scrap+7    ;4 bytes
 
-;;Still need to tend to special cases
+;Still need to tend to special cases
 addSingle:
-;;x+y
+;x+y
     push af
     push hl
     push de
@@ -126,7 +126,7 @@ normalize:
     ld (addend+6),a
     pop bc
 add_done:
-;;Need to adjust sign flag
+;Need to adjust sign flag
     ld hl,addend+5
     ld a,(hl)
     rla \ rl b \ rra \ ld (hl),a
@@ -146,22 +146,22 @@ add_copy:
     pop af
     ret
 add_underflow:
-;;How many push/pops are needed?
-;;return ZERO
+;How many push/pops are needed?
+;return ZERO
     ld hl,0
     ld (addend+3),hl
     ld (addend+5),hl
     pop bc
     jr add_done
 add_overflow:
-;;How many push/pops are needed?
-;;return INF
+;How many push/pops are needed?
+;return INF
     dec hl
     ld (hl),40h
     jr add_done
 add_unneeded:
-;;How many push/pops are needed?
-;;Return bigger number
+;How many push/pops are needed?
+;Return bigger number
     pop af
     dec hl
     dec hl

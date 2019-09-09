@@ -17,7 +17,7 @@
 
 ;           HL  DE  BC      desc
 pow2Single:
-;;Computes 2^x
+;Computes 2^x
   call pushpop
   push bc
 
@@ -29,10 +29,10 @@ exp_inject:
 ;
 ;int(x) -> out_exp
 ;x-=int(x)  ;leaves x in [0,1)
-;;If x==0    -> out==1
-;;if x==inf  -> out==inf
-;;if x==-inf -> out==0
-;;if x==NAN  -> out==NAN
+;If x==0    -> out==1
+;if x==inf  -> out==inf
+;if x==-inf -> out==0
+;if x==NAN  -> out==NAN
   ld de,var48+10
   call mov4
   ld hl,(var48+10)

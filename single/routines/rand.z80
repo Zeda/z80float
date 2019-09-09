@@ -1,13 +1,13 @@
 #ifndef included_rand
 #define included_rand
 rand:
-;;Tested and passes all CAcert tests
-;;Uses a very simple 32-bit LCG and 32-bit LFSR
-;;it has a period of 18,446,744,069,414,584,320
-;;roughly 18.4 quintillion.
-;;LFSR taps: 0,2,6,7  = 11000101
-;;323cc
-;;Thanks to Runer112 for his help on optimizing the LCG and suggesting to try the much simpler LCG. On their own, the two are terrible, but together they are great.
+;Tested and passes all CAcert tests
+;Uses a very simple 32-bit LCG and 32-bit LFSR
+;it has a period of 18,446,744,069,414,584,320
+;roughly 18.4 quintillion.
+;LFSR taps: 0,2,6,7  = 11000101
+;323cc
+;Thanks to Runer112 for his help on optimizing the LCG and suggesting to try the much simpler LCG. On their own, the two are terrible, but together they are great.
 ;Uses 64 bits of state
   ld hl,(seed0)
   ld de,(seed0+2)
@@ -22,7 +22,7 @@ rand:
   adc hl,de
   ld (seed0+2),hl
   ex de,hl
-;;lfsr
+;lfsr
   ld hl,(seed1)
   ld bc,(seed1+2)
   add hl,hl \ rl c \ rl b

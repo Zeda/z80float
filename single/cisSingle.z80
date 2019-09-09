@@ -7,10 +7,10 @@
 #include "rsubSingle.z80"
 
 cisSingle:
-;; Computes cosine and sine
-;; Named after the reresentation, cis(x) = cos(x)+i*sin(x)
-;; This is like exp(i*x), but we are computing it as:
-;;   cos(x)+i*sqrt(1-cos(x)^2)
+; Computes cosine and sine
+; Named after the reresentation, cis(x) = cos(x)+i*sin(x)
+; This is like exp(i*x), but we are computing it as:
+;   cos(x)+i*sqrt(1-cos(x)^2)
   call pushpop
 
 ;Compute cosine and store it back to BC

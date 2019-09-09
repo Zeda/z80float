@@ -3,7 +3,7 @@
 ;#include "routines/pushpop.z80"
 #include "addSingle.z80"
 rsubSingle:
-;;-x+y
+;-x+y
     push af
     push hl
     push de

@@ -5,7 +5,7 @@
 #include "mulSingle.z80"
 #include "str2single.z80"
 ti2single:
-;;converts a TI-float to a single precision float.
+;converts a TI-float to a single precision float.
   call pushpop
   push bc
 

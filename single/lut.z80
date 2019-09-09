@@ -1,6 +1,6 @@
 #ifndef included_lutsingle
 #define included_lutsingle
-;;LUTs used
+;LUTs used
 lut:
 pown10LUT:
 .db $CD,$CC,$4C,$7C  ;.1

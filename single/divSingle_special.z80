@@ -4,44 +4,44 @@
 #include "routines/C_Times_BDE.z80"
 
 div255Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 5, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 5, better speed.
     call pushpop
     ld a,1
     jr divspecial_stepin
 div85Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 85, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 85, better speed.
     call pushpop
     ld a,3
     jr divspecial_stepin
 div51Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 51, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 51, better speed.
     call pushpop
     ld a,5
     jr divspecial_stepin
 div17Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 17, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 17, better speed.
     call pushpop
     ld a,15
     jr divspecial_stepin
 div15Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 15, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 15, better speed.
     call pushpop
     ld a,17
     jr divspecial_stepin
 div5Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 5, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 5, better speed.
     call pushpop
     ld a,51
     jr divspecial_stepin
 div3Single:
-;;HL points to the input, BC points to the output
-;;Divides a single-precision float by 3, better speed.
+;HL points to the input, BC points to the output
+;Divides a single-precision float by 3, better speed.
     call pushpop
     ld a,85
 divspecial_stepin:

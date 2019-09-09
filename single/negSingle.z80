@@ -1,8 +1,8 @@
 #ifndef included_negSingle
 #define included_negSingle
 negSingle:
-;;HL points to the float
-;;BC points to where to output the result
+;HL points to the float
+;BC points to where to output the result
     push hl
     push de
     push bc

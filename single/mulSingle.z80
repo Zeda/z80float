@@ -1,7 +1,7 @@
 #ifndef included_mulSingle
 #define included_mulSingle
 #include "routines/C_Times_BDE.z80"
-;;Need to check special cases inf,zero,NAN
+;Need to check special cases inf,zero,NAN
 var48 = scrap+4
 mulSingle:
 ;Inputs: HL points to float1, DE points to float2, BC points to where the result is copied
@@ -32,7 +32,7 @@ mulSingle:
 
 
 _:
-;;return float in CHLB
+;return float in CHLB
     push de
     ld e,(hl)
     inc hl
@@ -171,12 +171,12 @@ _:
   ld c,0
   ret
 mul24:
-;;BDE*CHL -> HLBCDE
-;;155 bytes
-;;402+3*C_Times_BDE
-;;fastest:1201cc
-;;slowest:1753cc
-;;avg    :1464.9033203125cc (1464+925/1024)
+;BDE*CHL -> HLBCDE
+;155 bytes
+;402+3*C_Times_BDE
+;fastest:1201cc
+;slowest:1753cc
+;avg    :1464.9033203125cc (1464+925/1024)
 ;min: 825cc
 ;max: 1926cc
 ;avg: 1449.63839751681cc

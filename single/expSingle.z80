@@ -15,14 +15,14 @@
 ;           HL  DE  BC      desc
 
 expSingle:
-;;Computes e^x
-;;HL points to x
-;;BC points to the output
+;Computes e^x
+;HL points to x
+;BC points to the output
   call pushpop
   ld de,const_lg_e
   push bc
 pow_inject:
-;;DE points to lg(y), HL points to x, BC points to output
+;DE points to lg(y), HL points to x, BC points to output
   ld bc,var_x
   call mulSingle
   ld h,b

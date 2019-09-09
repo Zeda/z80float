@@ -3,9 +3,9 @@
 #include "routines/pushpop.z80"
 quot=scrap+1
 divSingle:
-;;HL points to numerator
-;;DE points to denominator
-;;BC points to where the quotient gets written
+;HL points to numerator
+;DE points to denominator
+;BC points to where the quotient gets written
   call pushpop
 divSingle_no_pushpop:
     inc hl \ inc de
@@ -115,7 +115,7 @@ _:
   ld c,e
   jr writeback
 divsub0:
-;;882cc max
+;882cc max
     call divsub1    ;34 or 66
     call divsub1    ;
     call divsub1

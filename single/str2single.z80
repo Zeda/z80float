@@ -19,14 +19,14 @@
 #endif
 #define ptr_sto scrap+9
 str2single:
-;;#Routines/Single Precision
-;;Inputs:
-;;  HL points to the string
-;;  BC points to where the float is output
-;;Output:
-;;  scrap+9 is the pointer to the end of the string
-;;Destroys:
-;;  11 bytes at scrap ?
+;#Routines/Single Precision
+;Inputs:
+;  HL points to the string
+;  BC points to where the float is output
+;Output:
+;  scrap+9 is the pointer to the end of the string
+;Destroys:
+;  11 bytes at scrap ?
   call pushpop
   push bc
 ;Check if there is a negative sign.

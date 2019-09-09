@@ -4,7 +4,7 @@
 #include "addSingle.z80"
 
 subSingle:
-;;x-y
+;x-y
     push af
     push hl
     push de
