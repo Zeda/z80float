@@ -65,7 +65,7 @@ sq3:            ;/
   sbc hl,de     ; 15
   jr c,sq2      ;\
   or 20h        ; | branch 1: 23cc
-  db 254        ; |   <-- start of `cp *` which is 7cc to skip the next byte.
+  .db 254        ; |   <-- start of `cp *` which is 7cc to skip the next byte.
 sq2:            ; | branch 2: 21cc
   add hl,de     ;/
 
@@ -79,7 +79,7 @@ sq2:            ; | branch 2: 21cc
   sbc hl,de     ; 15
   jr c,sq1      ;\
   or 8          ; | branch 1: 23cc
-  db 254        ; |   <-- start of `cp *` which is 7cc to skip the next byte.
+  .db 254        ; |   <-- start of `cp *` which is 7cc to skip the next byte.
 sq1:            ; | branch 2: 21cc
   add hl,de     ;/
 
