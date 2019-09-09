@@ -27,7 +27,7 @@ xrand:
 ;random bits, decrementing the exponent until we get a 1.
 
   ld bc,$4000    ;exponent
-  jr rand_gen_exp
+  jr xrand_gen_exp
 _:
   dec bc
   add hl,hl
@@ -40,7 +40,7 @@ _:
   or c
   jr z,xrand_zero
 
-rand_gen_exp:
+xrand_gen_exp:
   push bc
   call rand
   pop bc
