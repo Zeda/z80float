@@ -2,6 +2,8 @@
 #define included_xrand
 #include "routines/pushpop.z80"
 #include "routines/rand.z80"
+#include "routines/mov.z80"
+#include "constantsx.z80"
 
 xrand:
 ;Stores a pseudo-random number on [0,1) with uniform distribution.
@@ -72,15 +74,7 @@ _:
   ret
 
 xrand_zero:
-  pop hl
-
-set_xzero:
-;HL points to where to write 0 as an extended precision float.
-  xor a
-  ld b,10
-_:
-  ld (hl),a
-  inc hl
-  djnz -_
-  ret
+  pop de
+  ld hl,xconst_0
+  jp mov10
 #endif
