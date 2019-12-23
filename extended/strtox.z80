@@ -8,7 +8,7 @@
 #include "constantsx.z80"
 #include "xmul.z80"
 
-#ifdef char_TI_TOK
+#ifndef char_TI_TOK
 #define char_NEG  $1A
 #define char_ENG  $1B
 #define char_DEC  '.'
@@ -47,6 +47,8 @@ _:
   call strtox_sub0
 TItox_stepin:
 ;Gotta multiply the number at (xOP1) by 2^64
+
+;Save the location of the ending byte of the string
   ld (strtox_ptr),hl
   ld d,100
   call xOP1_xtimes_256
@@ -150,6 +152,7 @@ strtox_sub0:
   ld a,(hl)
   cp '0'
   jr z,-_
+
 ;Set exponent to 0
   ld bc,0
 ;Check if the next char is char_DEC
@@ -190,7 +193,7 @@ _:
 ;Otherwise, need to get rid of remaining digits, while incrementing the exponent
   call skipdigits
 ;Now check for engineering `E` to modify the exponent
-  cp char_ENG
+  cp char_ENG-'0'
   ret nz
 str_xeng_exp:
   ld de,0
@@ -290,19 +293,22 @@ _:
 
 skipdigits:
   jr nc,skipdigits_nodec
-  ld a,'0'
-_:
-  cpi
-  jr z,-_
-  dec hl
-  inc bc
-  ld a,(hl)
-  ret
+  .db $FE     ; start of `cp *` to skip the `inc hl`
 _:
   inc hl
+  ld a,(hl)
+  sub '0'
+  cp 10
+  jr c,-_
+  ret
+
+_:
+  inc hl
+  inc bc
 skipdigits_nodec:
   ld a,(hl)
-  cp '0'
-  jr z,-_
+  sub '0'
+  cp 10
+  jr c,-_
   ret
 #endif

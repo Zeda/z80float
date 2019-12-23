@@ -7,7 +7,7 @@
 #include "constants.z80"
 #include "lut.z80"
 
-#ifdef char_TI_TOK
+#ifndef char_TI_TOK
 #define char_NEG  $1A
 #define char_ENG  $1B
 #define char_DEC  '.'
