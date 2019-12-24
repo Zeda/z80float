@@ -14,10 +14,10 @@ xrand:
 ;          probability that n == k is 65535*65536^-k
 ;          probability that m == k is 2^-k
 ;
-;min: 2152cc
-;max:~1056442cc  (absurdly unlikely to happen before heatdeath of the universe).
-;avg: 2192.00595102cc
-;83 bytes.
+;min: 2160cc
+;max:~1056448cc  (absurdly unlikely to happen before heatdeath of the universe).
+;avg: 2200.00595102cc
+;85 bytes.
 
   call pushpop
   push bc
@@ -69,6 +69,7 @@ _:
 
   call rand
   ld (ix+6),h
+  set 7,l
   ld (ix+7),l
 
   ret
