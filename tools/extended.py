@@ -10,10 +10,16 @@ def dbify(l):
         s+=t[-2:]+",$"
     return s[0:-2]
 def tofloat(x,n=8,bias=16384):
+    if x.lower() == "nan":
+        return [0]*(n-1)+[64,0,0]
     mpmath.mp.dps=30
     x=mpmath.mpf(x)
     if x==0:
         return [0]*(n+2)
+    if x == mpmath.mpf("inf"):
+        return [0]*(n-1)+[192,0,0]
+    if x == mpmath.mpf("-inf"):
+        return [0]*(n-1)+[192,0,128]
     sign=0
     if x<0:
         sign=1

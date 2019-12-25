@@ -10,6 +10,8 @@ def dbify(l):
     s+=t[-2:]+",$"
   return s[0:-2]
 def tofloat(x,n=3):
+  if x.lower() == "nan":
+    return [0,0,32,0]
   x=float(x)
   if x==0:
     return [0,0,0,0]
