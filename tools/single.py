@@ -9,6 +9,7 @@ def dbify(l):
       t='0'+t
     s+=t[-2:]+",$"
   return s[0:-2]
+
 def tofloat(x,n=3):
   if x.lower() == "nan":
     return [0,0,32,0]
@@ -20,7 +21,8 @@ def tofloat(x,n=3):
     sign=1
     x=-x
   if x==float('inf'):
-    return [255,255,127+(sign<<7),0]
+    return [255,255,64+(sign<<7),0]
+
   exp=0
   while x<1:
     exp-=1
@@ -29,7 +31,7 @@ def tofloat(x,n=3):
     exp+=1
     x/=2
   if exp>127:
-    return [255,255,127+(sign<<7),0]  #infinity
+    return [255,255,64+(sign<<7),0]  #infinity
   if exp<-127:
     return [0,0,0,0]  #zero
   l=[exp+128]
@@ -52,10 +54,12 @@ def tofloat(x,n=3):
     return l
   if l[k]&127!=0:
     return l
-  l[k]-=128
-  l[k+1]+=1
-  if l[k+1]==128:
-    return [255,255,255,0]
+  #Here, we have [0,0,128 or 256,???]
+  l[k] -= 128
+  l[k+1] += 1
+  if l[k+1] == 256:
+    l[k] |= 64
+    l[k+1] = 0
   return l
 for i in sys.argv[1:]:
   print(dbify(tofloat(i))+"  ;"+i)
