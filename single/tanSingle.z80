@@ -5,10 +5,10 @@
 #include "sinSingle.z80"
 #include "divSingle.z80"
 
-#define var_x 800Bh
-#define var_y 800Fh
-#define temp 8013h
-#define var_z 8017h
+#define var_x scrap+11
+#define var_y scrap+15
+#define temp scrap+19
+#define var_z scrap+23
 tanSingle:
   call pushpop
   push bc

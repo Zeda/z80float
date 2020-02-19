@@ -9,9 +9,9 @@
 #include "mod1Single.z80"
 #include "constants.z80"
 
-#define var_x 800Bh
-#define var_y 800Fh
-#define temp 8013h
+#define var_x scrap+11
+#define var_y scrap+15
+#define temp scrap+19
 sinSingle:
 ;sine(-pi/4<=x<pi/4)
 ;y=x*x
