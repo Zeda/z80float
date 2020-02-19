@@ -67,6 +67,10 @@ f24mul_return_inf:
   ret
 _:
 
+  xor b
+  and $7F
+  xor b
+f24mul_mantissa:
 ;save the exponent
   push af
 
