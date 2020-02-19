@@ -93,7 +93,7 @@ _:
   call xtostr_mul
   call xtostr_mul
 ;now the number is pretty close to a nice value
-  jp inloop
+  jr inloop
 _:
   call xOP1mul10
   ld hl,(pow10exp)
@@ -203,7 +203,7 @@ _:
   ld a,(hl)
 _:
   cp '0'
-  jr nz,+_
+  jr nz,xtostr_no_leading_0
   dec de
   push de
   ex de,hl
@@ -237,7 +237,7 @@ _:
   ldir
   cp a
   .db $3E
-_:
+xtostr_no_leading_0:
   push de
 
 ;If z flag is reset, this means that the exponent should be bumped up 1
