@@ -6,14 +6,12 @@ f24mul:
 ;AHL * CDE ==> AHL
 ;Destroys BC,DE
 ;
-  ;put the output sign in B
-  ld b,a
-  xor c
-  sla b
-  add a,a
-  ld a,b
-  rra
 
+;put the output sign in the top bit of A
+  ld b,a
+  ld a,c
+  and $80
+  xor b
 
 ;check for special values
 ;NaN*x ==> NaN
@@ -145,6 +143,7 @@ _:
 ; inf*NaN ==> NaN
 ; inf*inf ==> inf
 ;so just return op2's mantissa
+  ld a,c
   ex de,hl
   ret
 
