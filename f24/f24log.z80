@@ -1,0 +1,39 @@
+#ifndef included_f24log
+#define included_f24log
+
+#include "f24bg.z80"
+
+f24log:
+;log(AHL) ==> AHL
+;(x-1)/BG(.5(1+x), sqrt(x))
+  push hl
+  push af
+
+  push hl
+  push af
+  call f24sqrt
+  pop bc
+  ex (sp),hl
+  push af
+  ld a,b
+  ld c,$3F
+  ld de,0
+  call f24amean
+  pop bc
+  pop de
+  ld c,b
+  call f24bg
+
+  pop bc
+  ex (sp),hl
+  push af
+  ld a,b
+  ld c,$BF
+  ld de,0
+  call f24add
+  pop bc
+  pop de
+  ld c,b
+  jp f24mul
+
+#endif
