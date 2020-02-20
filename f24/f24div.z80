@@ -1,6 +1,12 @@
 #ifndef included_f24div
 #define included_f24div
+#define included_f24inv
 
+f24inv:
+  ld c,a
+  ex de,hl
+  ld a,$3F
+  ld hl,0
 f24div:
 ;AHL * CDE ==> AHL
 ;Destroys BC,DE
