@@ -1,3 +1,10 @@
+#ifndef included_f24exp
+#define included_f24exp
+
+#include "f24div.z80"
+#include "f24mul.z80"
+#include "f24add.z80"
+
 f24exp:
 
 ;range reduction!
@@ -117,3 +124,5 @@ f24exp_range_reduced:
   sub 63
   add a,b
   ret
+
+#endif
