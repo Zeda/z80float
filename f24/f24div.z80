@@ -117,15 +117,19 @@ _:
 
 
 fdiv24_div16:
+;negate the divisior for more efficient division
+;(16-bit addition is cheaper than subtraction)
   xor a
   sub e
   ld e,a
-  sbc a,a
-  sub d
+  ld a,0
+  sbc a,d
   ld d,a
+  sbc a,a
+  dec a
+  ld b,a
 
   ld a,c
-  ld b,-2
   call fdiv24_div8
   rl c
   push bc
