@@ -2,7 +2,7 @@
 #define included_f24div_pow2
 
 f24div_pow2:
-;AHL/2^b ==> AHL
+;AHL/2^B ==> AHL
   ld c,a
   and $7F
   sub b

@@ -29,7 +29,7 @@ _:
   cp $7F
   ret z
 
-;Now adjust the mantissa for our square-root routine
+;Now adjust the significand for our square-root routine
   ;scf
   ld c,0
   rr h

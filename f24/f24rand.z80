@@ -29,7 +29,7 @@ rand_gen_exp:
   jr -_
 _:
 
-; Now we have generated the exponent, let's generate the mantissa
+; Now we have generated the exponent, let's generate the significand
   push af
   call rand
   pop af

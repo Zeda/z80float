@@ -33,5 +33,5 @@ _:
   ld d,h
   ld e,l
 
-  jp f24mul_mantissa
+  jp f24mul_significand
 #endif

@@ -57,7 +57,7 @@ _:
   adc a,c
   djnz -_
 
-;AHL is the mantissa
+;AHL is the significand
   ld c,a
   pop af
   ld b,126+16

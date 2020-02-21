@@ -10,7 +10,7 @@ f24cmp:
 ;
 ;Note:
 ;   This allows some wiggle room in the bottom two bits. For example, if the two
-;   exponents are the same and the two mantissas differ by at most 3, they are
+;   exponents are the same and the two significands differ by at most 3, they are
 ;   considered equal.
 ;
 ;Note:

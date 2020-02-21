@@ -68,7 +68,7 @@ _:
   xor b
   and $7F
   xor b
-f24mul_mantissa:
+f24mul_significand:
 ;save the exponent
   push af
 
@@ -92,7 +92,7 @@ f24mul_mantissa:
   add hl,bc
   adc a,0
   rra
-;now 1+A.HL is the mantissa
+;now 1+A.HL is the significand
   pop bc    ;B is the exponent
   ld a,b
   ret z
@@ -142,7 +142,7 @@ _:
 ;op2 is is either NaN or inf
 ; inf*NaN ==> NaN
 ; inf*inf ==> inf
-;so just return op2's mantissa
+;so just return op2's significand
   ld a,c
   ex de,hl
   ret

@@ -107,7 +107,7 @@ f24add_subtract:
   ;otherwise, the implicit bit is set to 0, so we need to renormalize
 normalize_D_HLBC:
 ;D is the sign+exponent
-;HLBC is the mantissa
+;HLBC is the significand
 ;returns AHLBC
   ;make sure HLBC is not 0
   ld a,h
@@ -146,7 +146,7 @@ _:
   ret
 
 f24add_subtract_same_exp:
-;subtract the mantissas
+;subtract the significands
   ld a,b
 ;  or a
   sbc hl,de
@@ -157,7 +157,7 @@ f24add_subtract_same_exp:
   ret
 
   ;if the carry flag is set, then we need to change the sign of the output
-  ;and negate the mantissa. if reset, then we still need to normalize and whatnot
+  ;and negate the significand. if reset, then we still need to normalize and whatnot
   ld bc,0
   jr nc,normalize_D_HLBC_nonzero
   xor $80
