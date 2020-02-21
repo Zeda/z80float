@@ -12,11 +12,11 @@ f24sqr:
   ret z
 
 ;NaN*NaN ==> NaN
-;inf*inf ==> NaN
+;inf*inf ==> inf
   inc a
   jp p,+_
   dec a
-  ret z
+  ret
 _:
 
 ;first approximation of the exponent is
