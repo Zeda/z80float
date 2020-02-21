@@ -1,0 +1,25 @@
+#ifndef included_f24amean
+#define included_f24amean
+
+f24amean:
+;(AHL+BDE) ==> AHL
+  call f24add
+#ifdef included_f24div2
+  jp f24div2
+#else
+#define included_f24div2
+f24div2:
+  ld b,a
+  and $7F
+  ld a,b
+  ret z
+
+  ld b,a
+  and $7F
+  inc a
+  ld a,b
+  ret m
+  dec a
+  ret
+#endif
+#endif

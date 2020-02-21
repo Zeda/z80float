@@ -63,6 +63,10 @@ spasm foo.z80 foo.8xp -I bar/z80float/extended
 ```
 
 ## General Syntax
+
+***NOTE:*** *The following does not apply to the 24-bit floats. View
+[the readme](f24/readme.md) for f24 documentation if you want to use them!*
+
 The calling syntax for the single- and extended-precision float routines are:
 ```
     HL points to the first operand
