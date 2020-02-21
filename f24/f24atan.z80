@@ -1,8 +1,9 @@
 #ifndef included_f24atan
 #define included_f24atan
 
+#include "f24sub.z80"
 #include "f24bg.z80"
-#include "f24mul.z80"
+#include "f24sqr.z80"
 
 f24atan:
 ;atan(AHL) ==> AHL
