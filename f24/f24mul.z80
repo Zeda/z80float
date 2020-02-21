@@ -81,10 +81,10 @@ f24mul_mantissa:
   push de
   call mul16
   ;result is .DEHL
-  ;we can discard HL, bu first round
+  ;we can discard HL, but first round
+  xor a
   sla h
   ex de,hl
-  xor a
   pop bc
   adc hl,bc
   adc a,0
