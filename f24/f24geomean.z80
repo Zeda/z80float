@@ -1,9 +1,3 @@
-;!! Note !!
-; This has numerical issues in that it is directly computing the the product,
-; then the square root. This can cause overflow when it shouldn't (note that as
-; long as both inputs are finite, the output should be strictly finite). There
-; is a slower and more difficult algorithm that can and probably should be made.
-
 #ifndef included_f24geomean
 #define included_f24geomean
 
