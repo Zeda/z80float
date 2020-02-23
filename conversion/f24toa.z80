@@ -23,7 +23,7 @@ strip_trailing_zeros:
 
 ;skip past the sign if it is there
   ld a,(hl)
-  cp chr_neg
+  cp char_NEG
   jr nz,$+4
   inc hl
 
@@ -36,7 +36,7 @@ _:
   jr c,-_
 
 ;make sure we have a decimal
-  cp chr_dec-'0'
+  cp char_DEC-'0'
   jr nz,stripped_zeros
 
 ;keep this location as the last location before trailing 0s
@@ -80,7 +80,7 @@ f4toa_formstr:
   ;write a negative if needed
   ex de,hl
   jr nc,$+5
-  ld (hl),chr_neg
+  ld (hl),char_NEG
   inc hl
   ld (hl),'0'
   inc hl
@@ -98,7 +98,7 @@ _:
   or l
   ld hl,s_NaN
   jr nz,+_
-  ld hl,s_neginf
+  ld hl,s_NEGinf
   bit 7,b
   jr nz,+_
   inc hl
@@ -121,7 +121,7 @@ f24toa_finite:
   add a,a
   jr nc,+_
   ex de,hl
-  ld (hl),chr_neg
+  ld (hl),char_NEG
   inc hl
   ex de,hl
 _:
@@ -227,14 +227,14 @@ _:
   add a,10
   inc hl
 ;write a '.'
-  ld (hl),chr_dec
+  ld (hl),char_DEC
   inc hl
   add a,'0'
   ld (hl),a
   inc hl
   ex de,hl
 
-  jr f24toa_dec_written
+  jr f24toa_DEC_written
 _:
 
 ;A is the next digit
@@ -243,7 +243,7 @@ _:
   inc de
 
 ;write a '.'
-  ld a,chr_dec
+  ld a,char_DEC
   ld (de),a
   inc de
 
@@ -253,7 +253,7 @@ _:
 ;get a second digit
   call f24toa_sub
 
-f24toa_dec_written:
+f24toa_DEC_written:
 
 ;get the next three digits
   call f24toa_sub
@@ -282,10 +282,10 @@ f24toa_writeexp:
 ;Otherwise, write out the exponent.
   sub 19
 ;  jr z,f24toa_finished
-  ld (hl),chr_exp
+  ld (hl),char_ENG
   inc hl
   jr nc,+_
-  ld (hl),chr_neg
+  ld (hl),char_NEG
   inc hl
   neg
 _:
@@ -345,7 +345,7 @@ _:
   inc hl
   ld (hl),a
   dec hl
-  ld (hl),chr_dec
+  ld (hl),char_DEC
   ld h,d
   ld l,e
   dec hl
