@@ -35,10 +35,10 @@ f24toi8_return_0:
   ret
 _:
 
-;if the exponent is greater than 7, return 127 or -128
+;if the exponent is greater than 6, return 127 or -128
   rra
   sub 63
-  cp 8
+  cp 7
   jr nc,f24toi8_return_inf
 
 ;all is good!
