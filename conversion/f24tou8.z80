@@ -2,7 +2,7 @@
 #define included_f24tou8
 
 f24tou8:
-;AHL to an 8-bit signed integer
+;AHL to an 8-bit unsigned integer
 ;NaN ==> 0
 ;too big ==> 255 (even if neg)
 ;negative values in range are mod 256
@@ -34,7 +34,7 @@ f24tou8_return_0:
   ret
 _:
 
-;if the exponent is greater than 8, return 255
+;if the exponent is greater than 7, return 255
   rra
   sub 63
   cp 8
