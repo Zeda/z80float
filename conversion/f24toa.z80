@@ -1,0 +1,428 @@
+#ifndef included_f24toa
+#define included_f24toa
+
+#include "../f24/f24mul.z80"
+
+f24toa:
+;converts a 24-bit float to a string
+;Inputs:
+;   AHL is the float to convert
+;   DE points to where to write the string
+;Output:
+;   HL pointing to the string
+;Destroys:
+;   A,DE,BC
+;Notes:
+;   Uses up to 12 bytes to store the string
+
+  call f4toa_formstr
+
+strip_trailing_zeros:
+;strip trailing zeros
+  push hl
+
+;skip past the sign if it is there
+  ld a,(hl)
+  cp chr_neg
+  jr nz,$+4
+  inc hl
+
+;skip all the leading numbers up to the decimal
+_:
+  ld a,(hl)
+  inc hl
+  sub '0'
+  cp 10
+  jr c,-_
+
+;make sure we have a decimal
+  cp chr_dec-'0'
+  jr nz,stripped_zeros
+
+;keep this location as the last location before trailing 0s
+  ld d,h
+  ld e,l
+  dec de
+  .db 1
+
+skip_trailling_zeros_loop:
+;keep this location as the last location before trailing 0s
+  ld d,h
+  ld e,l
+_:
+  ld a,(hl)
+  inc hl
+  sub '0'
+  jr z,-_
+  cp 10
+  jr c,skip_trailling_zeros_loop
+;need to copy up-to and including the ending 00 from HL-1 to DE
+  dec hl
+_:
+  ld a,(hl)
+  ld (de),a
+  inc hl
+  inc de
+  or a
+  jr nz,-_
+
+stripped_zeros:
+  pop hl
+  ret
+
+f4toa_formstr:
+;save the exponent
+  ld b,a
+
+;Check if the input is 0
+  add a,a
+  jr nz,+_
+  ;write a negative if needed
+  ex de,hl
+  jr nc,$+5
+  ld (hl),chr_neg
+  inc hl
+  ld (hl),'0'
+  inc hl
+  ld (hl),0
+  dec hl
+  ret nc
+  dec hl
+  ret
+_:
+
+;check if the input is inf or NaN
+  cp $FE
+  jr nz,f24toa_finite
+  ld a,h
+  or l
+  ld hl,s_NaN
+  jr nz,+_
+  ld hl,s_neginf
+  bit 7,b
+  jr nz,+_
+  inc hl
+_:
+  push de
+  ldi
+  ldi
+  ldi
+  ldi
+  ld a,(hl)
+  ld (de),a
+  pop hl
+  ret
+f24toa_finite:
+;save the return pointer for the string
+  push de
+
+;write a negative sign if needed
+  ld a,b
+  add a,a
+  jr nc,+_
+  ex de,hl
+  ld (hl),chr_neg
+  inc hl
+  ex de,hl
+_:
+
+;save the string pointer
+  push de
+
+;save the significand
+  push hl
+
+;Get an estimate of the power of 10
+;multiply A/2 by 77
+
+  ld l,a
+  ld h,0
+  rrca
+  ld e,a
+  ld d,h
+
+  add hl,hl ;4
+  add hl,hl ;8
+  add hl,de ;9
+  add hl,hl ;18
+  add hl,de ;19
+  add hl,hl ;38
+  add hl,hl ;76
+  add hl,de ;77
+
+;now HL is approximately (exp+63)*log10(2)*256
+
+;first, save H, the power-of-10 guess
+;also restore the significand
+  ld e,h
+  ex (sp),hl
+
+;now multiply by the appropriate power-of-10 to get our input in the [1,10]-ish
+;range. Unlike the higher-precision floats, it is actually smaller to store the
+;whole table. This will also be slightly more accurate and also faster.
+  push hl
+  ld hl,f24pow10_LUT
+  add hl,de
+  sla e
+  add hl,de
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld c,(hl)
+  ld a,b
+  and $7F
+  pop hl
+  call f24mul
+
+  cp 63
+  jr nc,+_
+  ;decrement the power of 10 and multiply by 10
+  pop de
+  dec d
+  push de
+  ld c,$42
+  ld de,$4000
+  call f24mul
+_:
+
+;now AHL is a float on [1,20]
+;let's convert it to an 8.16 unsigned fixed-point number
+  sub 63
+  ld b,a
+  ld a,1
+  jr z,+_
+  add hl,hl
+  rla
+  djnz $-2
+_:
+
+;for rounding porpoises, add 3 to A:HL
+  ld bc,3
+  add hl,bc
+  adc a,b
+
+  pop bc    ;power-of-10 is in B
+  pop de    ;where to write the output
+
+
+  cp 10
+  jr c,+_
+  inc b
+;save the power-of-10 exponent
+  push bc
+
+;for rounding porpoises, add another 30 to HL
+  ld bc,30
+  add hl,bc
+  adc a,b
+
+  ;the first digit is either a 1 or a 2
+  ex de,hl
+  ld (hl),'1'
+  sub 20
+  jr c,$+4
+  inc (hl)
+  .db $01
+  add a,10
+  inc hl
+;write a '.'
+  ld (hl),chr_dec
+  inc hl
+  add a,'0'
+  ld (hl),a
+  inc hl
+  ex de,hl
+
+  jr f24toa_dec_written
+_:
+
+;A is the next digit
+  add a,'0'
+  ld (de),a
+  inc de
+
+;write a '.'
+  ld a,chr_dec
+  ld (de),a
+  inc de
+
+;save the power-of-10 exponent
+  push bc
+
+;get a second digit
+  call f24toa_sub
+
+f24toa_dec_written:
+
+;get the next three digits
+  call f24toa_sub
+  call f24toa_sub
+  call f24toa_sub
+
+; need to determine what to do with the power-of-10 exponent
+  pop af
+
+; pop the pointer to the start of the string
+  pop hl
+  ex de,hl
+
+;if the exponent is on [-3,5], then just move the decimal (and prepend with 0s)
+;accordingly.
+  cp 16
+  jr c,f24toa_writeexp
+  cp 19
+  jr z,f24toa_finished
+  jr c,f24toa_insertzeros
+  cp 24
+  jr c,f24toa_movedec
+
+
+f24toa_writeexp:
+;Otherwise, write out the exponent.
+  sub 19
+;  jr z,f24toa_finished
+  ld (hl),chr_exp
+  inc hl
+  jr nc,+_
+  ld (hl),chr_neg
+  inc hl
+  neg
+_:
+  ;A is on [0,19]
+  cp 10
+  jr c,+_
+  sub 10
+  ld (hl),'1'
+  inc hl
+_:
+  add a,'0'
+  ld (hl),a
+  inc hl
+
+f24toa_finished:
+  xor a
+  ld (hl),a
+  ex de,hl
+  ret
+
+f24toa_movedec:
+;need to move the decimal down by A-19 places
+  sub 19
+  ld (hl),0
+  ld bc,5
+  sbc hl,bc   ;HL points to the decimal
+  ld c,a
+  push de
+  ld d,h
+  ld e,l
+  inc hl
+  ld a,(de)
+  ldir
+  ld (de),a
+  pop hl
+  ret
+
+f24toa_insertzeros:
+;need to insert 18-A zeros into the number
+  sub 18
+  jr nz,+_
+  ld (hl),a
+  ld h,d
+  ld l,e
+  inc de
+  ld a,(de)
+  ldd
+  ex de,hl
+  ld (hl),a
+  ret
+_:
+
+;move 5 bytes from HL-1 to HL-A+1
+  ex de,hl
+  ld c,a
+  ld a,(hl)
+  inc hl
+  ld (hl),a
+  dec hl
+  ld (hl),chr_dec
+  ld h,d
+  ld l,e
+  dec hl
+  xor a
+  sub c
+  push af
+  add a,e
+  ld e,a
+  jr nc,$+3
+  inc d
+  xor a
+  ld (de),a
+  dec de
+  ld bc,5
+  lddr
+  pop bc
+;B is the number of zeros to write at DE
+  ld a,'0'
+_:
+  ld (de),a
+  dec de
+  djnz -_
+  ex de,hl
+  ret
+;
+
+f24toa_sub:
+;now need to multiply 0.HL by 10 and add '0'
+  xor a
+  ld b,h
+  ld c,l
+  add hl,hl \ rla
+  add hl,hl \ rla
+  add hl,bc \ adc a,'0'/2
+  add hl,hl \ rla
+  ld (de),a
+  inc de
+  ret
+f24pow10_LUT:
+.db $8E,$15,$7E  ;1e19
+.db $17,$BC,$7A  ;1e18
+.db $45,$63,$77  ;1e17
+.db $38,$1C,$74  ;1e16
+.db $BF,$C6,$70  ;1e15
+.db $CC,$6B,$6D  ;1e14
+.db $0A,$23,$6A  ;1e13
+.db $A9,$D1,$66  ;1e12
+.db $87,$74,$63  ;1e11
+.db $06,$2A,$60  ;1e10
+.db $D6,$DC,$5C  ;1e9
+.db $78,$7D,$59  ;1e8
+.db $2D,$31,$56  ;1e7
+.db $48,$E8,$52  ;1e6
+.db $A0,$86,$4F  ;1e5
+.db $80,$38,$4C  ;1e4
+.db $00,$F4,$48  ;1e3
+.db $00,$90,$45  ;1e2
+f24const_10:
+.db $00,$40,$42  ;1e1
+.db $00,$00,$3F  ;1e0
+.db $9A,$99,$3B  ;1e-1
+.db $AE,$47,$38  ;1e-2
+.db $25,$06,$35  ;1e-3
+.db $6E,$A3,$31  ;1e-4
+.db $8B,$4F,$2E  ;1e-5
+.db $6F,$0C,$2B  ;1e-6
+.db $7F,$AD,$27  ;1e-7
+.db $99,$57,$24  ;1e-8
+.db $E1,$12,$21  ;1e-9
+.db $CE,$B7,$1D  ;1e-10
+.db $D8,$5F,$1A  ;1e-11
+.db $7A,$19,$17  ;1e-12
+.db $5C,$C2,$13  ;1e-13
+.db $4A,$68,$10  ;1e-14
+.db $3B,$20,$0D  ;1e-15
+.db $2B,$CD,$09  ;1e-16
+.db $EF,$70,$06  ;1e-17
+.db $26,$27,$03  ;1e-18
+
+#endif
