@@ -1,45 +1,44 @@
-#ifndef included_f24toi8
-#define included_f24toi8
+#ifndef included_f24tou8
+#define included_f24tou8
 
-f24toi8:
+f24tou8:
 ;AHL to an 8-bit signed integer
 ;NaN ==> 0
-;+inf ==> 127
-;-inf ==> -128
+;too big ==> 255 (even if neg)
+;negative values in range are mod 256
 
-;save the sign of the output
+;save the sign
   ld c,a
 
 ;Check if the input is 0
   add a,a
   ret z
 
+
 ;check if inf or NaN
   cp $FE
   jr nz,+_
   ld a,h
   or l
-  jr nz,f24toi8_return_0
-f24toi8_return_inf:
-  sla c
-  ld a,127
-  adc a,0
+  jr nz,f24tou8_return_0
+f24tou8_return_inf:
+  ld a,255
   ret
 _:
 
 ;now if exponent is less than 0, just return 0
   cp 63*2
   jr nc,+_
-f24toi8_return_0:
+f24tou8_return_0:
   xor a
   ret
 _:
 
-;if the exponent is greater than 7, return 127 or -128
+;if the exponent is greater than 8, return 255
   rra
   sub 63
   cp 8
-  jr nc,f24toi8_return_inf
+  jr nc,f24tou8_return_inf
 
 ;all is good!
 ;A is the exponent
