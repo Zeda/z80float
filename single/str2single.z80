@@ -7,16 +7,6 @@
 #include "constants.z80"
 #include "lut.z80"
 
-#ifndef char_TI_TOK
-#define char_NEG  $1A
-#define char_ENG  $1B
-#define char_DEC  '.'
-#else
-;otherwise, char_TI_CHR
-#define char_NEG  $B0
-#define char_ENG  $3B
-#define char_DEC  $3A
-#endif
 #define ptr_sto scrap+9
 str2single:
 ;#Routines/Single Precision
@@ -82,7 +72,7 @@ _:
   jr -_
 ;Now check for engineering `E` to modify the exponent
 _:
-  cp char_NEG
+  cp char_ENG
   call z,str_eng_exp
 ;Gotta multiply the number at (scrap) by 2^24
   ld (ptr_sto),hl
