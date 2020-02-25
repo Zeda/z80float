@@ -41,30 +41,27 @@ xdiv:
 _:
   push hl
   ex de,hl
-  ld de,xOP2
+  ld de,xOP2    ;denom
   call mov10
   pop hl
   call mov10
-	ld hl,(xOP3+8)
-	ld de,(xOP2+8)
+	ld hl,(xOP3+8) ;numer
+	ld de,(xOP2+8) ;denom
 	ld a,h
 	xor d
-  ld b,a
+;save the sign
+  push af
+
 	res 7,d
 	res 7,h
 	ld a,h \ or l \ jp z,casediv
 	ld a,d \ or e \ jp z,casediv2
-  ld a,b
   ld bc,$3FFF
   add hl,bc
   sbc hl,de
   jp z,div_zero
   jp c,div_zero
   jp m,div_inf
-  add a,a
-  jr nc,+_
-  set 7,h
-_:
   ;HL is the new exponent
   push hl
 ;Need to verify that mantissa var_n<var_x
@@ -90,46 +87,72 @@ _:
 _:
   call div64
   pop hl
+  sla h
+  pop af
+  add a,a
+  rr h  
   ret
 div_zero:
   xor a
   ld (xOP1+7),a
-  ld h,a
   ld l,a
+  pop bc
+  sla b
+  rra
+  ld h,a
   ret
 div_inf:
-  xor a
-  ld h,a
-  ld l,a
-  dec a
+  ld hl,0
+  ld a,-1
   ld (xOP1+7),a
+  pop bc
+  sla b
+  rr h
   ret
 casediv:
-;0/x
-;inf/x
-;NaN/x
-  ld hl,(xOP2+8)
-  ld a,h
-  or l
-  jr z,+_
-  ld hl,xOP3
-  ld de,xOP1
-  call mov8
-  ld hl,0
-  ret
-_:
+;0/0   ==> NaN
+;0/NaN ==> NaN
+;0/x ==> 0
+;inf/NaN ==> NaN
+;inf/inf ==> NaN
+;inf/x ==> inf
+;NaN/x  ==> NaN
 
-  ret
+  ld a,(xOP3+7)
+  and $C0
+  ld a,d
+  jr z,casediv_0
+  jp p,div_NaN
+;inf/NaN ==> NaN
+;inf/inf ==> NaN
+;inf/x ==> inf
+  or e
+  jr nz,div_inf
+  ld a,(xOP2+7)
+  and $C0
+  jr z,div_inf
+  jr div_NaN
+
+casediv_0:
+;0/0   ==> NaN
+;0/NaN ==> NaN
+;0/x ==> 0
+  or e
+  jr nz,div_zero
+  ld a,(xOP2+7)
+  and $C0
+  jp m,div_zero
+  jr div_NaN
 casediv2:
-;x/0   -> NaN
+;x/0   -> inf
 ;x/inf -> 0
 ;x/NaN -> NaN
   ld a,(xOP2+7)
-  rla
-  jr c,div_inf
-  rla
-  jr nc,div_zero
+  and $C0
+  jr z,div_inf
+  jp m,div_zero
 div_NaN:
+  pop bc
   ld hl,0
   ld a,$40
   ld (xOP1+7),a
