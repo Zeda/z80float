@@ -43,10 +43,10 @@ subadd_stepin:
   ld (xOP2-1),a
   ld a,h
   or l
-  ret z       ;special case
+  jp z,caseadd1
   ld a,d
   or e
-  ret z	      ;special case 2
+  jp z,caseadd
 ; Now make sure xOP3 has the bigger exponent
   sbc hl,de
   jr nc,+_
@@ -159,7 +159,7 @@ _:
   and $7F
   or e
   jr z,add_zero
-  
+
   ld hl,xOP3-1
   sla (hl) \ inc hl
   rl (hl) \ inc hl
@@ -233,20 +233,57 @@ srlxOP2_mantissa:
   rr (hl) \ dec hl
   rr (hl)
   ret
-caseadd:
-;zero+x => x for all x
-;NaN +x => NaN for all x
-;inf-inf=> NaN
-;inf +x => inf, x != inf
-
-caseadd1:
-;x+zero => x
-;x+inf  => inf
-;x+NaN  => NaN
-
 add_inf:
   ld (xOP3+7),a
   ld hl,-1
   ld (xOP3+8),hl
   ret
+
+caseadd:
+;OP2 is special, OP3 is not
+;zero+x => x for all x
+;NaN +x => NaN for all x
+;inf +x => inf, x != inf
+  ld a,(xOP2+7)
+  and $C0
+  ret z
+xadd_return_xOP2:
+  pop hl    ;pop the return
+  pop de    ;pop the pointer to the output
+  ld hl,xOP2
+  jp mov10
+
+
+caseadd1:
+;OP3 is special, OP2 is unknown
+;x+zero => x
+;x+inf  => inf
+;x+NaN  => NaN
+;return result in xOP3
+  ld a,(xOP3+7)
+  and $C0
+  jr z,xadd_return_xOP2   ;xOP3 is 0, so return xOP2
+  ret p   ;NaN+x == NaN, NaN in xOP3 so return
+
+;if xOP2 is NaN or -inf, return NaN
+;otherwise, return xOP2
+  ld a,d
+  or e
+  ret nz
+  ld a,(xOP2+7)
+  and $C0
+  ret z
+  jp p,xadd_return_NaN
+;both inputs are inf, so make sure signs match
+  ld a,(xOP3+9)
+  ld d,a
+  ld a,(xOP2+9)
+  xor d
+  ret p
+xadd_return_NaN:
+  pop hl
+  pop de
+  ld hl,xconst_NaN
+  jp mov10
+
 #endif

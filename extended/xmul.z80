@@ -93,11 +93,12 @@ casemul:
 ;xOP1 is inf/nan/0
   ld hl,xOP2+9
   ld a,(hl)
+  and $7F
   dec hl
   or (hl)
   dec hl
   ld a,(hl)
-  ld hl,xOP2
+  ld hl,xOP1
   jr nz,casemul2_copy
   ;now we have two special cases to multipy together
 ;inf*inf-> inf
@@ -125,8 +126,8 @@ _:
   ld (var_z+15),a
   ret
 casemul2:
-;finite times inf/nan/0, so xOP1 -> out
-  ld hl,xOP1
+;finite times inf/nan/0, so xOP2 -> out
+  ld hl,xOP2
 casemul2_copy:
   ld de,var_z+8
   call mov8
