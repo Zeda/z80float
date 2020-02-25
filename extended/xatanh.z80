@@ -7,28 +7,31 @@
 #include "xsqrt.z80"
 #include "xbg.z80"
 
-;NOTE: Does not check special cases yet, or 1 and -1.
-;
+#include "xrsub.z80"
+#include "xdiv.z80"
+#include "xdiv2.z80"
+#include "xln.z80"
+
 ;x/BG(1,sqrt(1-x^2))
 #define var_x  xOP1+152
 xatanh:
+;log((1+x)/(1-x))/2
   call pushpop
   push bc
-  ld de,var_x
-  call mov10
-  ld hl,var_x
-  ld d,h
-  ld e,l
-  ld bc,xOP2
-  call xmul
-  ld h,b
-  ld l,c
+
+  ld bc,xOP4
+  ld de,xconst_1
+  call xadd
+  ld bc,xOP5
   ld de,xconst_1
   call xrsub
-  call xsqrt
-  ex de,hl
-  call xbg
-  ld hl,var_x
+  ld d,b
+  ld e,c
+  ld hl,xOP4
+  call xdiv
+  ld h,b
+  ld l,c
+  call xln
   pop bc
-  jp xmul
+  jp xdiv2
 #endif
