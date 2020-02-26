@@ -5,7 +5,7 @@
 #define var_b xOP2   ; 4 bytes, result gets copied to bottom anyways
 #define var_n xOP3
 div32_16:
-;HLDE/BC
+;HLDE/BC, BC>HL
 ;770+16{0,10}+{0,20+{0,22+{0,21}}}
 ;min: 770
 ;max: 993

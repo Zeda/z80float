@@ -34,7 +34,8 @@ div32_32:
   sbc a,d
   ld d,a
   sbc hl,bc
-  jr nc,+_
+  jr nc,div32_32_final
+_:
   ld bc,(var_b+2)
   dec bc
   ld (var_b+2),bc
@@ -44,10 +45,19 @@ div32_32:
   ld bc,(var_x+6)
   ex de,hl
   adc hl,bc
-_:
+  jr nc,-_
+  or a
+div32_32_final:
 ;HLDE is the new remainder
   ld bc,(var_x+6)
+  sbc hl,bc
+  jr z,+_
+  add hl,bc
   call div32_16
   ld (var_b),de   ;low 16-bits
+  ret
+_:
+  dec hl
+  ld (var_b),hl
   ret
 #endif
