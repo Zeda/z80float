@@ -69,7 +69,7 @@ xcos_stepin:
   call xsub
 ;We don't want to infinite loop if the result is .25-.5 = -.25 !
   ld a,(cos_x+8)
-  sub $7E
+  sub $FE
   jr nz,$+9
   ld a,80h
   ld (cos_x+8),a
