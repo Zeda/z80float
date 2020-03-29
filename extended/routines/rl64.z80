@@ -2,6 +2,7 @@
 #define included_rl64
 rl64:
   rl (hl) \ inc hl
+rl56:
   rl (hl) \ inc hl
   rl (hl) \ inc hl
   rl (hl) \ inc hl
