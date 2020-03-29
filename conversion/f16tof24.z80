@@ -1,0 +1,43 @@
+#ifndef included_f16tof24
+#define included_f16tof24
+
+f16tof24:
+;HL is the f16 input
+;AHL is the f24 output
+
+;check for inf or NaN
+  ld a,h
+  and %01111100
+  jr z,f16tof24_zero
+  cp %01111100
+  jr z,f16tof24_inf_nan
+
+;it is not a special value
+  xor a
+  add hl,hl \ rla   ;A = 0000000s
+  rla               ;A = 000000s0
+  rla               ;A = 00000s00
+  add hl,hl \ rla   ;A = 0000s00e
+  add hl,hl \ rla   ;A = 000s00ee
+  add hl,hl \ rla   ;A = 00s00eee
+  add hl,hl \ rla   ;A = 0s00eeee
+  add hl,hl \ rla   ;A = s00eeeee
+
+;finally, need to subtract 15 from A and add 63
+  add a,48
+  ret
+
+
+f16tof24_zero:
+  sla h
+  rra
+  ret
+
+f16tof24_inf_NaN:
+  xor h
+  ld h,a
+  res 7,h
+  or $7F
+  ret
+
+#endif
