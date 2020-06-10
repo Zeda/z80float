@@ -88,7 +88,7 @@ f24pow2      2^x
 f24pow       x^y
 f24rand      random number on [0,1)
 f24rsub      -x+y       (included with f24sub.z80)
-f24sinh      sing(x)
+f24sinh      sinh(x)
 f24sin       sin(x)
 f24sqrt      sqrt(x)
 f24sqr       x*x
