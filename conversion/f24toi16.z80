@@ -45,6 +45,7 @@ _:
 ;all is good!
 ;A is the exponent
 ;1+A is the number of bits to read
+  or a
   ld b,a
   ld d,0
   ld a,1
@@ -66,5 +67,4 @@ _:
   sub h
   ld h,a
   ret
-
 #endif
