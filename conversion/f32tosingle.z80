@@ -14,7 +14,7 @@ f32tosingle:
   ldi
   or (hl)
   ldi
-  ld c,a    ;the OR od the bottom two bytes. Needed for NaN vs. Inf
+  ld c,a    ;the OR of the bottom two bytes. Needed for NaN vs. Inf
   ld a,(hl)
   inc hl
   ld h,(hl)
