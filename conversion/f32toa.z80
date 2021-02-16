@@ -1,0 +1,15 @@
+#ifndef included_f32toa
+#define included_f32toa
+
+#include "routines/pushpop.z80"
+#include "f32tosingle.z80"
+#include "single2str.z80"
+
+f32toa:
+;str(x) ==> z
+  call pushpop
+  call f32tosingle
+  ld h,b
+  ld l,c
+  jp single2str
+#endif
