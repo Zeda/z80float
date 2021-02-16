@@ -10,10 +10,10 @@ x_to_int16:
   push bc
   push af
   call +_
-  pop ix
-  pop de
-  pop bc
   pop af
+  pop bc
+  pop de
+  pop ix
   ret
 _:
   push hl
