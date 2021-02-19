@@ -3,12 +3,71 @@ z80float is a floating point library targeting the Z80 processor. While this
 project is tested on a TI-84+, the code should be generic enough to run on any
 Z80 CPU with very little modification (mostly defining scrap RAM locations).
 
+## Supported Formats
+
+These have a complete library of routines including the basic 5 functions
+(+, -, *, /, squareroot) as well as trigonometric functions
+(sine/cosine/tangent), inverse trig functions (arcsine, arccosine, arctangent),
+hyperbolic functions (sinh/cosh/tanh), inverse hyperbolics functions,
+logarithms, exponentials, comparison, and `rand`:
+
+* **[f24](f24)** - These are 24-bit floats modeled after IEEE-754 binary32,
+  removing one exponent bit and 7 significand bits. These are well-suited to the
+  Z80-- the operands can be passed via registers allowing the routines to have a
+  small memory and CPU-time footprint, while still having 5 digits of precision.
+  **NOTE:** `f24toa` converts an `f24` float to a string that can be displayed.
+  This is found in the [conversion](conversion) folder.
+
+* **[single](single)** - this is poorly named. This was my own 32-bit float
+  format. It can represent all IEEE-754 `binary32` numbers, but the layout of
+  the bits is different (keeping all exponent bits in one byte) and represents
+  0/inf/NaN differently allowing slightly more numbers to be represented.
+
+* **[extended](extended)** - These are 80-bit floats providing 19-digits
+  precision. These are quite fast all things considered-- My TI-84+'s TI-OS
+  takes over 85000 clock cycles to calculate a square root to 14 digits
+  precision, compared to 6500cc for xsqrt (that's 13 times faster). Most other
+  routines aren't that extreme, but they are generally pretty fast compared to
+  the TI-OS routines. To be fair, TI's floats are BCD, so clunkier to work with.
+
+Future ideas:
+* [ ] **f32** - an IEEE-754 binary32 format (the classic "single")
+  * note that in the [conversion](conversion) folder there are routines
+    `f32tosingle.z80` and `singletof32.z80` in case you *really* need to support
+    the binary32 format.
+
+* [ ] **f64** - an IEEE-754 binary64 format (the classic "double")
+  * note that in the [conversion](conversion) folder there are routines
+    `f64tox.z80` and `xtof64.z80` in case you need to support the binary64
+    format. This might end up being how most `f64` routines are implemented, at
+    least early on.
+
+* [ ] **f16** - The binary16 format. Although I might opt to work on
+  [DW0RKiN's library](https://github.com/DW0RKiN/Floating-point-Library-for-Z80)
+  instead. Their's has a bunch of 16-bit float implementations including
+  binary16.
+
+* [ ] **BCD floats** - Might be useful for calculators as these use base-10.
+
+* [ ] **base10** floats - encoding 3 digits in 10 bits. It has the advantage of
+  BCD in that it is quick to convert to and from base-10 representation, but it
+  can take advantage of more base-2 arithmetic since 1000 is close to a power of
+  2 (2^10 = 1024) and it can pack more digits into a smaller space than BCD (10
+  bits for 3 digits instead of 12).
+
 ## Building
-z80float is set up so that if you include a file, it includes all of its
-dependencies. For example, if you want to use xatan, `#include "xatan.z80"` will
-include all of the following files (if they haven't already been included) in
-the following order. Note that some routines are shared and so I am omitting
-multiplicities:
+The compiler that I've been using for this project is
+[spasm-ng](https://github.com/alberthdev/spasm-ng) which has its share of syntax
+quirks. In the future, I might migrate to
+[fasmg](https://flatassembler.net/docs.php?article=fasmg) using jacobly's
+[Z80 includes](https://github.com/jacobly0/fasmg-z80) (they also have
+[ez80 includes](https://github.com/jacobly0/fasmg-z80)).
+
+I've set up z80float so that when you `#include` a file, it `#includes` any
+dependencies that have yet to be included. For example, if you want to use
+`xatan`, then `#include "xatan.z80"` will include all of the following files (if
+they haven't already been included) in the following order. Note that some
+routines are shared and so I am omitting multiplicities:
 ```
 xatan.z80
   routines/pushpop.z80
@@ -52,11 +111,11 @@ xatan.z80
     xamean.z80
     xgeomean.z80  
 ```
-**In order for this to work**, you will need to add the `single` and/or
-`extended` directory to your assembler's default search path.
+**In order for this to work**, you will need to add the format's root directory
+(i.e. `extended` or `single`) to your assembler's default search path.
 
-I use [spasm-ng](https://github.com/alberthdev/spasm-ng) with its `-I` flag. For
-example:
+With [spasm-ng](https://github.com/alberthdev/spasm-ng), I use its `-I` flag.
+For example:
 
 ```
 spasm foo.z80 foo.8xp -I bar/z80float/extended
@@ -75,7 +134,8 @@ The calling syntax for the single- and extended-precision float routines are:
     BC points to where the result should be output
 ```
 In all cases unless specifically noted, registers are preserved on input and
-output. Notable exceptions are the comparison routines, `xcmp` and `cmpSingle`.
+output. Notable exceptions are the comparison routines such as `xcmp` and
+`cmpSingle`.
 
 Subroutines, like `mul16`, do not preserve registers.
 
