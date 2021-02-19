@@ -5,7 +5,7 @@
 
 div255Single:
 ;HL points to the input, BC points to the output
-;Divides a single-precision float by 5, better speed.
+;Divides a single-precision float by 255, better speed.
     call pushpop
     ld a,1
     jr divspecial_stepin
