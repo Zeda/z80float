@@ -1,0 +1,2 @@
+#!/bin/bash
+spasm tester.z80 tester.8xp -I ../f32 -I ../f24 -I ../conversion -I ../single -I ../extended
