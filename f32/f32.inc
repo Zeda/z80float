@@ -8,5 +8,10 @@ f32op3  = 8008h
 f32op4  = 800Ch
 f32op5  = 8010h
 
-seed0   = 80F8h
-seed1   = 80FCh
+#ifndef seed0
+#define seed0 80F8h
+#endif
+
+#ifndef seed1
+#define seed1 80FCh
+#endif

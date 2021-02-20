@@ -40,3 +40,6 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 * [x] f32abs
 * [x] f32neg
 * [x] f32rand
+* [x] f32add
+* [x] f32sub
+* [x] f32rsub
