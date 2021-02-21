@@ -2,13 +2,13 @@
 #define included_div24_24
 
 div24_24:
-;CHL/BDE
-;CHL<BDE
-;return result as 0.ABC
-;speed: 181+3*div24_24_sub_8
-;min: 1882
-;max: 2434
-;avg: 2116
+;BHL/CDE
+;BHL<CDE
+;return result as 0.BDE, with carry set to 1 if rounding should round up
+;speed: 167+3*div24_24_sub_8 + div24_24_sub_1
+;min: 1924
+;max: 2499
+;avg: 2167.75
 ; negate BDE
   xor a
   sub e
@@ -18,25 +18,22 @@ div24_24:
   sbc a,d
   ld d,a
 
-  ld a,0
-  sbc a,b
-  ld b,a
+  sbc a,a
+  sub a,c
+  ld c,a
 
 ;
-  ld a,c
-  ld c,b
-  call div24_24_sub_8
-  rl b
-  push bc
-  call div24_24_sub_8
-  rl b
-  push bc
-  call div24_24_sub_8
   ld a,b
-  rla
+  call div24_24_sub_1 ; we need an extra iteration for rounding
+  call div24_24_sub_8
+  push bc
+  call div24_24_sub_8
+  push bc
+  call div24_24_sub_8
+  ;carry is for rounding
+  pop de
+  ld e,b
   pop bc
-  ld c,a
-  pop af
   ret
 
 
@@ -51,6 +48,7 @@ div24_24_sub_4:
 div24_24_sub_2:
   call div24_24_sub_1
 div24_24_sub_1:
+;56+{8,{0,23}}
   rl b
   add hl,hl
   adc a,a

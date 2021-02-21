@@ -12,9 +12,9 @@ f32div:
   inc hl
   ld d,(hl)
   inc hl
-  ld c,(hl)
+  ld b,(hl)
   inc hl
-  ld a,c
+  ld a,b
   add a,a
   ld a,(hl)
   adc a,a
@@ -33,9 +33,9 @@ f32div:
   inc hl
   ld d,(hl)
   inc hl
-  ld b,(hl)
+  ld c,(hl)
   inc hl
-  ld a,b
+  ld a,c
   add a,a
   ld a,(hl)
   adc a,a
@@ -52,61 +52,76 @@ f32div:
   ; if CHL >= BDE then need to increment exponent and shift CHL>>1
   or a
   sbc hl,de
-  ld a,c
-  sbc a,b
+  ld a,b
+  sbc a,c
   jr nc,+_
   add hl,de
-  adc a,b
+  adc a,c
 _:
-  ld c,a
+  ld b,a
+  sbc a,a
+  inc a
+  ;A is 1 if we need to shift a 1 into the result of the division, else 0
   push af ;nc if we need to shift in a 1
   call div24_24
-  ld e,a
-  pop af
-  jr c,+_
-  scf
-  rr e
+  pop hl
+
+  rr h      ;shift out the bottom bit, shift round bit into H
+  jr nc,+_
   rr b
-  rr c
+  rr d
+  rr e
   pop af
   dec a
-  .db $16 ;start of `ld d,*` to eat the next byte
+  .db $0E ;start of `ld c,*` to eat the next byte
 _:
-;EBC is the significand
   pop af
-  ld d,a
+  ld l,a
   rr h
   pop af
   rr h    ;top 2 bits of H are signs
-  sub d
-  ld d,0
+
+  ;H.BDE, need to add carry
+  bit 5,h
+  jr z,+_
+  inc e
+  jr nz,+_
+  inc d
+  jr nz,+_
+  inc b
+  jr nz,+_
+  dec l
+_:
+
+  sub l
+  ld l,0
   jr nc,$+3
-  dec d
+  dec l
   add a,7Fh
   jr nc,$+3
-  inc d
-  dec d
+  inc l
+  dec l
   jr z,f32div_return_inf
-  inc d
+  inc l
   jr nz,f32div_return_zero
-;EBC
+
 f32div_return:
-  sla e
+;BDE is the significand
+  sla b
   ld l,a  ;exponent
   ld a,h
-f32div_return2:
   and %11000000
   jp pe,$+4
   scf
   ld a,l
   rra
-  rr e
+  rr b
   pop hl
-  ld (hl),c
+  ld (hl),e
+  inc hl
+  ld (hl),d
   inc hl
   ld (hl),b
-  inc hl
-  ld (hl),e
   inc hl
   ld (hl),a
   ret
@@ -142,7 +157,7 @@ f32div_0_op2:
 
 f32div_infnan_op2:
 ;if OP2 is 0, inf, or NaN, return NaN
-  rr b      ;save the sign of OP1
+  rr c      ;save the sign of OP1
   inc hl
   inc hl
   ld a,(hl)
@@ -150,16 +165,12 @@ f32div_infnan_op2:
   inc hl
   ld a,(hl)
   adc a,a
-  ld h,b
+  ld h,c
   jr z,f32div_return_NaN
   inc a
   jr z,f32div_return_NaN
-  ;otherwise, return OP1, CDE ==> EBC
+  ;otherwise, return OP1, BDE ==> BDE
   rr h
-  ld a,c
-  ld c,e
-  ld b,d
-  ld e,a
   ld a,-1
   jr f32div_return
 
@@ -170,7 +181,7 @@ f32div_return_NaN:
   rr h
 f32div_return_NaN2:
   ld a,-1
-  ld e,a  ;something > 1
+  ld b,a  ;something > 1
   jr f32div_return
 
 f32div_op1_infnan:
@@ -178,7 +189,7 @@ f32div_op1_infnan:
   rr h
   pop af
   rr h
-  ld a,b
+  ld a,c
   add a,a
   or d
   or e
@@ -190,6 +201,6 @@ f32div_return_inf:
   .db $FE
 f32div_return_zero:
   xor a
-  ld e,a
+  ld b,a
   jr f32div_return
 #endif
