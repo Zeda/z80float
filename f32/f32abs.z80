@@ -1,5 +1,6 @@
 #ifndef included_f32abs
 #define included_f32abs
+#include "routines/pushpop.z80"
 
 f32abs:
 ;abs(x) ==> z

@@ -1,6 +1,7 @@
 #ifndef included_f32sqrt
 #define included_f32sqrt
 
+#include "routines/pushpop.z80"
 #include "routines/sqrt24_mant.z80"
 
 f32sqrt:

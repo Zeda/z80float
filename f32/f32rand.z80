@@ -1,5 +1,6 @@
 #ifndef included_f32rand
 #define included_f32rand
+#include "routines/pushpop.z80"
 #include "../extended/routines/rand.z80"
 
 f32rand:
