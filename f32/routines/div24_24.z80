@@ -1,0 +1,69 @@
+#ifndef included_div24_24
+#define included_div24_24
+
+div24_24:
+;CHL/BDE
+;CHL<BDE
+;return result as 0.ABC
+;speed: 181+3*div24_24_sub_8
+;min: 1882
+;max: 2434
+;avg: 2116
+; negate BDE
+  xor a
+  sub e
+  ld e,a
+
+  ld a,0
+  sbc a,d
+  ld d,a
+
+  ld a,0
+  sbc a,b
+  ld b,a
+
+;
+  ld a,c
+  ld c,b
+  call div24_24_sub_8
+  rl b
+  push bc
+  call div24_24_sub_8
+  rl b
+  push bc
+  call div24_24_sub_8
+  ld a,b
+  rla
+  pop bc
+  ld c,a
+  pop af
+  ret
+
+
+div24_24_sub_8:
+; speed: 567+8*{8,{0,23}}
+; min: 567
+; max: 751
+; avg: 645
+  call div24_24_sub_4
+div24_24_sub_4:
+  call div24_24_sub_2
+div24_24_sub_2:
+  call div24_24_sub_1
+div24_24_sub_1:
+  rl b
+  add hl,hl
+  adc a,a
+  jr c,div24_24_sub_overflow
+  add hl,de
+  adc a,c
+  ret c
+  sbc hl,de
+  sbc a,c
+  ret
+div24_24_sub_overflow:
+  add hl,de
+  adc a,c
+  scf
+  ret
+#endif

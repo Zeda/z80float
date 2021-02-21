@@ -35,6 +35,7 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 ```
 
 ## Testing Needed
+(Note, I haven't tested very small and very large numbers.)
 * [x] f32mul2
 * [ ] f32cmp
 * [x] f32abs
@@ -45,3 +46,4 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 * [x] f32rsub
 * [x] f32sqrt
 * [x] f32mul
+* [x] f32div

@@ -1,0 +1,195 @@
+#ifndef included_f32div
+#define included_f32div
+#include "routines/pushpop.z80"
+#include "routines/div24_24.z80"
+
+f32div:
+;x/y ==> z
+  call pushpop
+  push bc
+  push de
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld c,(hl)
+  inc hl
+  ld a,c
+  add a,a
+  ld a,(hl)
+  adc a,a
+  ;A is the exponent, carry is the sign
+  pop hl
+  jp z,f32div_0_op2
+  inc a
+  jp z,f32div_infnan_op2
+  dec a
+  push af
+  push de
+
+
+
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld b,(hl)
+  inc hl
+  ld a,b
+  add a,a
+  ld a,(hl)
+  adc a,a
+  ;A is the exponent, carry is the sign
+  pop hl
+  jp z,f32div_op1_0
+  inc a
+  jp z,f32div_op1_infnan
+  push af
+
+  set 7,c
+  set 7,b
+  ;CHL is the first operand, BDE is the second operand
+  ; if CHL >= BDE then need to increment exponent and shift CHL>>1
+  or a
+  sbc hl,de
+  ld a,c
+  sbc a,b
+  jr nc,+_
+  add hl,de
+  adc a,b
+_:
+  ld c,a
+  push af ;nc if we need to shift in a 1
+  call div24_24
+  ld e,a
+  pop af
+  jr c,+_
+  scf
+  rr e
+  rr b
+  rr c
+  pop af
+  dec a
+  .db $16 ;start of `ld d,*` to eat the next byte
+_:
+;EBC is the significand
+  pop af
+  ld d,a
+  rr h
+  pop af
+  rr h    ;top 2 bits of H are signs
+  sub d
+  ld d,0
+  jr nc,$+3
+  dec d
+  add a,7Fh
+  jr nc,$+3
+  inc d
+  dec d
+  jr z,f32div_return_inf
+  inc d
+  jr nz,f32div_return_zero
+;EBC
+f32div_return:
+  sla e
+  ld l,a  ;exponent
+  ld a,h
+f32div_return2:
+  and %11000000
+  jp pe,$+4
+  scf
+  ld a,l
+  rra
+  rr e
+  pop hl
+  ld (hl),c
+  inc hl
+  ld (hl),b
+  inc hl
+  ld (hl),e
+  inc hl
+  ld (hl),a
+  ret
+
+f32div_0_op2:
+; if op2 is 0 or NaN, return NaN, else 0
+;if OP2 is 0, inf, or NaN, return NaN
+  rr b       ;save the sign of OP1
+  ld a,(hl)
+  inc hl
+  or (hl)
+  inc hl
+  ld c,(hl)
+  sla c
+  or c
+  ld c,a    ;c is zero if the significand is zero
+  ld a,(hl)
+  add a,a
+  inc hl
+  ld a,(hl)
+  adc a,a
+  ld h,b
+  jr z,f32div_return_NaN
+  rr h
+  inc a
+  ;If A is not zero, return 0
+  ;If A is 0 and C is 0, then continue
+  ;If A is 0 and C is not 0, NaN
+  jr nz,f32div_return_zero
+  or c
+  jr z,f32div_return_zero
+  jr f32div_return_NaN2
+
+f32div_infnan_op2:
+;if OP2 is 0, inf, or NaN, return NaN
+  rr b      ;save the sign of OP1
+  inc hl
+  inc hl
+  ld a,(hl)
+  add a,a
+  inc hl
+  ld a,(hl)
+  adc a,a
+  ld h,b
+  jr z,f32div_return_NaN
+  inc a
+  jr z,f32div_return_NaN
+  ;otherwise, return OP1, CDE ==> EBC
+  rr h
+  ld a,c
+  ld c,e
+  ld b,d
+  ld e,a
+  ld a,-1
+  jr f32div_return
+
+f32div_op1_0:
+  rr h
+  pop af
+f32div_return_NaN:
+  rr h
+f32div_return_NaN2:
+  ld a,-1
+  ld e,a  ;something > 1
+  jr f32div_return
+
+f32div_op1_infnan:
+;if the second op is NaN, return NaN, else 0
+  rr h
+  pop af
+  rr h
+  ld a,b
+  add a,a
+  or d
+  or e
+  jr z,f32div_return_zero
+  jr f32div_return_NaN2
+
+f32div_return_inf:
+  ld a,$FF
+  .db $FE
+f32div_return_zero:
+  xor a
+  ld e,a
+  jr f32div_return
+#endif
