@@ -15,5 +15,6 @@ f32_const_inf:
   .db $00,$00,$80,$7F  ;inf
 f32_const_ninf:
   .db $00,$00,$80,$FF  ;-inf
-
+f32_const_ln2:
+  .db $18,$72,$31,$3F  ;.6931471806
 #endif
