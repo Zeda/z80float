@@ -193,12 +193,12 @@ f32add_sub_norm:
   sla b
   inc a
   dec a
-  jr f32add_sub_norm_start
+  jp m,f32add_output
 f32add_sub_norm_loop:
-  adc hl,hl
-  adc a,a
   dec d
   jr z,f32add_output
+  adc hl,hl
+  adc a,a
 f32add_sub_norm_start:
   jp p,f32add_sub_norm_loop
   ;now do rounding. If we normed, then we know B has no more bits from the
