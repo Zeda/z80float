@@ -54,7 +54,7 @@ f32bgi:
   adc a,a
   ldi
   pop hl
-  jp z,f32bgi_return_NaN
+  ; jp z,f32bgi_return_NaN
   inc a
   jr z,f32bgi_infnan_op2
 
