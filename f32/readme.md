@@ -47,3 +47,16 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 * [x] f32sqrt
 * [x] f32mul
 * [x] f32div
+* [x] f32amean
+* [x] f32geomean
+* [x] f32bgi
+* [x] f32acos
+* [x] f32asin
+* [x] f32atan
+* [x] f32log
+* [x] f32log2
+* [x] f32log10
+* [x] f32logy
+* [x] f32acosh
+* [x] f32asinh
+* [x] f32atanh
