@@ -1,3 +1,6 @@
+#ifndef included_f32constants
+#define included_f32constants
+
 f32_const_pi:
   .db $DB,$0F,$49,$40  ;3.14159265
 f32_const_2pi:
@@ -12,3 +15,5 @@ f32_const_inf:
   .db $00,$00,$80,$7F  ;inf
 f32_const_ninf:
   .db $00,$00,$80,$FF  ;-inf
+
+#endif
