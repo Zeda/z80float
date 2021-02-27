@@ -11,7 +11,7 @@
 #define f32asin_x f32bgi_c+4
 
 f32asin:
-;asin(AHL) ==> AHL
+;asin(x)
 ;x/BG(sqrt(1-x^2),1)
 ;
   call pushpop
