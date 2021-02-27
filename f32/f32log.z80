@@ -15,6 +15,7 @@
 
 
 f32log:
+;log(x) (natural logarithm)
 ;(x-1)/BG(.5(1+x), sqrt(x))
   call pushpop
   push bc
