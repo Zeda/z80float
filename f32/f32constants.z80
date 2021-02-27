@@ -17,4 +17,8 @@ f32_const_ninf:
   .db $00,$00,$80,$FF  ;-inf
 f32_const_ln2:
   .db $18,$72,$31,$3F  ;.6931471806
+f32_const_lg_e:
+  .db $3B,$AA,$B8,$3F  ;1.442695041
+f32_const_log10_e:
+  .db $D9,$5B,$DE,$3E  ;0.4342944819
 #endif
