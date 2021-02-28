@@ -18,6 +18,10 @@ logarithms, exponentials, comparison, and `rand`:
   **NOTE:** `f24toa` converts an `f24` float to a string that can be displayed.
   This is found in the [conversion](conversion) folder.
 
+* **[f32](f32)** - an IEEE-754 binary32 format (the classic "single")
+  * **NOTE:** `f32toa` converts an f32 float to a string that can be displayed.
+  This is found in the [conversion](conversion) folder.
+
 * **[single](single)** - this is poorly named. This was my own 32-bit float
   format. It can represent all IEEE-754 `binary32` numbers, but the layout of
   the bits is different (keeping all exponent bits in one byte) and represents
@@ -31,11 +35,6 @@ logarithms, exponentials, comparison, and `rand`:
   the TI-OS routines. To be fair, TI's floats are BCD, so clunkier to work with.
 
 Future ideas:
-* [ ] **f32** - an IEEE-754 binary32 format (the classic "single")
-  * note that in the [conversion](conversion) folder there are routines
-    `f32tosingle.z80` and `singletof32.z80` in case you *really* need to support
-    the binary32 format.
-
 * [ ] **f64** - an IEEE-754 binary64 format (the classic "double")
   * note that in the [conversion](conversion) folder there are routines
     `f64tox.z80` and `xtof64.z80` in case you need to support the binary64
