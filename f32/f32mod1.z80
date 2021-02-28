@@ -5,7 +5,6 @@
 f32mod1:
 ;x%1
   call pushpop
-  scf \ jr c,$
   push bc
   ld e,(hl)
   inc hl
@@ -49,11 +48,11 @@ f32mod1_pos:
   jr c,f32mod1_shift_bits
   ld c,d
   ld d,e
-  ld l,0
+  ld e,0
   sub 8
   jr c,f32mod1_shift_bits
   ld c,d
-  ld d,l
+  ld d,e
   sub 8
   jr nc,f32mod1_return_0
 f32mod1_shift_bits:
@@ -71,7 +70,9 @@ f32mod1_shift_bits_done:
   ld c,a
   or h
   or l
+  ex de,hl
   jr z,f32mod1_return_0
+  ex de,hl
   ld a,c
   or a
   jr f32mod1_norm_start
