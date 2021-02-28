@@ -11,6 +11,8 @@ f32_const_0:
   .db $00,$00,$00,$00  ;0
 f32_const_1:
   .db $00,$00,$80,$3F  ;1
+f32_const_n1:
+  .db $00,$00,$80,$BF  ;-1
 f32_const_NaN:
   .db $FF,$FF,$FF,$7F  ;NaN
 f32_const_inf:
@@ -29,4 +31,7 @@ f32_const_p25:
   .db $00,$00,$80,$3E  ;.25
 f32_const_2pi_inv:
   .db $83,$F9,$22,$3E  ;.1591549431
+f32_const_lg_10:
+  .db $78,$9A,$54,$40  ;3.321928095
+
 #endif
