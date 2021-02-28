@@ -60,3 +60,14 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 * [x] f32acosh
 * [x] f32asinh
 * [x] f32atanh
+* [x] f32mod1
+* [x] f32cos
+* [x] f32sin
+* [x] f32tan
+* [x] f32pow2
+* [x] f32exp
+* [x] f32pow10
+* [x] f32pow
+* [x] f32cosh
+* [x] f32sinh
+* [x] f32tanh
