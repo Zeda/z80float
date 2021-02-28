@@ -168,10 +168,10 @@ f32add_sub:
   ccf
   push af
   xor a
-  ld d,a \ sbc a,b \ ld b,a
-  ld a,d \ sbc a,l \ ld l,a
-  ld a,d \ sbc a,h \ ld h,a
-  ld a,d \ sbc a,c \ ld c,a
+  ld e,a \ sbc a,b \ ld b,a
+  ld a,e \ sbc a,l \ ld l,a
+  ld a,e \ sbc a,h \ ld h,a
+  ld a,e \ sbc a,c \ ld c,a
 f32add_sub_negated:
 ;now we need to re-normalize. Only the top bit of B matters.
 ;(note that if B had extra bits of the original significand, then we'd only have
