@@ -112,12 +112,13 @@ xatan.z80
 ```
 **In order for this to work**, you will need to add the format's root directory
 (i.e. `extended` or `single`) to your assembler's default search path.
+**You will also need to add the `common` folder to your compiler's search path!.**
 
 With [spasm-ng](https://github.com/alberthdev/spasm-ng), I use its `-I` flag.
 For example:
 
 ```
-spasm foo.z80 foo.8xp -I bar/z80float/extended
+spasm foo.z80 foo.8xp -I bar/z80float/common -I bar/z80float/extended
 ```
 
 ## General Syntax
