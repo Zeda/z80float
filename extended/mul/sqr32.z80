@@ -1,6 +1,6 @@
 #ifndef included_sqr32
 #define included_sqr32
-#include "mul/mul16.z80"
+#include "mul16.z80"
 
 #define var_c xOP1   ;input
 #define var_y var_c+4 ;  used for sqrt32

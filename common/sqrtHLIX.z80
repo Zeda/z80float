@@ -1,6 +1,6 @@
 #ifndef included_sqrtHLIX
 #define included_sqrtHLIX
-#include "routines/sqrt16.z80"
+#include "sqrt16.z80"
 
 sqrtHLIX:
 ;Input: HLIX

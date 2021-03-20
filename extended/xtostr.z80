@@ -5,7 +5,7 @@
 #include "routines/sla64.z80"
 #include "routines/add64.z80"
 #include "mul/xOP1mul10.z80"
-#include "mul/mul16.z80"
+#include "mul16.z80"
 #include "xmul.z80"
 #include "data.z80"
 #include "tables.z80"

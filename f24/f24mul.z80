@@ -1,6 +1,6 @@
 #ifndef included_f24mul
 #define included_f24mul
-#include "../extended/mul/mul16.z80"
+#include "mul16.z80"
 
 f24mul:
 ;AHL * CDE ==> AHL

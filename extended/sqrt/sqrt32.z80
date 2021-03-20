@@ -1,7 +1,7 @@
 #ifndef included_sqrt32
 #define included_sqrt32
-#include "sqrt/sqrtHLIX.z80"
-#include "mul/mul16.z80"
+#include "sqrtHLIX.z80"
+#include "mul16.z80"
 #include "div/div32_16.z80"
 
 

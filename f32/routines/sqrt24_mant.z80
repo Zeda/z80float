@@ -1,7 +1,7 @@
 #ifndef included_sqrt24_mant
 #define included_sqrt24_mant
 
-#include "../extended/sqrt/sqrtHLIX.z80"
+#include "sqrtHLIX.z80"
 
 sqrt24_mant:
 ;DEB.C is the 24-bit mantissa with C as any extra bits used for rounding.
