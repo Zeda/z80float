@@ -1,6 +1,6 @@
 #ifndef included_xrsub
 #define included_xrsub
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 #include "routines/mov.z80"
 #include "xadd.z80"
 xrsub:

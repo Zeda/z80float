@@ -1,6 +1,6 @@
 #ifndef included_TItox
 #define included_TItox
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 #include "strtox.z80"
 
 TItox:

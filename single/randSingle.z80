@@ -1,7 +1,7 @@
 #ifndef included_randSingle
 #define included_randSingle
-#include "routines/pushpop.z80"
-#include "routines/rand.z80"
+#include "pushpop.z80"
+#include "rand.z80"
 
 randSingle:
 ;Generates a pseudo-random number on [0,1) with uniform distribution.

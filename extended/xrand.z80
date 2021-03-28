@@ -1,7 +1,7 @@
 #ifndef included_xrand
 #define included_xrand
-#include "routines/pushpop.z80"
-#include "routines/rand.z80"
+#include "pushpop.z80"
+#include "rand.z80"
 #include "routines/mov.z80"
 #include "constantsx.z80"
 

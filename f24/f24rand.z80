@@ -1,6 +1,6 @@
 #ifndef included_f24rand
 #define included_f24rand
-#include "../extended/routines/rand.z80"
+#include "rand.z80"
 
 f24rand:
 ;Generates a pseudo-random number on [0,1) with uniform distribution.

@@ -1,6 +1,6 @@
 #ifndef included_f32mul2
 #define included_f32mul2
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 
 f32mul2:
 ;x*2 ==> z

@@ -1,6 +1,6 @@
 #ifndef included_xpow10
 #define included_xpow10
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 #include "constantsx.z80"
 #include "xmul.z80"
 #include "xpow2.z80"

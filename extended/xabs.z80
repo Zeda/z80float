@@ -1,6 +1,6 @@
 #ifndef included_xabs
 #define included_xabs
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 #include "routines/mov.z80"
 
 xabs:

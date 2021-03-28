@@ -1,6 +1,6 @@
 #ifndef included_f32mulpow2
 #define included_f32mulpow2
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 
 f32mulpow2:
   call pushpop

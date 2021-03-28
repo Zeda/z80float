@@ -1,6 +1,6 @@
 #ifndef included_f32cmp
 #define included_f32cmp
-#include "routines/pushpop.z80"
+#include "pushpop.z80"
 #include "f32sub.z80"
 
 f32cmp:
