@@ -1,7 +1,7 @@
 #ifndef included_f32mul
 #define included_f32mul
 #include "pushpop.z80"
-#include "routines/mul24.z80"
+#include "mul24_stack_based.z80"
 
 f32mul:
 ;x * y ==> z

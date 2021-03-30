@@ -1,7 +1,7 @@
 #ifndef included_xneg
 #define included_xneg
 #include "pushpop.z80"
-#include "routines/mov.z80"
+#include "mov.z80"
 xneg:
   call pushpop
   ld d,b

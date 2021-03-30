@@ -1,6 +1,6 @@
 #ifndef included_xOP1mul10
 #define included_xOP1mul10
-#include "routines/mov.z80"
+#include "mov.z80"
 #include "routines/add64.z80"
 xOP1mul10:
 ;Note! Does not check for special numbers! Does not check overflow!

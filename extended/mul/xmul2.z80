@@ -1,7 +1,7 @@
 #ifndef included_xmul2
 #define included_xmul2
 #include "pushpop.z80"
-#include "routines/mov.z80"
+#include "mov.z80"
 xmul2:
   call pushpop
   ld d,b
