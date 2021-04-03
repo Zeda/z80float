@@ -2,7 +2,7 @@
 #define included_f64tox
 
 #include "routines/rl64.z80"
-#include "routines/mov.z80"
+#include "mov.z80"
 #include "pushpop.z80"
 
 f64tox:
