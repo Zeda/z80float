@@ -2,16 +2,16 @@
 #define included_randinit
 
 randinit:
-  ld a,r
-  ld hl,seed0
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  xor (hl) \ ld (hl),a \ inc hl
-  or 97   ;no particular reason
-  or (hl) \ ld (hl),a
+; need to make sure seed1 is non-zero
+  ld hl,seed1
+  ld a,(hl)
+  inc hl
+  or (hl)
+  inc hl
+  or (hl)
+  inc hl
+  or (hl)
+  ret nz
+  dec (hl)
   ret
 #endif
