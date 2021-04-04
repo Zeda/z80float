@@ -37,7 +37,6 @@
 
 f32toa:
   call pushpop
-
   ld e,(hl)
   inc hl
   ld d,(hl)
@@ -124,7 +123,6 @@ f32toa_first_digit_loop:
   cp 10
   jr c,f32toa_first_digit_fixed
   inc d
-  inc b
   dec hl
   ld (hl),'1'
   inc hl
@@ -168,6 +166,11 @@ f32toa_round_start:
   sbc a,a
   ld d,a
   pop hl
+  ; check if rounding caused overflow; increment exponent if so
+  ld a,(hl)
+  cp '0'
+  jp z,formatstr
+  inc de
   jp formatstr
 
 
