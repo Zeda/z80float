@@ -66,7 +66,7 @@
 formatstr:
 ;Inputs:
 ;   HL points to the null-terminated string of digits
-;   DE iss the signed exponent.
+;   DE is the signed exponent.
 ;Outputs:
 ;   The string has leading and trailing zeros stripped, a decimal is placed
 ;   (if needed), and an exponent field is appended (if needed).
@@ -77,7 +77,6 @@ formatstr:
 ;   allocated for the string. At most MAX_FORMAT_LEN+10 bytes is needed,
 ;   assuming the exponent can be up to 5 digits long.
 ;
-
 ; Skip over the negative sign, if any
   ld a,(hl)
   cp TOK_NEG
@@ -174,16 +173,43 @@ formatstr_insert_decimal_loop:
 
 formatstr_neg_exp:
 ; Need to pad -DE 0s to the left
+  xor a
+  ld c,a
+  cpir
+  ld b,a
+  sub c
+  ld c,a
+  ;HL-1 is where to start reading bytes
+  ;HL-DE is where to start writing bytes
+  xor a
+  ld d,a
+  sub e     ; A is the number of 0s to write
+  ld e,a
+  ex de,hl
+  add hl,de
+  ex de,hl
+  dec hl
+  ; DE points to where to write the last byte
+  ; HL points to where to read it from
+  ; BC is the number of bytes to copy (it will be non-zero)
+  ; A is the number of zeros to insert
+  lddr
+  ;now from DE backwards, write A '0's
+  ex de,hl
+  ld b,a
+  ld (hl),'0'
+  dec hl
+  djnz $-3
+  ; finally, write a '.'
+  ld (hl),TOK_DECIMAL
   ret
 
 formatstr_pad_right:
-  ; append BC 0s
-  ; we jump here after a cpir, so we can check for `ret po`
-  ;if BC reached 0 at the same time, then we are good :)
-  ret po
+  ; append BC+1 0s
   dec hl
+  inc bc
 _:
-  ld (hl),a
+  ld (hl),'0'
   cpi
   jp pe,-_
   ld (hl),0
@@ -193,7 +219,8 @@ formatstr_eng:
 ; need to insert a decimal after the first digit
   inc hl
   call formatstr_insert_decimal
-  dec de
+  ld (hl),TOK_ENG
+  inc hl
   bit 7,d
   jr z,formatstr_exp_to_str
   ld (hl),TOK_NEG
@@ -205,25 +232,26 @@ formatstr_eng:
   sub d
   ld d,a
 formatstr_exp_to_str:
-  ld (hl),TOK_ENG
-  inc hl
   ex de,hl
-
   ld a,'0'-1
   ld bc,-10000
 _:
   inc a
   add hl,bc
   jr c,-_
+  cp '0'
+  jr z,$+4
   ld (de),a
   inc de
 
-  ld a,'0'-1
+  ld a,'9'+1
   ld bc,1000
 _:
-  inc a
+  dec a
   add hl,bc
   jr nc,-_
+  cp '0'
+  jr z,$+4
   ld (de),a
   inc de
 
@@ -233,18 +261,25 @@ _:
   inc a
   add hl,bc
   jr c,-_
+  cp '0'
+  jr z,$+4
   ld (de),a
   inc de
 
-  ld b,'0'-1
+  ld b,10
   ld a,l
 _:
-  inc b
-  adc a,10
+  add a,10
+  dec b
   jr nc,-_
   ex de,hl
+  jr z,formatstr_eng_last_digit
+  set 4,b
+  set 5,b
   ld (hl),b
   inc hl
+formatstr_eng_last_digit:
+  add a,'0'
   ld (hl),a
   inc hl
   ld (hl),0
