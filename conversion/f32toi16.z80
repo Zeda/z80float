@@ -1,0 +1,79 @@
+#ifndef included_f32toi16
+#define included_f32toi16
+
+f32toi16:
+;Inputs: HL points to an f32 float
+;Outputs: HL is the signed 16-bit integer part of the input (rounded down)
+;NaN ==> 0
+;+inf ==> 32767
+;-inf ==> -32768
+  push de
+  push bc
+  push af
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld a,(hl)
+  rlca
+  scf
+  rra
+  ld c,a
+  inc hl
+  ld a,(hl)
+  adc a,a
+
+; carry flag is sign, CDE is the significand, A is the exponent
+  push af   ; carry flag is a sign
+
+  call f32toi16_get_int
+
+  pop af    ; get the carry flag
+  ld a,h
+  jr nc,f32toi16_return
+  ; -HL-1
+  ld a,l
+  cpl
+  ld l,a
+  ld a,h
+  cpl
+  ld h,a
+f32toi16_return:
+  pop af
+  pop bc
+  pop de
+  ret
+
+f32toi16_get_int:
+  ld hl,32767
+  cp 142
+  ret nc
+  sub h   ;
+  ld hl,0
+  ret c
+  ld b,a
+
+  ; if the exponent is 128, return 0 if NaN, else inf
+  jp p,f32toi16_extract
+  ld a,l
+  or e
+  or d
+  ret nz
+  ld hl,32767
+  ret
+f32toi16_extract:
+  inc b
+  ld l,d
+  ld h,c
+  xor a
+  ld e,a
+
+  add hl,hl
+  rl e
+  rla
+  djnz $-4
+
+  ld h,a
+  ld l,e
+  ret
+#endif

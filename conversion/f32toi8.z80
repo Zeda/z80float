@@ -1,0 +1,64 @@
+#ifndef included_f32toi8
+#define included_f32toi8
+
+f32toi8:
+;Inputs: HL points to an f32 float
+;Outputs: A is the signed 8-bit integer part of the input (rounded down)
+;NaN ==> 0
+;+inf ==> 127
+;-inf ==> -128
+  push hl
+  push de
+  push bc
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld a,(hl)
+  rlca
+  scf
+  rra
+  ld c,a
+  inc hl
+  ld a,(hl)
+  adc a,a
+
+; carry flag is sign, CDE is the significand, A is the exponent
+  push af   ; carry flag is a sign
+
+  call f32toi8_get_int
+
+  pop af    ; get the carry flag
+  ; if carry is set, return -H-1, else return H
+  sbc a,a
+  xor h
+f32toi8_return:
+  pop bc
+  pop de
+  pop hl
+  ret
+
+f32toi8_get_int:
+  ld h,127
+  cp 134
+  ret nc
+  sub h
+  ld h,0
+  ret c
+  ld l,c    ; upper 8 bits of the significand
+  ld b,a
+
+  ; if the exponent is 128, return inf
+  jp p,f32toi8_extract
+  ld a,l
+  or e
+  or d
+  ret nz
+  ld h,127
+  ret
+f32toi8_extract:
+  inc b
+  add hl,hl
+  djnz $-1
+  ret
+#endif
