@@ -34,40 +34,58 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 
 ```
 
-## Testing Needed
+## Routines
 (Note, I haven't tested very small and very large numbers.)
-* [x] f32mul2
-* [ ] f32cmp
-* [x] f32abs
-* [x] f32neg
-* [x] f32rand
-* [x] f32add
-* [x] f32sub
-* [x] f32rsub
-* [x] f32sqrt
-* [x] f32mul
-* [x] f32div
-* [x] f32amean
-* [x] f32geomean
-* [x] f32bgi
-* [x] f32acos
-* [x] f32asin
-* [x] f32atan
-* [x] f32log
-* [x] f32log2
-* [x] f32log10
-* [x] f32logy
-* [x] f32acosh
-* [x] f32asinh
-* [x] f32atanh
-* [x] f32mod1
-* [x] f32cos
-* [x] f32sin
-* [x] f32tan
-* [x] f32pow2
-* [x] f32exp
-* [x] f32pow10
-* [x] f32pow
-* [x] f32cosh
-* [x] f32sinh
-* [x] f32tanh
+
+| tested |   routine   | Description |
+|--------|-------------|-------------|
+|  yes   | f32abs      | \|x\| - absolute value of x
+|  yes   | f32acos     | arccosine(x)
+|  yes   | f32acosh    | hyperbolic arccosine(x)
+|  yes   | f32add      | x+y
+|  yes   | f32amean    | (x+y)/2 - arithmetic mean
+|  yes   | f32asin     | arcsine(x)
+|  yes   | f32asinh    | hyperbolic arcsine(x)
+|  yes   | f32atan     | arctangent(x)
+|  yes   | f32atanh    | hyperbolic arctangent(x)
+|  yes   | f32bgi      | 1/BG(x,y) - BG(x,y) is the Borchardt-Gauss Mean
+|        | f32cmp      | compares x to y - returns Z and C flag
+|  yes   | f32cos      | cosine(x)
+|  yes   | f32cosh     | hyperbolic cosine(x)
+|  yes   | f32div      | x/y
+|  yes   | f32exp      | e^x
+|  yes   | f32geomean  | sqrt(x*y) - geometric mean
+|  yes   | f32log      | log(x) - natural logarithm
+|  yes   | f32log10    | log10(x) - log base 10
+|  yes   | f32log2     | log2(x) - log base 2
+|  yes   | f32logy     | log_y(x) - log base y
+|  yes   | f32mod1     | x % 1
+|  yes   | f32mul      | x*y
+|  yes   | f32mul2     | x*2
+|  yes   | f32neg      | -x
+|  yes   | f32pow      | x^y
+|  yes   | f32pow10    | 10^x
+|  yes   | f32pow2     | 2^x
+|  yes   | f32rand     | rand - uniform random variable selected from [0,1)
+|  yes   | f32randnorm | randnorm - normal random variable centered about 0 with standard deviation of 1.
+|  yes   | f32rsub     | -x+y
+|  yes   | f32sin      | sine(x)
+|  yes   | f32sinh     | hyperbolic sine(x)
+|  yes   | f32sqrt     | sqrt(x) - square root
+|  yes   | f32sub      | x-y
+|  yes   | f32tan      | tangent(x)
+|        | f32tanh     | hyperbolic tangent(x) - seems to be broken at tanh(0)
+
+## Useful Subroutines
+These are in the [/f32/routines](/f32/routines) folder:
+
+* f32_muli8
+  * multiply an f32 float by a signed 8-bit integer
+  * this is faster than multiplying two floats
+* f32_mulu8_divpow2
+  * multiply an f32 float by an unsigned 8-bit integer, and divide by a power of 2
+  * this is faster than multiplying two floats.
+* f32mulpow2
+  * multiply an f32 float by a power of 2
+  * Significantly faster than multiplication. This just needs to do an 8-bit add
+    along with edge-case testing (and special numbers).
