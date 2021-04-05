@@ -37,7 +37,7 @@ f32randnorm2:
   inc bc
   inc bc
   inc bc
-  call f32mul
+  call f32randnorm_mul_rand_sign
   pop bc
   pop de
   pop hl

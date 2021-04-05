@@ -26,15 +26,9 @@ f32randnorm_gen_xy:
 ; We need to generate two random numbers, X and Y
   ld bc,f32randnorm_x
   call f32rand
-  ; multiply by 2 and subtract 1
+; square our number, storing in T for now
   ld h,b
   ld l,c
-  call f32mul2
-  ld de,f32_const_1
-  call f32sub
-; square our number, storing in T for now
-  ; ld h,b
-  ; ld l,c
   ld d,b
   ld e,c
   ld bc,f32randnorm_t
@@ -42,15 +36,9 @@ f32randnorm_gen_xy:
 
   ld bc,f32randnorm_y
   call f32rand
-  ; multiply by 2 and subtract 1
+; square it, storing to S for now
   ld h,b
   ld l,c
-  call f32mul2
-  ld de,f32_const_1
-  call f32sub
-; square it, storing to S for now
-  ; ld h,b
-  ; ld l,c
   ld d,b
   ld e,c
   ld bc,f32randnorm_s
@@ -89,8 +77,21 @@ f32randnorm_gen_xy:
 ; square root
   call f32sqrt
 
-; finally, multiply X (and/or Y) by T
+; multiply X (and/or Y) by T
   ld de,f32randnorm_x
   pop bc
-  jp f32mul
+f32randnorm_mul_rand_sign:
+  call f32mul
+; Finally, assign a random sign to the output
+; Assign a random sign to X and Y
+  push bc
+  call rand
+  sla h   ; random bit
+  pop hl
+  ret nc
+  inc hl
+  inc hl
+  inc hl
+  set 7,(hl)
+  ret
 #endif
