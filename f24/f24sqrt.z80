@@ -1,7 +1,7 @@
 #ifndef included_f24sqrt
 #define included_f24sqrt
 
-#include "../extended/sqrt/sqrt16.z80"
+#include "sqrt16.z80"
 
 f24sqrt:
 ;sqrt(AHL) ==> AHL
