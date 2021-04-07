@@ -1,7 +1,95 @@
 #ifndef included_f24toa
 #define included_f24toa
 
+; Lot's of #define statements
+; This first batch is to make sure char_NEG, TOK_NEG, char_DEC, and TOK_DECIMAL
+; are defined. This is because I accidentally used two different standards early
+; on, and then I decided to share common routines. Let this be a lesson, because
+; now I have to do convoluted trickery for compatibility -__-
+
+#ifndef char_NEG
+#ifdef TOK_NEG
+#define char_NEG TOK_NEG
+#else
+#define char_NEG '-'
+#endif
+#endif
+
+#ifndef char_DEC
+#ifdef TOK_DECIMAL
+#define char_DEC TOK_DECIMAL
+#else
+#define char_DEC '.'
+#endif
+#endif
+
+#ifndef TOK_NEG
+#ifdef char_NEG
+#define TOK_NEG char_NEG
+#else
+#define TOK_NEG '-'
+#endif
+#endif
+
+#ifndef TOK_DECIMAL
+#ifdef char_DECIMAL
+#define TOK_DECIMAL char_DEC
+#else
+#define TOK_DECIMAL '.'
+#endif
+#endif
+
+
+; Now we'll set some defaults
+
+
+; Define the absolute maximum number of digits in the result string.
+; If FORMAT_LEN is bigger than this value, then it will be reduced.
+#ifndef MAX_FORMAT_LEN
+#define MAX_FORMAT_LEN 7
+#endif
+
+; Define this to use an external reference to get the number of digits used
+;#define EXTERNAL_FORMAT_LEN <pointer>
+;
+; For example, TI-OS has a byte at fmtDigits:
+;#define EXTERNAL_FORMAT_LEN fmtDigits
+
+; This is the max number of digits in the output.
+; If EXTERNAL_FORMAT_LEN is used and it is 0, then this will be used.
+#ifndef FORMAT_LEN
+#define FORMAT_LEN 5
+#endif
+
+; Define this to use an external reference for the max exponent before switching
+; to enginieering mode.
+;#define EXTERNAL_FORMAT_MAX_ENGINEERING  <pointer>
+
+; Define the max exponent to use before switching to engineering format
+; If none is defined, this uses FORMAT_LEN.
+; If EXTERNAL_FORMAT_MAX_ENGINEERING is used and is 0 or larger than FORMAT_LEN,
+; then this will be used.
+;#define FORMAT_MAX_ENGINEERING
+
+
+; Define this to use an external reference for the min exponent before switching
+; to enginieering mode.
+;#define EXTERNAL_FORMAT_MIN_ENGINEERING  <pointer>
+
+; Define the largest negative exponent to use engineering format
+; If EXTERNAL_FORMAT_MIN_ENGINEERING is used and is 0 or larger than FORMAT_LEN,
+; then this will be used.
+#ifndef FORMAT_MIN_ENGINEERING
+#define FORMAT_MIN_ENGINEERING  -3  ; causes exponent of -3 to be enginierring
+#endif
+
+
+
+; Finally, includes
 #include "../f24/f24mul.z80"
+#include "../f24/f24pow10_LUT.z80"
+#include "formatstr.z80"
+
 
 f24toa:
 ;converts a 24-bit float to a string
@@ -15,69 +103,11 @@ f24toa:
 ;Notes:
 ;   Uses up to 12 bytes to store the string
 
-  call f4toa_formstr
+  ld b,a  ; save the exponent
 
-strip_trailing_zeros:
-;strip trailing zeros
-  push hl
-
-;skip past the sign if it is there
-  ld a,(hl)
-  cp char_NEG
-  jr nz,$+4
-  inc hl
-
-;skip all the leading numbers up to the decimal
-_:
-  ld a,(hl)
-  inc hl
-  sub '0'
-  cp 10
-  jr c,-_
-
-;make sure we have a decimal
-  cp char_DEC-'0'
-  jr nz,stripped_zeros
-
-;keep this location as the last location before trailing 0s
-  ld d,h
-  ld e,l
-  dec de
-  .db 1
-
-skip_trailling_zeros_loop:
-;keep this location as the last location before trailing 0s
-  ld d,h
-  ld e,l
-_:
-  ld a,(hl)
-  inc hl
-  sub '0'
-  jr z,-_
-  cp 10
-  jr c,skip_trailling_zeros_loop
-;need to copy up-to and including the ending 00 from HL-1 to DE
-  dec hl
-_:
-  ld a,(hl)
-  ld (de),a
-  inc hl
-  inc de
-  or a
-  jr nz,-_
-
-stripped_zeros:
-  pop hl
-  ret
-
-f4toa_formstr:
-;save the exponent
-  ld b,a
-
-;Check if the input is 0
+  ; check if the input is 0
   add a,a
   jr nz,+_
-  ;write a negative if needed
   ex de,hl
   jr nc,$+5
   ld (hl),char_NEG
@@ -92,6 +122,7 @@ f4toa_formstr:
 _:
 
 ;check if the input is inf or NaN
+  push de
   cp $FE
   jr nz,f24toa_finite
   ld a,h
@@ -103,7 +134,6 @@ _:
   jr nz,+_
   inc hl
 _:
-  push de
   ldi
   ldi
   ldi
@@ -113,8 +143,9 @@ _:
   pop hl
   ret
 f24toa_finite:
-;save the return pointer for the string
-  push de
+
+;BHL is the float and it is not a special number
+;save the exponent
 
 ;write a negative sign if needed
   ld a,b
@@ -207,12 +238,20 @@ _:
 
 
   cp 10
-  jr c,+_
+  jr nc,+_
+  add a,'0'
+  ld (de),a
+  inc de
+;get a second digit
+  push bc
+  call f24toa_sub
+  jr f24toa_write_digits
+_:
   inc b
 ;save the power-of-10 exponent
   push bc
 
-;for rounding porpoises, add another 30 to HL
+;for rounding purposes, add another 30 to HL
   ld bc,30
   add hl,bc
   adc a,b
@@ -226,152 +265,32 @@ _:
   .db $01
   add a,10
   inc hl
-;write a '.'
-  ld (hl),char_DEC
-  inc hl
-  add a,'0'
-  ld (hl),a
-  inc hl
   ex de,hl
-
-  jr f24toa_DEC_written
-_:
-
-;A is the next digit
   add a,'0'
   ld (de),a
   inc de
-
-;write a '.'
-  ld a,char_DEC
-  ld (de),a
-  inc de
-
-;save the power-of-10 exponent
-  push bc
-
-;get a second digit
-  call f24toa_sub
-
-f24toa_DEC_written:
-
+f24toa_write_digits:
 ;get the next three digits
   call f24toa_sub
   call f24toa_sub
   call f24toa_sub
+  xor a
+  ld (de),a
 
 ; need to determine what to do with the power-of-10 exponent
   pop af
 
-; pop the pointer to the start of the string
-  pop hl
-  ex de,hl
-
-;if the exponent is on [-3,5], then just move the decimal (and prepend with 0s)
-;accordingly.
-  cp 16
-  jr c,f24toa_writeexp
-  cp 19
-  jr z,f24toa_finished
-  jr c,f24toa_insertzeros
-  cp 24
-  jr c,f24toa_movedec
-
-
-f24toa_writeexp:
-;Otherwise, write out the exponent.
+  pop hl  ; pointer to the string
+  push hl
   sub 19
-;  jr z,f24toa_finished
-  ld (hl),char_ENG
-  inc hl
-  jr nc,+_
-  ld (hl),char_NEG
-  inc hl
-  neg
-_:
-  ;A is on [0,19]
-  cp 10
-  jr c,+_
-  sub 10
-  ld (hl),'1'
-  inc hl
-_:
-  add a,'0'
-  ld (hl),a
-  inc hl
-
-f24toa_finished:
-  xor a
-  ld (hl),a
-  ex de,hl
-  ret
-
-f24toa_movedec:
-;need to move the decimal down by A-19 places
-  sub 19
-  ld (hl),0
-  ld bc,5
-  sbc hl,bc   ;HL points to the decimal
-  ld c,a
-  push de
-  ld d,h
-  ld e,l
-  inc hl
-  ld a,(de)
-  ldir
-  ld (de),a
-  pop hl
-  ret
-
-f24toa_insertzeros:
-;need to insert 18-A zeros into the number
-  sub 18
-  jr nz,+_
-  ld (hl),a
-  ld h,d
-  ld l,e
-  inc de
-  ld a,(de)
-  ldd
-  ex de,hl
-  ld (hl),a
-  ret
-_:
-
-;move 5 bytes from HL-1 to HL-A+1
-  ex de,hl
-  ld c,a
-  ld a,(hl)
-  inc hl
-  ld (hl),a
-  dec hl
-  ld (hl),char_DEC
-  ld h,d
-  ld l,e
-  dec hl
-  xor a
-  sub c
-  push af
-  add a,e
   ld e,a
-  jr nc,$+3
-  inc d
-  xor a
-  ld (de),a
-  dec de
-  ld bc,5
-  lddr
-  pop bc
-;B is the number of zeros to write at DE
-  ld a,'0'
-_:
-  ld (de),a
-  dec de
-  djnz -_
-  ex de,hl
+  add a,a
+  sbc a,a
+  ld d,a
+  call formatstr
+  pop hl
   ret
 ;
-
 f24toa_sub:
 ;now need to multiply 0.HL by 10 and add '0'
   xor a
@@ -384,45 +303,4 @@ f24toa_sub:
   ld (de),a
   inc de
   ret
-f24pow10_LUT:
-.db $8E,$15,$7E  ;1e19
-.db $17,$BC,$7A  ;1e18
-.db $45,$63,$77  ;1e17
-.db $38,$1C,$74  ;1e16
-.db $BF,$C6,$70  ;1e15
-.db $CC,$6B,$6D  ;1e14
-.db $0A,$23,$6A  ;1e13
-.db $A9,$D1,$66  ;1e12
-.db $87,$74,$63  ;1e11
-.db $06,$2A,$60  ;1e10
-.db $D6,$DC,$5C  ;1e9
-.db $78,$7D,$59  ;1e8
-.db $2D,$31,$56  ;1e7
-.db $48,$E8,$52  ;1e6
-.db $A0,$86,$4F  ;1e5
-.db $80,$38,$4C  ;1e4
-.db $00,$F4,$48  ;1e3
-.db $00,$90,$45  ;1e2
-f24const_10:
-.db $00,$40,$42  ;1e1
-.db $00,$00,$3F  ;1e0
-.db $9A,$99,$3B  ;1e-1
-.db $AE,$47,$38  ;1e-2
-.db $25,$06,$35  ;1e-3
-.db $6E,$A3,$31  ;1e-4
-.db $8B,$4F,$2E  ;1e-5
-.db $6F,$0C,$2B  ;1e-6
-.db $7F,$AD,$27  ;1e-7
-.db $99,$57,$24  ;1e-8
-.db $E1,$12,$21  ;1e-9
-.db $CE,$B7,$1D  ;1e-10
-.db $D8,$5F,$1A  ;1e-11
-.db $7A,$19,$17  ;1e-12
-.db $5C,$C2,$13  ;1e-13
-.db $4A,$68,$10  ;1e-14
-.db $3B,$20,$0D  ;1e-15
-.db $2B,$CD,$09  ;1e-16
-.db $EF,$70,$06  ;1e-17
-.db $26,$27,$03  ;1e-18
-
 #endif
