@@ -79,13 +79,13 @@ NaN     -1111111 1xxxxxxx xxxxxxxx xxxxxxxx ;as long as at least 1 'x' is non-ze
 ## Useful Subroutines
 These are in the [/f32/routines](/f32/routines) folder:
 
-* f32_muli8
-  * multiply an f32 float by a signed 8-bit integer
+* **f32_muli8**
+  * multiply an f32 float by a ***signed*** 8-bit integer
   * this is faster than multiplying two floats
-* f32_mulu8_divpow2
-  * multiply an f32 float by an unsigned 8-bit integer, and divide by a power of 2
+* **f32_mulu8_divpow2**
+  * multiply an f32 float by an ***unsigned*** 8-bit integer, and divide by a power of 2
   * this is faster than multiplying two floats.
-* f32mulpow2
+* **f32mulpow2**
   * multiply an f32 float by a power of 2
   * Significantly faster than multiplication. This just needs to do an 8-bit add
     along with edge-case testing (and special numbers).
