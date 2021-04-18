@@ -88,12 +88,13 @@ atof24_loop_1:
   cp TOK_DECIMAL
   jr nz,$+8
   dec c
-  jp pe,atof24_skip_5
+  jp pe,atof24_skip_7
   jr atof24_skip_2  ; else C was already FF, then a decimal was already encountered
 
   sub '0'
   cp 10
   jr nc,atof24_skip_6
+atof24_skip_7:
 ; carry flag is set
   inc hl
   ld a,b
@@ -107,9 +108,9 @@ atof24_loop_1:
 atof24_skip_6:
   ld a,(hl)
 ;Now check for engineering `E` to modify the exponent
-atof24_skip_2:
   cp TOK_ENG
   call z,atof24_str_eng_exp
+atof24_skip_2:
   ex de,hl  ; DE points to the end of the string
 
 ;Gotta multiply the number at (scrap) by 2^17
