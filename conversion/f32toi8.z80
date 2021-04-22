@@ -4,9 +4,11 @@
 f32toi8:
 ;Inputs: HL points to an f32 float
 ;Outputs: A is the signed 8-bit integer part of the input (rounded down)
-;NaN ==> 0
-;+inf ==> 127
-;-inf ==> -128
+;Special cases:
+;   NaN              ==> 0
+;   greater than 127 ==> 127
+;   less than -128   ==> -128
+
   push hl
   push de
   push bc

@@ -4,9 +4,10 @@
 f32toi16:
 ;Inputs: HL points to an f32 float
 ;Outputs: HL is the signed 16-bit integer part of the input (rounded down)
-;NaN ==> 0
-;+inf ==> 32767
-;-inf ==> -32768
+;Special cases:
+;   NaN              ==> 0
+;   greater than 127 ==> 32767
+;   less than -128   ==> -32768
   push de
   push bc
   push af
