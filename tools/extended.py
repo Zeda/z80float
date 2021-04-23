@@ -33,7 +33,7 @@ def tofloat(x,n=8,bias=16384):
         x/=2
     if exp>16383:
         return [255]*n+[0,sign<<7] #infinity
-    if exp<-127:
+    if exp<-16383:
         return [0]*(n+2)    #zero
     l=[]
     x*=128
