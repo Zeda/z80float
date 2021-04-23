@@ -7,8 +7,8 @@
 #include "mul/xOP1mul10.z80"
 #include "mul16.z80"
 #include "xmul.z80"
-#include "data.z80"
 #include "tables.z80"
+#include "common_str.z80"
 ;fmtDigits = 97B0h
 ;#define EXTERNAL_FORMAT_LEN    ;Uses an external reference to get the format length
 ;#define EXTERNAL_FORMAT_LEN_LOC fmtDigits    ;Use for TI-OS

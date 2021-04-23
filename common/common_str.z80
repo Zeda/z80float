@@ -9,4 +9,6 @@ str_inf:
 s_NaN:
 str_NaN:
   .db "NaN",0
+str_Zero:
+  .db "0", 0
 #endif
