@@ -12,21 +12,25 @@ f16tof24:
   cp %01111100
   jr z,f16tof24_inf_nan
 
+  ; subtract 15 and add 63 to the exponent, net +48
 ;it is not a special value
-  xor a
-  add hl,hl \ rla   ;A = 0000000s
-  rla               ;A = 000000s0
-  rla               ;A = 00000s00
-  add hl,hl \ rla   ;A = 0000s00e
-  add hl,hl \ rla   ;A = 000s00ee
-  add hl,hl \ rla   ;A = 00s00eee
-  add hl,hl \ rla   ;A = 0s00eeee
-  add hl,hl \ rla   ;A = s00eeeee
-
-;finally, need to subtract 15 from A and add 63
+  add hl,hl
+  rla        ;A = xxxxxxxs
+  add a,a    ;A = xxxxxxs0
+  add a,a    ;A = xxxxxs00
+  add hl,hl
+  rla        ;A = xxxxs00e
+  add hl,hl
+  rla        ;A = xxxs00ee
+  add hl,hl
+  rla        ;A = xxs00eee
+  add hl,hl
+  rla        ;A = xs00eeee
+  add hl,hl
+  rla        ;A = s00eeeee
+  ; Finally, subtract 15 and add 63 to the exponent
   add a,48
   ret
-
 
 f16tof24_zero:
   sla h
@@ -34,10 +38,12 @@ f16tof24_zero:
   ret
 
 f16tof24_inf_NaN:
-  xor h
-  ld h,a
-  res 7,h
+  ld a,h
+  and 3
+  or l
+  ld l,a
+  ld a,h
   or $7F
+  ld h,l
   ret
-
 #endif
