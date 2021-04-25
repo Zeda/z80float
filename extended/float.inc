@@ -1,3 +1,5 @@
+#ifndef included_x_float.inc
+#define included_x_float.inc
 ; Equates
 xOP1 = 8000h
 xOP2 = xOP1+10
@@ -33,3 +35,5 @@ xOP5 = xOP1+40
   inc hl
 #endif
 #endmacro
+
+#endif
