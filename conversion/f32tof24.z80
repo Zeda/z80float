@@ -34,6 +34,15 @@ f32tof24:
   rl c
   rra
   ex de,hl
+
+; round
+  bit 6,c
+  ret z
+  inc l
+  ret z
+  inc h
+  ret z
+  inc a
   ret
 
 f32tof24_return_infnan:
@@ -56,9 +65,10 @@ f32tof24_return_inf:
 
 f32tof24_return_0:
   xor a
+  rl c
 f32tof24_return_0_noA:
-  ld h,a  ; Not necessary, but nice
-  ld l,a  ;
+  ld h,a
+  ld l,a
   rra     ; shift the sign back in
   ret
 #endif
