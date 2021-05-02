@@ -12,9 +12,10 @@ f32toi8:
   push hl
   push de
   push bc
-  ld e,(hl)
+  ld a,(hl)
   inc hl
-  ld d,(hl)
+  or (hl)
+  ld d,a    ; save the OR of the bottom two bytes of the significand
   inc hl
   ld a,(hl)
   rlca
@@ -25,15 +26,12 @@ f32toi8:
   ld a,(hl)
   adc a,a
 
-; carry flag is sign, CDE is the significand, A is the exponent
-  push af   ; carry flag is a sign
+  rr e    ; save the sign
+; E has the sign, C is the portion of the significand that matters,
+; A is the exponent
 
   call f32toi8_get_int
 
-  pop af    ; get the carry flag
-  ; if carry is set, return -H-1, else return H
-  sbc a,a
-  xor h
 f32toi8_return:
   pop bc
   pop de
@@ -41,14 +39,11 @@ f32toi8_return:
   ret
 
 f32toi8_get_int:
-  ld h,127
   cp 134
-  ret nc
-  sub h
+  jr nc,f32toi8_return_inf
+  sub 127
   ld h,0
   ret c
-  ld l,c    ; upper 8 bits of the significand
-  ld b,a
 
   ; if the exponent is 128, return inf
   jp p,f32toi8_extract
@@ -56,11 +51,26 @@ f32toi8_get_int:
   or e
   or d
   ret nz
+f32toi8_return_inf:
   ld h,127
+  rl e
+  ret nc
+  inc h
   ret
+
 f32toi8_extract:
+  ld l,c    ; upper 8 bits of the significand, H is 0
+  ld b,a
   inc b
   add hl,hl
   djnz $-1
+  rl e
+  ret nc
+  ld a,l
+  or d
+  add a,255
+  sbc a,a
+  sub h
+  ld h,a
   ret
 #endif

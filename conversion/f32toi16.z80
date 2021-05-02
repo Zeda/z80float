@@ -11,34 +11,21 @@ f32toi16:
   push de
   push bc
   push af
-  ld e,(hl)
+
+  ld c,(hl)
   inc hl
-  ld d,(hl)
+  ld e,(hl)
   inc hl
   ld a,(hl)
   rlca
   scf
   rra
-  ld c,a
+  ld d,a
   inc hl
   ld a,(hl)
   adc a,a
-
-; carry flag is sign, CDE is the significand, A is the exponent
-  push af   ; carry flag is a sign
-
+; carry flag is sign, DEC is the significand, A is the exponent
   call f32toi16_get_int
-
-  pop af    ; get the carry flag
-  ld a,h
-  jr nc,f32toi16_return
-  ; -HL-1
-  ld a,l
-  cpl
-  ld l,a
-  ld a,h
-  cpl
-  ld h,a
 f32toi16_return:
   pop af
   pop bc
@@ -46,35 +33,69 @@ f32toi16_return:
   ret
 
 f32toi16_get_int:
-  ld hl,32767
+  rl b    ; save the sign
   cp 142
-  ret nc
-  sub h   ;
+  jr nc,f32toi16_return_early
+  sub 127
   ld hl,0
   ret c
-  ld b,a
 
   ; if the exponent is 128, return 0 if NaN, else inf
   jp p,f32toi16_extract
-  ld a,l
+  ld a,c
   or e
   or d
   ret nz
+f32toi16_return_early:
   ld hl,32767
+  rr b
+  ret nc
+  inc hl
   ret
+
 f32toi16_extract:
+  ex de,hl  ; significand is in HLC now, but we don't need to track C
+  ;DE is 0
+  cp 7
+  jr c,$+7
+  ;shift up by 8
+  sub 8
+  ld e,h
+  ld h,l
+  ld l,d    ; 0
+
+  ld d,b    ; save sign
+  ld b,a
   inc b
-  ld l,d
-  ld h,c
   xor a
-  ld e,a
+  ;AE.HLC
 
   add hl,hl
   rl e
   rla
   djnz $-4
 
+  ld b,d    ; save sign again
+  ld d,a
+  ex de,hl
+  ; HL is the result, DEC has any fractional bits
+
+  rrc b   ; if carry is reset, then we are done
+  ret nc
+  ; otherwise the number is negative, so if the fractional part is non-zero,
+  ; need to round down
+
+  xor a
+  sub l
+  ld l,a
+  sbc a,a
+  sub h
   ld h,a
-  ld l,e
+
+  ld a,c
+  or d
+  or e
+  ret z
+  dec hl
   ret
 #endif
