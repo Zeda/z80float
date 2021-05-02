@@ -1,5 +1,6 @@
 #ifndef included_u16tof32
 #define included_u16tof32
+#include "pushpop.z80"
 
 u16tof32:
 ;Inputs:
