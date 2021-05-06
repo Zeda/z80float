@@ -38,32 +38,46 @@ f32toi8_return:
   pop hl
   ret
 
-f32toi8_get_int:
-  cp 134
-  jr nc,f32toi8_return_inf
-  sub 127
-  ld h,0
-  ret c
-
-  ; if the exponent is 128, return inf
-  jp p,f32toi8_extract
-  ld a,l
-  or e
-  or d
-  ret nz
-f32toi8_return_inf:
-  ld h,127
+f32toi8_zero_ish:
+  xor a
   rl e
   ret nc
-  inc h
+  ld a,c
+  add a,a
+  or d
+  add a,255
+  sbc a,a
   ret
 
-f32toi8_extract:
+f32toi8_infnan:
+  ; if the significand is non-zero, return NaN
+  ld a,c
+  add a,a
+  or d
+  sub 1
+  sbc a,a
+  ret z
+f32toi8_inf:
+  ld a,127
+  rl e
+  adc a,0
+  ret
+
+f32toi8_get_int:
+  inc a
+  jr z,f32toi8_infnan
+  jp p,f32toi8_zero_ish
+  sub 128
+  cp 7
+  jr nc,f32toi8_inf
+
+  ld h,0
   ld l,c    ; upper 8 bits of the significand, H is 0
   ld b,a
   inc b
   add hl,hl
   djnz $-1
+  ld a,h
   rl e
   ret nc
   ld a,l
