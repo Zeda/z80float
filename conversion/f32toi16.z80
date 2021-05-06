@@ -32,28 +32,40 @@ f32toi16_return:
   pop de
   ret
 
-f32toi16_get_int:
-  rl b    ; save the sign
-  cp 142
-  jr nc,f32toi16_return_early
-  sub 127
-  ld hl,0
-  ret c
-
+f32toi16_infnan:
   ; if the exponent is 128, return 0 if NaN, else inf
-  jp p,f32toi16_extract
-  ld a,c
+  ld a,d
+  add a,a
   or e
-  or d
+  or c
   ret nz
-f32toi16_return_early:
+f32toi16_inf:
   ld hl,32767
   rr b
   ret nc
   inc hl
   ret
 
-f32toi16_extract:
+f32toi16_zero_ish:
+  rr b
+  ret nc
+  ld a,d
+  add a,a
+  or e
+  or c
+  ret z
+  dec hl
+  ret
+
+f32toi16_get_int:
+  rl b    ; save the sign
+  ld hl,0
+  inc a
+  jr z,f32toi16_infnan
+  jp p,f32toi16_zero_ish
+  sub 128
+  cp 15
+  jr nc,f32toi16_inf
   ex de,hl  ; significand is in HLC now, but we don't need to track C
   ;DE is 0
   cp 7
@@ -66,10 +78,10 @@ f32toi16_extract:
 
   ld d,b    ; save sign
   ld b,a
-  inc b
   xor a
   ;AE.HLC
-
+  inc b
+  jr z,$+8
   add hl,hl
   rl e
   rla
